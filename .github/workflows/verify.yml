@@ -1,4 +1,4 @@
-name: Verify handoff and V2 baseline
+name: Verify TensorWeave baselines and reconstruction
 on: [push, pull_request]
 jobs:
   verify:
@@ -11,3 +11,5 @@ jobs:
       - run: python VERIFY_REPOSITORY.py
       - run: python -m pip install -e './v2_baseline[test]'
       - run: pytest -q v2_baseline/tests
+      - run: python -m pip install -e './v3[test]'
+      - run: pytest -q -p no:cacheprovider v3/tests
