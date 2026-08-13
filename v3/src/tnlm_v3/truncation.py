@@ -19,6 +19,7 @@ import sys
 
 import torch
 from torch import Tensor
+from torch import nn
 
 from .binding import RoutedBindingModel
 from .operators import ScaleSharedCPMerge
@@ -221,6 +222,8 @@ def _checked_merge(model: RoutedBindingModel) -> ScaleSharedCPMerge:
 def _validate_model_architecture(model: RoutedBindingModel) -> None:
     """Reject live-module metadata that disagrees with the hashed config."""
 
+    if type(model) is not RoutedBindingModel:
+        raise TypeError("model must be exactly RoutedBindingModel")
     config = model.config
     task = config.task
     if (
@@ -256,6 +259,113 @@ def _validate_model_architecture(model: RoutedBindingModel) -> None:
         or merge.scale_feature_dim != config.scale_feature_dim
     ):
         raise ValueError("live merge architecture does not match its configuration")
+    parameter_dtypes = {parameter.dtype for parameter in model.parameters()}
+    if len(parameter_dtypes) != 1 or next(iter(parameter_dtypes)) not in (
+        torch.float32,
+        torch.float64,
+    ):
+        raise ValueError(
+            "model parameters must share one executable float32 or float64 dtype"
+        )
+    parameter_devices = {parameter.device for parameter in model.parameters()}
+    if len(parameter_devices) != 1:
+        raise ValueError("model parameters must share one executable device")
+    parameter_device = next(iter(parameter_devices))
+    if any(buffer.device != parameter_device for buffer in model.buffers()):
+        raise ValueError("model buffers must share the parameter device")
+    for name, parameter in model.named_parameters():
+        if bool(getattr(parameter, "_backward_hooks", None)) or bool(
+            getattr(parameter, "_post_accumulate_grad_hooks", None)
+        ):
+            raise ValueError(
+                f"parameter gradient hooks are unsupported at {name!r}"
+            )
+    try:
+        with torch.device("meta"):
+            schema = RoutedBindingModel(config)
+    except (RuntimeError, TypeError, ValueError, OverflowError) as error:
+        raise ValueError("model configuration cannot reconstruct its architecture") from error
+    actual_modules = list(model.named_modules(remove_duplicate=False))
+    expected_modules = list(schema.named_modules(remove_duplicate=False))
+    if [name for name, _ in actual_modules] != [
+        name for name, _ in expected_modules
+    ]:
+        raise ValueError("live module topology does not match its configuration")
+    for (name, actual), (_, expected) in zip(
+        actual_modules, expected_modules, strict=True
+    ):
+        if type(actual) is not type(expected):
+            raise ValueError(f"live module type changed at {name!r}")
+        if isinstance(actual, nn.LayerNorm) and (
+            actual.normalized_shape != expected.normalized_shape
+            or actual.eps != expected.eps
+            or actual.elementwise_affine != expected.elementwise_affine
+        ):
+            raise ValueError(f"live LayerNorm metadata changed at {name!r}")
+        if isinstance(actual, nn.Embedding) and (
+            actual.num_embeddings != expected.num_embeddings
+            or actual.embedding_dim != expected.embedding_dim
+            or actual.padding_idx != expected.padding_idx
+            or actual.max_norm != expected.max_norm
+            or actual.norm_type != expected.norm_type
+            or actual.scale_grad_by_freq != expected.scale_grad_by_freq
+            or actual.sparse != expected.sparse
+        ):
+            raise ValueError(f"live Embedding metadata changed at {name!r}")
+        if isinstance(actual, nn.Linear) and (
+            actual.in_features != expected.in_features
+            or actual.out_features != expected.out_features
+            or (actual.bias is None) != (expected.bias is None)
+        ):
+            raise ValueError(f"live Linear metadata changed at {name!r}")
+        if isinstance(actual, nn.GELU) and actual.approximate != expected.approximate:
+            raise ValueError(f"live GELU metadata changed at {name!r}")
+        hook_fields = (
+            "_backward_hooks",
+            "_backward_pre_hooks",
+            "_forward_hooks",
+            "_forward_hooks_always_called",
+            "_forward_hooks_with_kwargs",
+            "_forward_pre_hooks",
+            "_forward_pre_hooks_with_kwargs",
+            "_load_state_dict_post_hooks",
+            "_load_state_dict_pre_hooks",
+            "_state_dict_hooks",
+            "_state_dict_pre_hooks",
+        )
+        if any(bool(getattr(actual, field, None)) for field in hook_fields):
+            raise ValueError(f"runtime hooks are unsupported at module {name!r}")
+        if any(callable(value) for value in actual.__dict__.values()):
+            raise ValueError(
+                f"instance-level executable callables are unsupported at module {name!r}"
+            )
+
+
+def _validate_cp_rank_selection(
+    model: RoutedBindingModel,
+    selection: CPRankSelection,
+) -> ScaleSharedCPMerge:
+    """Validate selection provenance against the exact live source model."""
+
+    merge = _checked_merge(model)
+    if not isinstance(selection, CPRankSelection):
+        raise TypeError("selection must be a CPRankSelection")
+    fingerprint = model_state_fingerprint(model)
+    if fingerprint != selection.source_model_fingerprint:
+        raise ValueError("selection source_model_fingerprint mismatch")
+    if selection.nominal_rank != merge.cp_rank:
+        raise ValueError("selection nominal rank does not match model")
+    expected_scores = _parameter_energy_scores(merge)
+    if selection.channel_scores != expected_scores:
+        raise ValueError("selection channel scores do not match the source model")
+    ranked = sorted(
+        range(merge.cp_rank),
+        key=lambda index: (-expected_scores[index], index),
+    )
+    expected_indices = tuple(sorted(ranked[: selection.exported_rank]))
+    if selection.retained_indices != expected_indices:
+        raise ValueError("selection retained indices do not match its declared method")
+    return merge
 
 
 def _parameter_energy_scores(merge: ScaleSharedCPMerge) -> tuple[float, ...]:
@@ -343,24 +453,7 @@ def build_dense_selected_reference(
     normalization, readout, and non-rank scale tensors remain byte-identical.
     """
 
-    merge = _checked_merge(model)
-    if not isinstance(selection, CPRankSelection):
-        raise TypeError("selection must be a CPRankSelection")
-    fingerprint = model_state_fingerprint(model)
-    if fingerprint != selection.source_model_fingerprint:
-        raise ValueError("selection source model fingerprint mismatch")
-    if selection.nominal_rank != merge.cp_rank:
-        raise ValueError("selection nominal rank does not match model")
-    expected_scores = _parameter_energy_scores(merge)
-    if selection.channel_scores != expected_scores:
-        raise ValueError("selection channel scores do not match the source model")
-    ranked = sorted(
-        range(merge.cp_rank),
-        key=lambda index: (-expected_scores[index], index),
-    )
-    expected_indices = tuple(sorted(ranked[: selection.exported_rank]))
-    if selection.retained_indices != expected_indices:
-        raise ValueError("selection retained indices do not match its declared method")
+    merge = _validate_cp_rank_selection(model, selection)
 
     reference = copy.deepcopy(model)
     reference_merge = _checked_merge(reference)

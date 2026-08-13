@@ -158,6 +158,39 @@ def test_dense_reference_rejects_a_selection_for_another_model() -> None:
         build_dense_selected_reference(model, selection)
 
 
+def test_fingerprint_rejects_behavior_mutation_subclass_and_runtime_hook() -> None:
+    model = make_model()
+    model.encoder.event_norm.eps = 1.0
+    with pytest.raises(ValueError, match="LayerNorm metadata"):
+        model_state_fingerprint(model)
+
+    class Derived(RoutedBindingModel):
+        pass
+
+    derived = Derived(model.config).double()
+    with pytest.raises(TypeError, match="exactly RoutedBindingModel"):
+        model_state_fingerprint(derived)
+
+    hooked = make_model()
+    handle = hooked.encoder.event_norm.register_forward_hook(
+        lambda _module, _inputs, output: output + 1.0
+    )
+    try:
+        with pytest.raises(ValueError, match="runtime hooks"):
+            model_state_fingerprint(hooked)
+    finally:
+        handle.remove()
+
+    parameter_hooked = make_model()
+    parameter = next(parameter_hooked.parameters())
+    parameter_handle = parameter.register_hook(lambda gradient: gradient * 0.0)
+    try:
+        with pytest.raises(ValueError, match="parameter gradient hooks"):
+            model_state_fingerprint(parameter_hooked)
+    finally:
+        parameter_handle.remove()
+
+
 def test_dense_reference_rejects_forged_scores_and_retained_indices() -> None:
     model = make_model()
     selection = select_cp_rank_by_parameter_energy(model, target_rank=2)

@@ -98,7 +98,14 @@ would require coordinated slicing through embeddings, router, residual and gate
 paths, normalization, scale signals, and readout; it is not implied by this
 CP-rank result.
 
+The compact model now has a deterministic, non-executable byte format with a
+bounded canonical header, little-endian tensor payload, whole-section and
+per-tensor checksums, strict configuration reconstruction, and exact manifest,
+selection, mode, gradient-flag, and model-fingerprint validation. A separate
+worker reloads it in a fresh process and hashes all predictions, routes, and
+persistent router/forest state under both execution engines.
+
 Parameter-energy selection is a deterministic structural proxy, not evidence
-that a chosen compact rank preserves scientific quality. A canonical model
-artifact codec, fresh-process replay, longer-real-update parity, and measured
-runtime/RSS audit remain required before Milestone 3 is marked verified.
+that a chosen compact rank preserves scientific quality. The commit-bound
+longer-real-update parity, midstream resume, and measured runtime/RSS audit
+remain required before Milestone 3 is marked verified.

@@ -7,6 +7,10 @@ from .binding import (
     BindingModelOutput,
     RoutedBindingModel,
 )
+from .compact_artifact import (
+    deserialize_compact_binding_model,
+    serialize_compact_binding_model,
+)
 from .data import (
     BindingBatch,
     BindingEpisode,
@@ -95,6 +99,7 @@ __all__ = [
     "build_model",
     "collate_binding_episodes",
     "compute_binding_loss",
+    "deserialize_compact_binding_model",
     "evaluate_binding_model",
     "export_compact_binding_model",
     "generate_binding_episode",
@@ -103,6 +108,7 @@ __all__ = [
     "load_forest_config",
     "model_state_fingerprint",
     "select_cp_rank_by_parameter_energy",
+    "serialize_compact_binding_model",
     "slice_cp_merge",
     "train_binding_step",
 ]

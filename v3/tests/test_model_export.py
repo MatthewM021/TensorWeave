@@ -203,6 +203,32 @@ def test_wrong_source_fingerprint_is_rejected_before_export() -> None:
         export_compact_binding_model(source, wrong)
 
 
+def test_forged_selection_scores_and_indices_are_rejected_before_export() -> None:
+    source = make_model()
+    selection = select_cp_rank_by_parameter_energy(source, target_rank=4)
+    forged_scores = replace(
+        selection,
+        channel_scores=(selection.channel_scores[0] + 1.0,)
+        + selection.channel_scores[1:],
+    )
+    with pytest.raises(ValueError, match="scores"):
+        export_compact_binding_model(source, forged_scores)
+
+    discarded = next(
+        index
+        for index in range(selection.nominal_rank)
+        if index not in selection.retained_indices
+    )
+    forged_indices = replace(
+        selection,
+        retained_indices=tuple(
+            sorted((*selection.retained_indices[:-1], discarded))
+        ),
+    )
+    with pytest.raises(ValueError, match="retained indices"):
+        export_compact_binding_model(source, forged_indices)
+
+
 def test_export_has_no_mask_buffer_or_original_rank_cp_tensor() -> None:
     source, compact, _ = export_model()
     nominal_rank = source.config.cp_rank

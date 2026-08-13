@@ -20,7 +20,11 @@ from torch import nn
 
 from .binding import BindingModelConfig, RoutedBindingModel
 from .operators import ScaleSharedCPMerge, slice_cp_merge
-from .truncation import CPRankSelection, model_state_fingerprint
+from .truncation import (
+    CPRankSelection,
+    _validate_cp_rank_selection,
+    model_state_fingerprint,
+)
 
 
 _MANIFEST_SCHEMA_VERSION = 1
@@ -236,8 +240,7 @@ def _validate_selection(
     selection: CPRankSelection,
     source_fingerprint: str,
 ) -> tuple[int, ...]:
-    if not isinstance(selection, CPRankSelection):
-        raise TypeError("selection must be a CPRankSelection")
+    _validate_cp_rank_selection(source, selection)
     if selection.source_model_fingerprint != source_fingerprint:
         raise ValueError("selection source_model_fingerprint does not match source")
     nominal = source.config.cp_rank

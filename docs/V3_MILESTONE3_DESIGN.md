@@ -37,14 +37,34 @@ result. This covers inactive CP scale-conditioning channels. It does not cover
 future pruning of `d_model` scale-signal channels; that broader exporter must
 permanently test `scale_to_state`, gates, normalization, router, and readout.
 
+## Portable artifact contract
+
+Compact models are stored in a deterministic, non-executable binary format.
+The fixed prefix checksum-binds a bounded canonical-JSON header and a contiguous
+little-endian tensor payload. The header binds the strict model configuration,
+export manifest, CP selection, model fingerprint, sorted tensor names,
+dtypes, shapes, offsets, per-tensor checksums, module modes, and parameter
+gradient flags. Loading rejects duplicate or noncanonical JSON, unknown fields,
+unsupported devices or dtypes, malformed tensor ranges, excessive allocation,
+trailing bytes, and every checksum or fingerprint mismatch. It never invokes
+pickle or executes artifact-provided code.
+
+The unkeyed digests detect corruption; they do not authenticate who produced
+an artifact. Source-side manifest fields are exporter assertions that cannot be
+re-derived from compact tensors alone. Commit-bound evidence must therefore
+record and compare the expected source, manifest, selection, and complete
+artifact fingerprints. The independent replay worker requires all four trusted
+expectations rather than accepting provenance claimed only inside the artifact.
+
+The independent replay worker accepts only bounded structured fixtures, loads
+the artifact in a fresh Python process, and hashes all logits, routes, router
+state, and forest state for both streaming and parallel execution.
+
 ## Remaining verification gate
 
-Before a pruned reference campaign, a separate commit-bound audit must add and
-verify:
+Before a pruned reference campaign, a separate commit-bound audit must verify:
 
-- a deterministic, non-executable compact-model byte format;
 - source/config/selection/artifact checksums;
-- fresh-process load and exact replay;
 - midstream forest-state serialize/reload/resume under the compact model;
 - real-update parity across binary carry boundaries;
 - parameter, raw byte, operation, state-scalar, RSS, and wall-time records; and
