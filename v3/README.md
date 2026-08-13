@@ -157,6 +157,15 @@ malformed native state and forged tree-work diagnostics, and makes an
 empty-query batch a true optimizer no-op. Routed oracle, curriculum, and latent
 conditions continue to use the explicit routing-aware training path.
 
+The strict campaign planner freezes three distinct stages: pilot, validation-
+only screen, and promotion-bound confirmatory. It requires the routed oracle,
+curriculum, and latent sources; a compact child exported from each curriculum
+checkpoint; GRU; cached Transformer; and causal tree. Run IDs bind the complete
+model, task, data, seed, training, source-tree, and config identity. A plan is
+revalidated against its original config before resume, preventing a missing
+model or seed pair from being accepted as a smaller complete campaign. No test
+field exists in pilot or screen configurations.
+
 This is source-level control infrastructure only. There are no trained baseline
 checkpoints, commit-bound campaign records, matched-quality results, TTN or MERA
 scientific results, or speed/RSS wins. The functional cache path deliberately

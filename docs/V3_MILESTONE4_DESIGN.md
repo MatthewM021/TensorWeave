@@ -105,6 +105,24 @@ persistent-state tensor bytes are reported under one strict contract. Routed
 oracle, curriculum, and latent models intentionally remain on their separate
 routing-aware training path.
 
+The campaign planner is also implemented as a strict source contract. It
+separates `pilot`, `screen`, and `confirmatory` configurations at the schema
+level: pilot and screen documents cannot contain test or scaling fields, screen
+alone contains validation-only selection, and confirmatory documents must bind
+a prior promotion record before exposing fresh test seeds. The required seven
+entries are the routed oracle/curriculum/latent sources, a curriculum compact
+child, GRU, cached Transformer, and causal tree. Compact entries inherit each
+pair's exact curriculum-source lineage and are never independent optimizer
+runs.
+
+Every model/pair run is resolved from the complete architecture, task, data,
+training, seed, code-tree, raw-config, semantic-config, and executable-bundle
+identity. Its run identifier and the sorted plan digest are content addressed.
+Plan validation re-resolves against the original config, so removing a whole
+model or seed axis cannot masquerade as a complete resumed campaign. The
+mutable manifest, non-executable resumable checkpoint, isolated workers, and
+pilot execution remain separate pending checkpoints.
+
 The recurrent, cached-Transformer, and corrected causal-tree source contracts
 are implemented and pass the complete local V3 suite. This establishes source
 behavior only: there is no trained baseline checkpoint, commit-bound campaign
