@@ -1,0 +1,28 @@
+project: tensor-network-native-language-model
+updated: 2026-08-13
+status: v3_reconstruction_in_progress
+historical_handoff: V3_RECOVERY_STATUS.yaml
+validated_reconstruction:
+  v2_baseline_reproduced:
+    tests_passed: 22
+    evidence_checks_passed: 161
+    record: V2_BASELINE_REPRODUCTION.json
+  milestone_1_foundational_forest:
+    status: verified
+    scope:
+      - branch-wise streaming binary-counter state
+      - scale-shared CP merge
+      - canonical packed parallel reduction
+      - query-aware active-slot readout
+      - deterministic runtime-state serialization and resume
+    record: MILESTONE1_VALIDATION.json
+not_yet_reconstructed:
+  - constrained causal router
+  - dynamic document-local binding benchmark
+  - training and scientific baselines
+  - structural truncation and compact model export
+  - campaign closure and V3 release
+evidence_rule: >-
+  This file records only newly reconstructed and locally verified work. The
+  interrupted V3 source and 127 reported runs remain unavailable and are not
+  represented as repository evidence.

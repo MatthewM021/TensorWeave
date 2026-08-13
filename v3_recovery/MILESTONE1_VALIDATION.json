@@ -1,0 +1,38 @@
+{
+  "evidence_scope": "foundational_streaming_forest_only",
+  "implementation": {
+    "associativity_required": false,
+    "maximum_length_parameter": false,
+    "parallel_construction": "chronologically_packed_canonical_dyadic_dag",
+    "route_semantics": {
+      "global": "route_id == branches; valid clock advances; dedicated global lane updates",
+      "local": "0 <= route_id < branches; valid clock advances; selected local lane updates",
+      "null": "route_id == -1; valid clock advances; no lane updates",
+      "padding": "valid_mask == false; total no-op including valid clock"
+    },
+    "scale_parameterization": "one shared CP merge plus fixed-size analytic scale features",
+    "state_complexity": "O((branches + 1) * log(max_routed_lane_length))"
+  },
+  "remaining_scope": [
+    "constrained causal router and route-label independence",
+    "dynamic document-local binding benchmark",
+    "training and checkpoint replay",
+    "structural truncation and compact model export",
+    "scientific baselines and campaign closure"
+  ],
+  "schema_version": 1,
+  "tests": {
+    "randomized_parity_cases": 320,
+    "suite": "v3/tests",
+    "total_passed": 78
+  },
+  "verification": {
+    "clean_wheel_import": "passed",
+    "package_version": "3.0.0a1",
+    "wheel_build": "passed"
+  },
+  "tolerances": {
+    "float64_atol": 1e-10,
+    "float64_rtol": 1e-09
+  }
+}

@@ -1,0 +1,25 @@
+schema_version: 1
+seed: 1729
+device: cpu
+dtype: float64
+determinism:
+  algorithms: true
+  num_threads: 1
+model:
+  vocab_size: 32
+  output_size: 7
+  branches: 4
+  d_model: 8
+  cp_rank: 4
+  scale_feature_dim: 8
+  pad_token_id: 0
+architecture:
+  operator: scale_shared_cp_merge
+  global_lane: true
+readout:
+  kind: query_aware_active_slots
+validation:
+  sequence_lengths: [0, 1, 2, 3, 7, 8, 9, 33, 257]
+  batch_size: 3
+  atol: 1.0e-10
+  rtol: 1.0e-9
