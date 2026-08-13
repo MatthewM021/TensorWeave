@@ -104,34 +104,42 @@ validated_reconstruction:
     remaining:
       - paired multi-seed matched-quality compactness campaign
       - scientific baseline comparison
-  milestone_4_recurrent_and_cached_transformer_controls:
+  milestone_4_causal_reference_controls:
     status: verified_source_contracts
     scope:
       - stacked GRU control with context-length-independent persistent state
       - causal Transformer control with explicit per-layer key/value cache
+      - fixed one-lane causal complete-tree TTN with canonical binary-frontier state
       - sanitized model-only architecture and bounded strict YAML configurations
       - exact full, stepped, and chunked continuation in float32 and float64
       - prefix causality and padding/empty-input total no-op contracts
-      - canonical state/cache validation, counter overflow rejection, and independent returned state
+      - canonical state/cache/frontier validation, counter overflow rejection, and independent returned state
       - finite forward/backward behavior and suffix gradients through cached prefixes
-      - real-event cache growth, length-independent parameters, and structural metrics
-    source_commit: 832e6de01e2b7d8b6c9e0ab9c1eae4b9a68db9f8
-    source_tree: adf9cedea816760541d9ef0ef8e8c3396141c874
-    ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31717106318
-    ci_status: passed
-    v3_source_tests_passed: 414
-    baseline_contract_tests_passed: 84
-    baseline_contract_test_files: 2
+      - real-event cache/frontier growth, length-independent parameters, and structural metrics
+      - independent non-associative complete-tree oracle and tensor-only resume roundtrip
+    published_checkpoints:
+      recurrent_and_cached_transformer:
+        source_commit: 832e6de01e2b7d8b6c9e0ab9c1eae4b9a68db9f8
+        source_tree: adf9cedea816760541d9ef0ef8e8c3396141c874
+        ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31717106318
+        ci_status: passed
+      causal_complete_tree:
+        source_commit: 65f625eafe4f1ff03ac77fcd6a2d7f688619cd8b
+        source_tree: e59ca383e984177ea337c1a2037bfbe48687cdda
+        ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31720252790
+        ci_status: passed
+    v3_source_tests_passed: 494
+    baseline_contract_tests_passed: 164
+    baseline_contract_test_files: 3
     evidence_scope: deterministic_source_contracts_not_scientific_campaign
     remaining:
       - trained baseline checkpoints and commit-bound run records
-      - corrected causal complete-tree TTN control
       - optional identity-initialized MERA ablation
       - fair predeclared cached-runtime measurement path
       - paired multi-seed matched-quality campaign
 not_yet_reconstructed:
-  - trained scientific evaluation of recurrent and cached-transformer controls
-  - corrected causal-tree control and optional MERA ablation
+  - trained scientific evaluation of recurrent, cached-transformer, and causal-tree controls
+  - optional identity-initialized MERA ablation
   - paired multi-seed matched-quality compactness campaign
   - campaign closure and V3 release
 evidence_rule: >-
