@@ -1,0 +1,32 @@
+[
+  {
+    "accuracy_max": 0.5380859375,
+    "accuracy_mean": 0.50390625,
+    "accuracy_min": 0.4853515625,
+    "accuracy_std": 0.029636700987292028,
+    "loss_mean": 0.6963372578223547,
+    "parameters": 1843,
+    "seeds": 3,
+    "variant": "mera_chi4_rank4"
+  },
+  {
+    "accuracy_max": 0.5234375,
+    "accuracy_mean": 0.4993489583333333,
+    "accuracy_min": 0.482421875,
+    "accuracy_std": 0.021425107645708766,
+    "loss_mean": 0.7018836985031763,
+    "parameters": 1203,
+    "seeds": 3,
+    "variant": "ttn_chi4_rank4"
+  },
+  {
+    "accuracy_max": 0.5263671875,
+    "accuracy_mean": 0.5143229166666666,
+    "accuracy_min": 0.494140625,
+    "accuracy_std": 0.017587164920885554,
+    "loss_mean": 0.7003526290257772,
+    "parameters": 1803,
+    "seeds": 3,
+    "variant": "ttn_chi4_rank9"
+  }
+]

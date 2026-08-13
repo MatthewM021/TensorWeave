@@ -1,0 +1,120 @@
+seed: 20260812
+device: cpu
+max_length: 128
+fail_fast: false
+model_settings:
+  branches: 8
+  tn_dimension: 16
+  tn_rank: 16
+  tn_dropout: 0.0
+  share_levels: false
+  mps_bond_dimension: 16
+  baseline_dimension: 32
+  gru_layers: 1
+  transformer_layers: 2
+  transformer_heads: 4
+  transformer_ff_multiplier: 3
+train:
+  epochs: 20
+  batch_size: 64
+  learning_rate: 0.004
+  weight_decay: 0.0001
+  gradient_clip: 1.0
+  patience: 6
+  min_delta: 0.0001
+  orthogonality_weight: 0.0001
+  rank_weight: 0.002
+  router_entropy_weight: 0.01
+  router_balance_weight: 0.05
+  router_temperature_start: 0.8
+  router_temperature_end: 0.25
+  router_hard_fraction: 0.35
+  label_smoothing: 0.0
+  num_threads: 4
+inference:
+  evaluation_batch_size: 256
+  batch_size: 64
+  warmup_batches: 2
+  measured_batches: 3
+studies:
+  - id: interleaved_tournament
+    task: interleaved_threads
+    train_length: 32
+    active_branches: 8
+    train_samples: 2048
+    validation_samples: 512
+    test_samples: 512
+    eval_lengths: [32, 64, 128]
+    models: [mps, fixed_ttn, fixed_mera, routed_ttn_oracle, routed_ttn_learned, routed_mera_oracle, routed_mera_learned, gru, transformer]
+  - id: hierarchy_topology
+    task: permuted_hierarchy
+    train_length: 32
+    active_branches: 8
+    train_samples: 4096
+    validation_samples: 1024
+    test_samples: 512
+    eval_lengths: [32, 64, 128]
+    train:
+      epochs: 22
+      batch_size: 128
+      patience: 7
+    models: [fixed_ttn, fixed_mera, routed_ttn_oracle, routed_ttn_learned, gru, transformer]
+  - id: detail_disentangler
+    task: predictive_detail
+    train_length: 32
+    active_branches: 8
+    train_samples: 2048
+    validation_samples: 512
+    test_samples: 512
+    eval_lengths: [32, 64, 128]
+    train:
+      epochs: 22
+      patience: 7
+    models: [fixed_ttn, fixed_mera, routed_ttn_oracle, routed_mera_oracle, routed_ttn_learned, routed_mera_learned, gru, transformer]
+  - id: detail_low_rank
+    task: predictive_detail
+    train_length: 32
+    active_branches: 8
+    train_samples: 2048
+    validation_samples: 512
+    test_samples: 512
+    eval_lengths: [32, 64]
+    model_settings:
+      tn_dimension: 4
+      tn_rank: 4
+    train:
+      epochs: 18
+      batch_size: 64
+      patience: 6
+      learning_rate: 0.005
+    model_overrides:
+      routed_ttn_oracle_widecore:
+        model_settings:
+          tn_rank: 9
+    models: [routed_ttn_oracle, routed_mera_oracle, routed_ttn_oracle_widecore]
+  - id: adaptive_rank
+    task: predictive_detail
+    train_length: 32
+    active_branches: 8
+    train_samples: 2048
+    validation_samples: 512
+    test_samples: 512
+    eval_lengths: [32, 64]
+    train:
+      epochs: 20
+      patience: 6
+      rank_weight: 0.03
+    models: [routed_ttn_oracle_adaptive]
+  - id: combined_stress
+    task: combined_language
+    train_length: 64
+    active_branches: 8
+    train_samples: 1024
+    validation_samples: 256
+    test_samples: 512
+    eval_lengths: [64, 128]
+    train:
+      epochs: 10
+      batch_size: 64
+      patience: 4
+    models: [fixed_ttn, routed_ttn_oracle, routed_mera_oracle, gru, transformer]

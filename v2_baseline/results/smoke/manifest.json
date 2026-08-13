@@ -1,0 +1,68 @@
+{
+  "completed_at_utc": "2026-08-12T03:18:49Z",
+  "config_sha256": "c4f347e35f36d5a92e23993048df93505056ace7d38be2c28e4bd21211e88ef9",
+  "failure_count": 0,
+  "row_count": 13,
+  "run_count": 13,
+  "runs": [
+    {
+      "run_key": "smoke_all__fixed_mera__seed220",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_all__fixed_ttn__seed120",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_all__gru__seed720",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_all__mps__seed20",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_all__routed_mera_learned__seed620",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_all__routed_mera_oracle__seed520",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_all__routed_ttn_learned__seed420",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_all__routed_ttn_oracle__seed320",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_all__transformer__seed820",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_combined__routed_ttn_oracle__seed30020",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_detail__routed_mera_oracle__seed20020",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_detail__routed_ttn_oracle_adaptive__seed20120",
+      "status": "completed"
+    },
+    {
+      "run_key": "smoke_hierarchy__routed_ttn_oracle__seed10020",
+      "status": "completed"
+    }
+  ],
+  "status": "completed",
+  "system": {
+    "cuda_available": false,
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.41",
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "torch": "2.10.0+cpu"
+  }
+}

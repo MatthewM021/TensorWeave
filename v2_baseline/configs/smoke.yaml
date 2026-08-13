@@ -1,0 +1,56 @@
+seed: 13
+device: cpu
+max_length: 64
+fail_fast: true
+model_settings:
+  branches: 8
+  tn_dimension: 8
+  tn_rank: 8
+  mps_bond_dimension: 8
+  baseline_dimension: 16
+  transformer_layers: 1
+  transformer_heads: 4
+train:
+  epochs: 2
+  batch_size: 16
+  learning_rate: 0.003
+  patience: 2
+  num_threads: 2
+inference:
+  evaluation_batch_size: 32
+  batch_size: 16
+  warmup_batches: 1
+  measured_batches: 1
+studies:
+  - id: smoke_all
+    task: interleaved_threads
+    train_length: 32
+    train_samples: 64
+    validation_samples: 32
+    test_samples: 32
+    eval_lengths: [32]
+    models: [mps, fixed_ttn, fixed_mera, routed_ttn_oracle, routed_ttn_learned, routed_mera_oracle, routed_mera_learned, gru, transformer]
+  - id: smoke_hierarchy
+    task: permuted_hierarchy
+    train_length: 32
+    train_samples: 64
+    validation_samples: 32
+    test_samples: 32
+    eval_lengths: [32]
+    models: [routed_ttn_oracle]
+  - id: smoke_detail
+    task: predictive_detail
+    train_length: 32
+    train_samples: 64
+    validation_samples: 32
+    test_samples: 32
+    eval_lengths: [32]
+    models: [routed_mera_oracle, routed_ttn_oracle_adaptive]
+  - id: smoke_combined
+    task: combined_language
+    train_length: 64
+    train_samples: 64
+    validation_samples: 32
+    test_samples: 32
+    eval_lengths: [64]
+    models: [routed_ttn_oracle]

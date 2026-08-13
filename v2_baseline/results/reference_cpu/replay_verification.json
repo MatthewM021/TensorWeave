@@ -1,0 +1,75 @@
+{
+  "eval_length": 32,
+  "replays": [
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/detail_low_rank__routed_ttn_oracle__seed20290819.pt",
+      "data_seed_test": 21290812,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.53125,
+        "loss": 0.69462451338768
+      },
+      "replayed": {
+        "accuracy": 0.53125,
+        "loss": 0.69462451338768
+      },
+      "results_directory": "reference_cpu",
+      "run_key": "detail_low_rank__routed_ttn_oracle__seed20290819",
+      "test_samples": 512
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/detail_low_rank__routed_ttn_oracle_widecore__seed20291019.pt",
+      "data_seed_test": 21291012,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.53125,
+        "loss": 0.683394581079483
+      },
+      "replayed": {
+        "accuracy": 0.53125,
+        "loss": 0.683394581079483
+      },
+      "results_directory": "reference_cpu",
+      "run_key": "detail_low_rank__routed_ttn_oracle_widecore__seed20291019",
+      "test_samples": 512
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 4.163336342344337e-17
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/detail_low_rank__routed_mera_oracle__seed20290919.pt",
+      "data_seed_test": 21290912,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.98046875,
+        "loss": 0.0675446223467588
+      },
+      "replayed": {
+        "accuracy": 0.98046875,
+        "loss": 0.06754462234675884
+      },
+      "results_directory": "reference_cpu",
+      "run_key": "detail_low_rank__routed_mera_oracle__seed20290919",
+      "test_samples": 512
+    }
+  ],
+  "results": "reference_cpu",
+  "run_count": 3,
+  "status": "passed",
+  "tolerance": 1e-10
+}

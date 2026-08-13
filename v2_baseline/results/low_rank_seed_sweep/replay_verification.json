@@ -1,0 +1,207 @@
+{
+  "eval_length": 32,
+  "replays": [
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/mera_chi4_rank4__seed4101.pt",
+      "data_seed_test": 304101,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.5380859375,
+        "loss": 0.6974304467439651
+      },
+      "replayed": {
+        "accuracy": 0.5380859375,
+        "loss": 0.6974304467439651
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "mera_chi4_rank4__seed4101",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/mera_chi4_rank4__seed4102.pt",
+      "data_seed_test": 304102,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.48828125,
+        "loss": 0.694731742143631
+      },
+      "replayed": {
+        "accuracy": 0.48828125,
+        "loss": 0.694731742143631
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "mera_chi4_rank4__seed4102",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/mera_chi4_rank4__seed4103.pt",
+      "data_seed_test": 304103,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.4853515625,
+        "loss": 0.6968495845794678
+      },
+      "replayed": {
+        "accuracy": 0.4853515625,
+        "loss": 0.6968495845794678
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "mera_chi4_rank4__seed4103",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/ttn_chi4_rank4__seed4101.pt",
+      "data_seed_test": 304101,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.5234375,
+        "loss": 0.6941548436880112
+      },
+      "replayed": {
+        "accuracy": 0.5234375,
+        "loss": 0.6941548436880112
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "ttn_chi4_rank4__seed4101",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/ttn_chi4_rank4__seed4102.pt",
+      "data_seed_test": 304102,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.482421875,
+        "loss": 0.6968381404876709
+      },
+      "replayed": {
+        "accuracy": 0.482421875,
+        "loss": 0.6968381404876709
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "ttn_chi4_rank4__seed4102",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/ttn_chi4_rank4__seed4103.pt",
+      "data_seed_test": 304103,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.4921875,
+        "loss": 0.714658111333847
+      },
+      "replayed": {
+        "accuracy": 0.4921875,
+        "loss": 0.714658111333847
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "ttn_chi4_rank4__seed4103",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/ttn_chi4_rank9__seed4101.pt",
+      "data_seed_test": 304101,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.5263671875,
+        "loss": 0.7062277048826218
+      },
+      "replayed": {
+        "accuracy": 0.5263671875,
+        "loss": 0.7062277048826218
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "ttn_chi4_rank9__seed4101",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/ttn_chi4_rank9__seed4102.pt",
+      "data_seed_test": 304102,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.494140625,
+        "loss": 0.6951457113027573
+      },
+      "replayed": {
+        "accuracy": 0.494140625,
+        "loss": 0.6951457113027573
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "ttn_chi4_rank9__seed4102",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/ttn_chi4_rank9__seed4103.pt",
+      "data_seed_test": 304103,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.5224609375,
+        "loss": 0.6996844708919525
+      },
+      "replayed": {
+        "accuracy": 0.5224609375,
+        "loss": 0.6996844708919525
+      },
+      "results_directory": "low_rank_seed_sweep",
+      "run_key": "ttn_chi4_rank9__seed4103",
+      "test_samples": 1024
+    }
+  ],
+  "results": "low_rank_seed_sweep",
+  "run_count": 9,
+  "status": "passed",
+  "tolerance": 1e-10
+}

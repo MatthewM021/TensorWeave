@@ -1,0 +1,16 @@
+{
+  "paired_design": "Within each seed, all variants share train/validation/test data and the same PyTorch initialization seed.",
+  "row_count": 18,
+  "run_count": 9,
+  "seeds": [
+    4101,
+    4102,
+    4103
+  ],
+  "status": "completed",
+  "variants": [
+    "mera_chi4_rank4",
+    "ttn_chi4_rank4",
+    "ttn_chi4_rank9"
+  ]
+}

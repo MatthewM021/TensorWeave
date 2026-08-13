@@ -1,0 +1,58 @@
+project: tensor-network-native-language-model
+handoff_date: 2026-08-13
+status: v3_recovery_required
+verified_repository_contents:
+  v2_source: complete
+  v2_reference_results: complete
+  v2_checkpoints: complete
+  v2_validation: passed
+  v3_source: unavailable
+  v3_partial_results: unavailable
+interrupted_v3_reported_status:
+  planned_reference_runs: 168
+  completed_reference_runs: 127
+  recorded_training_failures: 0
+  scientific_status: preliminary_not_validated
+  strongest_preliminary_observation: >-
+    Autonomous curriculum routing reportedly achieved approximately 98-100 percent
+    dynamic document-local binding accuracy through length 256 on the first two
+    strong seeds. Fully latent routing and strong GRU/Transformer controls were
+    substantially lower. No final claim was issued.
+implemented_components_reported_but_not_present:
+  - streaming tensor forest
+  - branch-wise binary-counter update
+  - scale-shared operators
+  - associative transition/operator experiments
+  - causal persistent router
+  - oracle/curriculum/fully-latent routing modes
+  - dynamic document-local binding task
+  - query-aware readout
+  - corrected causal TTN and MERA controls
+  - cached Transformer baseline
+  - predictive truncation and compact export
+  - streaming-parallel comparison and auxiliary diagnostics
+known_invalidating_bug:
+  description: >-
+    Inactive scale-signal channels could influence retained gate outputs in the
+    compact-export path.
+  patch_reported: true
+  patch_source_present: false
+  regression_test_reported: true
+  affected_pruned_runs_requiring_regeneration: 16
+outstanding_at_interruption:
+  - third strong dynamic-binding seed
+  - additional corrected causal TTN/MERA controls
+  - strong-opponent tournament
+  - regenerate 16 bug-affected pruned runs
+  - clean 22-run smoke campaign
+  - 2048-token scaling run
+  - operational routing audit
+  - evaluation-label independence audit
+  - complete checkpoint replay
+  - final tests
+  - checksums
+  - V3 report
+  - release archive or GitHub release
+recovery_rule: >-
+  Rebuild V3 from the verified V2 base and the handoff specification. Do not
+  represent the missing 127 run files or V3 source as repository evidence.

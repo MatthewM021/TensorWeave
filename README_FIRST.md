@@ -19,4 +19,3 @@ ChatGPT Work cannot see files merely because they were linked in another ChatGPT
 Do not create an empty repository containing only `HANDOFF.md` or only paste `WORK_START_PROMPT.md`; that would omit the code and evidence.
 
 See `GITHUB_IMPORT.md` for exact commands.
-

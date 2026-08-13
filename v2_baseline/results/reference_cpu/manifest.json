@@ -1,0 +1,144 @@
+{
+  "completed_at_utc": "2026-08-12T03:18:14Z",
+  "config_sha256": "a0452733a694fb245956c132609ea6740da7ee9b69626f8ea9ac9dbe1a008839",
+  "failure_count": 0,
+  "row_count": 87,
+  "run_count": 32,
+  "runs": [
+    {
+      "run_key": "adaptive_rank__routed_ttn_oracle_adaptive__seed20300819",
+      "status": "completed"
+    },
+    {
+      "run_key": "combined_stress__fixed_ttn__seed20310819",
+      "status": "completed"
+    },
+    {
+      "run_key": "combined_stress__gru__seed20311119",
+      "status": "completed"
+    },
+    {
+      "run_key": "combined_stress__routed_mera_oracle__seed20311019",
+      "status": "completed"
+    },
+    {
+      "run_key": "combined_stress__routed_ttn_oracle__seed20310919",
+      "status": "completed"
+    },
+    {
+      "run_key": "combined_stress__transformer__seed20311219",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_disentangler__fixed_mera__seed20280919",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_disentangler__fixed_ttn__seed20280819",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_disentangler__gru__seed20281419",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_disentangler__routed_mera_learned__seed20281319",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_disentangler__routed_mera_oracle__seed20281119",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_disentangler__routed_ttn_learned__seed20281219",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_disentangler__routed_ttn_oracle__seed20281019",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_disentangler__transformer__seed20281519",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_low_rank__routed_mera_oracle__seed20290919",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_low_rank__routed_ttn_oracle__seed20290819",
+      "status": "completed"
+    },
+    {
+      "run_key": "detail_low_rank__routed_ttn_oracle_widecore__seed20291019",
+      "status": "completed"
+    },
+    {
+      "run_key": "hierarchy_topology__fixed_mera__seed20270919",
+      "status": "completed"
+    },
+    {
+      "run_key": "hierarchy_topology__fixed_ttn__seed20270819",
+      "status": "completed"
+    },
+    {
+      "run_key": "hierarchy_topology__gru__seed20271219",
+      "status": "completed"
+    },
+    {
+      "run_key": "hierarchy_topology__routed_ttn_learned__seed20271119",
+      "status": "completed"
+    },
+    {
+      "run_key": "hierarchy_topology__routed_ttn_oracle__seed20271019",
+      "status": "completed"
+    },
+    {
+      "run_key": "hierarchy_topology__transformer__seed20271319",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__fixed_mera__seed20261019",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__fixed_ttn__seed20260919",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__gru__seed20261519",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__mps__seed20260819",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__routed_mera_learned__seed20261419",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__routed_mera_oracle__seed20261319",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__routed_ttn_learned__seed20261219",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__routed_ttn_oracle__seed20261119",
+      "status": "completed"
+    },
+    {
+      "run_key": "interleaved_tournament__transformer__seed20261619",
+      "status": "completed"
+    }
+  ],
+  "status": "completed",
+  "system": {
+    "cuda_available": false,
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.41",
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "torch": "2.10.0+cpu"
+  }
+}

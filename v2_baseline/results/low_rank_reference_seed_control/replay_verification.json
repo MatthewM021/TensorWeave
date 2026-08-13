@@ -1,0 +1,75 @@
+{
+  "eval_length": 32,
+  "replays": [
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 0.0
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/mera_chi4_rank4__seed20290919.pt",
+      "data_seed_test": 21290912,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.9853515625,
+        "loss": 0.0631685545668006
+      },
+      "replayed": {
+        "accuracy": 0.9853515625,
+        "loss": 0.0631685545668006
+      },
+      "results_directory": "low_rank_reference_seed_control",
+      "run_key": "mera_chi4_rank4__seed20290919",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 6.938893903907228e-17
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/ttn_chi4_rank4__seed20290919.pt",
+      "data_seed_test": 21290912,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.9736328125,
+        "loss": 0.0952018275856971
+      },
+      "replayed": {
+        "accuracy": 0.9736328125,
+        "loss": 0.09520182758569717
+      },
+      "results_directory": "low_rank_reference_seed_control",
+      "run_key": "ttn_chi4_rank4__seed20290919",
+      "test_samples": 1024
+    },
+    {
+      "absolute_difference": {
+        "accuracy": 0.0,
+        "loss": 6.938893903907228e-17
+      },
+      "active_branches": 8,
+      "checkpoint": "checkpoints/ttn_chi4_rank9__seed20290919.pt",
+      "data_seed_test": 21290912,
+      "eval_length": 32,
+      "passed": true,
+      "recorded": {
+        "accuracy": 0.9814453125,
+        "loss": 0.1189224645495414
+      },
+      "replayed": {
+        "accuracy": 0.9814453125,
+        "loss": 0.11892246454954147
+      },
+      "results_directory": "low_rank_reference_seed_control",
+      "run_key": "ttn_chi4_rank9__seed20290919",
+      "test_samples": 1024
+    }
+  ],
+  "results": "low_rank_reference_seed_control",
+  "run_count": 3,
+  "status": "passed",
+  "tolerance": 1e-10
+}

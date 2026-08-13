@@ -1,0 +1,28 @@
+{
+  "batch_size": 64,
+  "lengths": [
+    32,
+    64,
+    128
+  ],
+  "measured_passes": 2,
+  "method": "fresh subprocess per checkpoint/length; psutil RSS sampled during warmed forward passes; process maximum is max(sampled RSS, ru_maxrss)",
+  "models": [
+    "routed_ttn_oracle",
+    "routed_mera_oracle",
+    "fixed_ttn",
+    "mps",
+    "gru",
+    "transformer"
+  ],
+  "row_count": 18,
+  "study": "interleaved_tournament",
+  "system": {
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.41",
+    "psutil": "7.2.2",
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "torch": "2.10.0+cpu"
+  },
+  "threads": 4,
+  "warmup_passes": 1
+}

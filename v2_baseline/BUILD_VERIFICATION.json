@@ -1,0 +1,49 @@
+{
+  "checks": {
+    "bundle_integrity": {
+      "checks": 161,
+      "status": "passed"
+    },
+    "checkpoint_replays": {
+      "main": 3,
+      "paired_reference_control": 3,
+      "paired_seed_sweep": 9,
+      "status": "passed"
+    },
+    "clean_smoke": {
+      "failures": 0,
+      "finite_accuracy_rows": 13,
+      "rows": 13,
+      "runs": 13,
+      "status": "completed"
+    },
+    "compileall": {
+      "command": "python -m compileall -q src tests scripts run_v2.py",
+      "status": "passed"
+    },
+    "editable_install": {
+      "command": "python -m pip install -e . --no-build-isolation --no-deps",
+      "status": "passed"
+    },
+    "entrypoint": {
+      "command": "tnlm-v2 --help",
+      "status": "passed"
+    },
+    "pytest": {
+      "command": "PYTHONPATH=src pytest -q",
+      "status": "passed",
+      "tests": 22
+    },
+    "strict_json": {
+      "nonstandard_constants": 0,
+      "status": "passed"
+    }
+  },
+  "environment": {
+    "cuda_available": false,
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.41",
+    "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]",
+    "torch": "2.10.0+cpu"
+  },
+  "status": "passed"
+}
