@@ -119,9 +119,25 @@ Every model/pair run is resolved from the complete architecture, task, data,
 training, seed, code-tree, raw-config, semantic-config, and executable-bundle
 identity. Its run identifier and the sorted plan digest are content addressed.
 Plan validation re-resolves against the original config, so removing a whole
-model or seed axis cannot masquerade as a complete resumed campaign. The
-mutable manifest, non-executable resumable checkpoint, isolated workers, and
-pilot execution remain separate pending checkpoints.
+model or seed axis cannot masquerade as a complete resumed campaign.
+
+The source now also provides the safety boundaries required before a worker
+can execute that plan. Checkpoints use bounded canonical JSON plus raw
+little-endian tensor payloads—never pickle—and bind the exact model
+configuration, dtype, complete AdamW contract, run identity, stream prefix,
+optimizer cursor, and CPU/Python RNG state. Restore is transactional, and
+bit-exact next-step continuation is tested across both dtypes and every routed
+or baseline family. The campaign manifest keeps immutable content-addressed
+attempt transitions, an atomic generation-checked index, crash-tail
+reconciliation, and external checksum-bound artifacts. The execution adapter
+binds constructed models to an exact model/pair run, checks the declared Torch
+determinism/thread policy, generates domain-separated paired streams, and
+requires a curriculum parent at its final optimizer cursor before compact
+derivation. A runner must additionally bind every checkpoint/artifact to the
+completed manifest attempt and clean executable bundle.
+
+These are source contracts only. The isolated pilot runner and its
+commit-bound execution record remain pending.
 
 The recurrent, cached-Transformer, and corrected causal-tree source contracts
 are implemented and pass the complete local V3 suite. This establishes source

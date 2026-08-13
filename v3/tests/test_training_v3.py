@@ -189,6 +189,29 @@ def test_one_training_step_updates_model_and_reports_all_components():
     )
 
 
+def test_routed_nonfinite_gradients_fail_before_optimizer_mutation() -> None:
+    torch.manual_seed(121)
+    batch, model = fixture(RoutingMode.ORACLE)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    before = {name: parameter.detach().clone() for name, parameter in model.named_parameters()}
+
+    def poison(tensor: torch.Tensor) -> torch.Tensor:
+        return torch.full_like(tensor, float("nan")) if tensor.is_floating_point() else tensor
+
+    with torch.autograd.graph.saved_tensors_hooks(lambda tensor: tensor, poison):
+        try:
+            train_binding_step(model, batch, optimizer, training_step=0)
+        except ValueError as error:
+            assert "finite" in str(error)
+        else:
+            raise AssertionError("nonfinite routed gradients were accepted")
+    assert not optimizer.state
+    assert all(
+        torch.equal(before[name], parameter.detach())
+        for name, parameter in model.named_parameters()
+    )
+
+
 def test_evaluation_contract_is_autonomous_for_curriculum():
     torch.manual_seed(13)
     batch, model = fixture(RoutingMode.CURRICULUM)

@@ -166,7 +166,19 @@ revalidated against its original config before resume, preventing a missing
 model or seed pair from being accepted as a smaller complete campaign. No test
 field exists in pilot or screen configurations.
 
-This is source-level control infrastructure only. There are no trained baseline
+Campaign execution is protected by three additional source contracts. The
+execution adapter binds a constructed model to its exact model/pair run,
+enforces the declared deterministic/thread policy, generates paired streams,
+validates the full AdamW state and cursor, and only derives a compact child at
+the curriculum parent's declared final cursor. The checkpoint codec is
+non-pickle, allocation-bounded, canonical, checksum-bound, and restores the
+exact model/optimizer/RNG continuation transactionally. The manifest stores
+immutable content-addressed attempt transitions with atomic generation checks,
+crash reconciliation, and checksum-bound external artifacts. The eventual
+isolated worker must derive its trusted checkpoint contract from the resolved
+plan and verify the manifest artifact digest.
+
+This remains source-level control infrastructure only. There are no trained baseline
 checkpoints, commit-bound campaign records, matched-quality results, TTN or MERA
 scientific results, or speed/RSS wins. The functional cache path deliberately
 performs strict public-state validation and immutable growth; comparative timing

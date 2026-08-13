@@ -778,3 +778,54 @@ def test_unknown_or_missing_nested_keys_are_rejected(tmp_path: Path) -> None:
     del training["checkpoint_interval"]
     with pytest.raises(ValueError, match="checkpoint_interval"):
         load_milestone4_campaign_config(write_document(tmp_path, document, "missing.yaml"))
+
+
+def test_unimplemented_generator_version_is_rejected(tmp_path: Path) -> None:
+    document = base_document()
+    data = document["data"]
+    assert isinstance(data, dict)
+    data["generator_version"] = "binding-v999"
+    with pytest.raises(ValueError, match="binding-v1"):
+        load_milestone4_campaign_config(
+            write_document(tmp_path, document, "generator-version.yaml")
+        )
+
+
+def test_optimizer_step_count_is_bounded_by_exact_adamw_counter(tmp_path: Path) -> None:
+    document = base_document()
+    training = document["training"]
+    data = document["data"]
+    assert isinstance(training, dict) and isinstance(data, dict)
+    train = data["train"]
+    assert isinstance(train, dict)
+    training["optimizer_steps"] = 2**24 + 1
+    training["train_token_budget"] = (2**24 + 1) * sum(train["length_schedule"])
+    with pytest.raises(ValueError, match="counter range"):
+        load_milestone4_campaign_config(
+            write_document(tmp_path, document, "optimizer-counter.yaml")
+        )
+
+
+def test_model_spec_requires_exact_immutable_tuple_mapping(tmp_path: Path) -> None:
+    config = load_milestone4_campaign_config(
+        write_document(tmp_path, base_document(), "immutable.yaml")
+    )
+    model = copy.deepcopy(config.models[0])
+    object.__setattr__(model, "architecture", list(model.architecture))
+    with pytest.raises(TypeError, match="tuple"):
+        model.__post_init__()
+
+
+def test_selection_requires_exact_immutable_nested_tuples(tmp_path: Path) -> None:
+    config = load_milestone4_campaign_config(
+        write_document(tmp_path, base_document("screen"), "selection-immutable.yaml")
+    )
+    selection = copy.deepcopy(config.selection)
+    assert selection is not None
+    object.__setattr__(
+        selection,
+        "candidates_by_family",
+        list(selection.candidates_by_family),
+    )
+    with pytest.raises(TypeError, match="immutable tuple"):
+        selection.__post_init__()

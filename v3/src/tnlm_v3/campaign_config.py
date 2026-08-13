@@ -178,6 +178,37 @@ def _immutable_mapping(value: Mapping[str, Any]) -> tuple[tuple[str, object], ..
     return tuple(result)
 
 
+def _validate_immutable_value(value: object, name: str) -> None:
+    """Require the exact recursively immutable representation emitted by the loader."""
+
+    if value is None or type(value) in {bool, int, float, str}:
+        return
+    if type(value) is not tuple:
+        raise TypeError(f"{name} must use immutable tuple storage")
+    for index, item in enumerate(value):
+        _validate_immutable_value(item, f"{name}[{index}]")
+
+
+def _validate_immutable_mapping(
+    value: object,
+    name: str,
+    *,
+    optional: bool = False,
+) -> None:
+    if optional and value is None:
+        return
+    if type(value) is not tuple:
+        raise TypeError(f"{name} must be an immutable tuple mapping")
+    keys: list[str] = []
+    for index, item in enumerate(value):
+        if type(item) is not tuple or len(item) != 2 or type(item[0]) is not str:
+            raise TypeError(f"{name}[{index}] must be an exact (str, value) tuple")
+        keys.append(item[0])
+        _validate_immutable_value(item[1], f"{name}.{item[0]}")
+    if keys != sorted(set(keys)):
+        raise ValueError(f"{name} keys must be sorted and unique")
+
+
 def _thaw(value: object) -> object:
     if is_dataclass(value) and not isinstance(value, type):
         return _thaw(asdict(value))
@@ -246,6 +277,8 @@ class CampaignModelSpec:
             raise ValueError("unsupported routing_mode")
         if self.parent_model_id is not None:
             _identifier(self.parent_model_id, "parent_model_id")
+        _validate_immutable_mapping(self.architecture, "architecture")
+        _validate_immutable_mapping(self.export, "export", optional=True)
 
     @property
     def architecture_values(self) -> dict[str, object]:
@@ -326,6 +359,8 @@ class CampaignDataSpec:
 
     def __post_init__(self) -> None:
         _identifier(self.generator_version, "generator_version")
+        if self.generator_version != "binding-v1":
+            raise ValueError("generator_version must be the implemented binding-v1")
 
 
 @dataclass(frozen=True)
@@ -361,6 +396,8 @@ class CampaignTrainingSpec:
             ),
         )
         _plain_int(self.optimizer_steps, "optimizer_steps", minimum=1)
+        if self.optimizer_steps > 2**24 - 1:
+            raise ValueError("optimizer_steps exceeds exact AdamW float32 counter range")
         _plain_int(self.train_token_budget, "train_token_budget", minimum=1)
         _plain_int(self.checkpoint_interval, "checkpoint_interval", minimum=1)
         if self.checkpoint_interval > self.optimizer_steps:
@@ -379,6 +416,28 @@ class CampaignSelectionSpec:
     tie_break: tuple[str, ...]
 
     def __post_init__(self) -> None:
+        if type(self.candidates_by_family) is not tuple:
+            raise TypeError("candidates_by_family must be an immutable tuple")
+        families: list[str] = []
+        for index, item in enumerate(self.candidates_by_family):
+            if type(item) is not tuple or len(item) != 2 or type(item[0]) is not str:
+                raise TypeError(
+                    f"candidates_by_family[{index}] must be an exact (str, tuple) pair"
+                )
+            family, candidates = item
+            if family not in _FAMILIES:
+                raise ValueError("selection contains an unsupported family")
+            if type(candidates) is not tuple or any(
+                type(candidate) is not str for candidate in candidates
+            ):
+                raise TypeError("selection candidates must be a tuple of strings")
+            if not candidates:
+                raise ValueError("selection family/candidates cannot be empty")
+            if candidates != tuple(sorted(set(candidates))):
+                raise ValueError("selection candidates must be sorted and unique")
+            families.append(family)
+        if families != sorted(set(families)):
+            raise ValueError("selection families must be sorted and unique")
         if self.primary_metric != "macro_length_query_accuracy":
             raise ValueError("selection primary_metric is unsupported")
         if self.direction != "maximize":
@@ -1265,7 +1324,7 @@ def _make_selection(value: object) -> CampaignSelectionSpec:
         normalized.append(
             (
                 family,
-                tuple(_sequence(candidates[family], f"candidates.{family}")),
+                tuple(sorted(_sequence(candidates[family], f"candidates.{family}"))),
             )
         )
     return CampaignSelectionSpec(

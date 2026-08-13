@@ -238,12 +238,31 @@ def train_binding_step(
         routing_mode=mode,
         config=loss_config,
     )
+    if not bool(torch.isfinite(loss.total)):
+        raise ValueError("binding training loss must be finite")
+    if not loss.total.requires_grad:
+        raise ValueError("binding training loss must retain a gradient path")
     loss.total.backward()
+    gradients = [
+        parameter.grad
+        for parameter in model.parameters()
+        if parameter.requires_grad and parameter.grad is not None
+    ]
+    if not gradients:
+        raise ValueError("binding training loss produced no parameter gradients")
+    if any(not bool(torch.isfinite(gradient).all()) for gradient in gradients):
+        raise ValueError("binding gradients must be finite")
     if max_gradient_norm is not None:
         if max_gradient_norm <= 0 or not math.isfinite(float(max_gradient_norm)):
             raise ValueError("max_gradient_norm must be positive and finite")
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_gradient_norm)
+        norm = torch.nn.utils.clip_grad_norm_(
+            model.parameters(), max_gradient_norm, error_if_nonfinite=True
+        )
+        if not bool(torch.isfinite(norm)):
+            raise ValueError("binding gradient norm must be finite")
     optimizer.step()
+    if any(not bool(torch.isfinite(parameter).all()) for parameter in model.parameters()):
+        raise ValueError("binding parameters must remain finite")
     return output, loss
 
 
