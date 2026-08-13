@@ -1,0 +1,1885 @@
+{
+  "code_commit": "a9935857821ffc6d486f1aa19d0e4059dc4ecb28",
+  "code_tree": "fb5f1a156905deb1b2b36c95e26e913d06a197c1",
+  "completed_at_utc": "2026-08-13T11:32:21.237775+00:00",
+  "conditions": [
+    {
+      "condition": "oracle",
+      "config_fingerprint": "29ec7d62304296d253f48b81004e39e06057fb8bcf4dee658a1192a2590a22a3",
+      "config_sha256": "5ff8ea8dc536b8c27230a1f399f17c48ba028d0cb9514b426b22da5115136d7e",
+      "curriculum": null,
+      "data_seed": 777,
+      "elapsed_training_seconds": 1.0775766000006115,
+      "episodes": 4,
+      "evaluation_label_independence": null,
+      "final": {
+        "heldout_query": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "query_count": 0
+        },
+        "query": {
+          "accuracy": 1.0,
+          "correct": 12,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 1.0,
+          "consistent_events": 36,
+          "fully_consistent_groups": 12,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 1.0,
+          "correct": 36,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 1.0
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            11,
+            13,
+            12
+          ],
+          "branch_fractions": [
+            0.3055555555555556,
+            0.3611111111111111,
+            0.3333333333333333
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 1,
+          "global_event_fraction": 0.025,
+          "load_entropy": 1.0962947871994972,
+          "local_event_count": 36,
+          "max_load_fraction": 0.3611111111111111,
+          "mean_active_branches_per_document": 3.0,
+          "mean_assignment_entropy": 0.2966410517692566,
+          "normalized_load_entropy": 0.9978905192555035,
+          "normalized_mean_assignment_entropy": 0.27001432154821975,
+          "null_event_count": 3,
+          "null_event_fraction": 0.075,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 1.0,
+          "correct": 12,
+          "query_count": 12
+        }
+      },
+      "final_guidance": {
+        "guided_events": 40,
+        "guided_fraction": 1.0,
+        "probability": 1.0
+      },
+      "final_loss": {
+        "persistence_pair_count": 24,
+        "query": 0.0038516984786838293,
+        "query_count": 12,
+        "route_curriculum": 0.0,
+        "route_persistence": 0.04841384291648865,
+        "route_supervision_count": 0,
+        "router_balance": 0.006765599362552166,
+        "router_entropy": 0.2973725497722626,
+        "total": 0.006908043287694454
+      },
+      "heldout_batch_sha256": "d4c724787a832e3dc8a12f8f8d6765ec05e090462dd719040ae69bc51eb9ca97",
+      "heldout_evaluation": {
+        "heldout_query": {
+          "accuracy": 0.5,
+          "correct": 3,
+          "query_count": 6
+        },
+        "query": {
+          "accuracy": 0.4166666666666667,
+          "correct": 5,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 1.0,
+          "consistent_events": 36,
+          "fully_consistent_groups": 12,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 1.0,
+          "correct": 36,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 1.0
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            12,
+            11,
+            13
+          ],
+          "branch_fractions": [
+            0.3333333333333333,
+            0.3055555555555556,
+            0.3611111111111111
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 0,
+          "global_event_fraction": 0.0,
+          "load_entropy": 1.0962947871994972,
+          "local_event_count": 36,
+          "max_load_fraction": 0.3611111111111111,
+          "mean_active_branches_per_document": 3.0,
+          "mean_assignment_entropy": 0.25472092628479004,
+          "normalized_load_entropy": 0.9978905192555035,
+          "normalized_mean_assignment_entropy": 0.23185697894713891,
+          "null_event_count": 4,
+          "null_event_fraction": 0.1,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 0.3333333333333333,
+          "correct": 2,
+          "query_count": 6
+        }
+      },
+      "initial": {
+        "heldout_query": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "query_count": 0
+        },
+        "query": {
+          "accuracy": 0.4166666666666667,
+          "correct": 5,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 1.0,
+          "consistent_events": 36,
+          "fully_consistent_groups": 12,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 1.0,
+          "correct": 36,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 1.0
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            11,
+            13,
+            12
+          ],
+          "branch_fractions": [
+            0.3055555555555556,
+            0.3611111111111111,
+            0.3333333333333333
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 1,
+          "global_event_fraction": 0.025,
+          "load_entropy": 1.0962947871994972,
+          "local_event_count": 36,
+          "max_load_fraction": 0.3611111111111111,
+          "mean_active_branches_per_document": 3.0,
+          "mean_assignment_entropy": 1.098438024520874,
+          "normalized_load_entropy": 0.9978905192555035,
+          "normalized_mean_assignment_entropy": 0.9998413779373914,
+          "null_event_count": 3,
+          "null_event_fraction": 0.075,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 0.4166666666666667,
+          "correct": 5,
+          "query_count": 12
+        }
+      },
+      "initial_state_dict_sha256": "eb04890e0d907ff24b0ca9c93ecbd0d207417302ac145ad012d599f9b6ca575b",
+      "model_fingerprint": "1bb8c4cd1cf8d0a71a84016743ed140e1e4bd78aa3217c7447131a0b07612866",
+      "model_seed": 20260813,
+      "parameter_count": 6895,
+      "parameter_shapes_sha256": "eb9f45a4860c60c3ee574f8dfa78555691a0b242d2c93b4b68f69204f0554e31",
+      "sequence_length": 10,
+      "status": "completed",
+      "steps": 40,
+      "structural_work": {
+        "forest_active_slots": 17,
+        "forest_merge_count": 20,
+        "router_branch_score_work_proxy": 120
+      },
+      "task_fingerprint": "6b4c53fc11790aa68bcf94eed4cfd239f29dacc108a6e0106922b4fc0b04a964",
+      "train_batch_sha256": "91844f5e437c5fb035c983b5c86112d73b8c585a2899f13c846029bbdff47d27"
+    },
+    {
+      "condition": "curriculum",
+      "config_fingerprint": "50256e806c7f2c77ef281ce677391d8b4494e04c8d16517a260725f16c29e649",
+      "config_sha256": "49e191940f29bface6309bca1865098a4387631e29965e220e4ab608a60798b2",
+      "curriculum": {
+        "declared_schedule": {
+          "end_probability": 0.0,
+          "end_step": 80,
+          "start_probability": 1.0,
+          "start_step": 0
+        },
+        "realized_trace": [
+          {
+            "guidance_probability": 0.987500011920929,
+            "guided_events": 40,
+            "guided_fraction": 1.0,
+            "route_supervision_count": 40,
+            "step": 1
+          },
+          {
+            "guidance_probability": 0.9750000238418579,
+            "guided_events": 37,
+            "guided_fraction": 0.925000011920929,
+            "route_supervision_count": 37,
+            "step": 2
+          },
+          {
+            "guidance_probability": 0.9624999761581421,
+            "guided_events": 40,
+            "guided_fraction": 1.0,
+            "route_supervision_count": 40,
+            "step": 3
+          },
+          {
+            "guidance_probability": 0.949999988079071,
+            "guided_events": 38,
+            "guided_fraction": 0.949999988079071,
+            "route_supervision_count": 38,
+            "step": 4
+          },
+          {
+            "guidance_probability": 0.9375,
+            "guided_events": 38,
+            "guided_fraction": 0.949999988079071,
+            "route_supervision_count": 38,
+            "step": 5
+          },
+          {
+            "guidance_probability": 0.925000011920929,
+            "guided_events": 37,
+            "guided_fraction": 0.925000011920929,
+            "route_supervision_count": 37,
+            "step": 6
+          },
+          {
+            "guidance_probability": 0.9125000238418579,
+            "guided_events": 38,
+            "guided_fraction": 0.949999988079071,
+            "route_supervision_count": 38,
+            "step": 7
+          },
+          {
+            "guidance_probability": 0.8999999761581421,
+            "guided_events": 37,
+            "guided_fraction": 0.925000011920929,
+            "route_supervision_count": 37,
+            "step": 8
+          },
+          {
+            "guidance_probability": 0.887499988079071,
+            "guided_events": 36,
+            "guided_fraction": 0.8999999761581421,
+            "route_supervision_count": 36,
+            "step": 9
+          },
+          {
+            "guidance_probability": 0.875,
+            "guided_events": 34,
+            "guided_fraction": 0.8500000238418579,
+            "route_supervision_count": 34,
+            "step": 10
+          },
+          {
+            "guidance_probability": 0.862500011920929,
+            "guided_events": 36,
+            "guided_fraction": 0.8999999761581421,
+            "route_supervision_count": 36,
+            "step": 11
+          },
+          {
+            "guidance_probability": 0.8500000238418579,
+            "guided_events": 38,
+            "guided_fraction": 0.949999988079071,
+            "route_supervision_count": 38,
+            "step": 12
+          },
+          {
+            "guidance_probability": 0.8374999761581421,
+            "guided_events": 35,
+            "guided_fraction": 0.875,
+            "route_supervision_count": 35,
+            "step": 13
+          },
+          {
+            "guidance_probability": 0.824999988079071,
+            "guided_events": 33,
+            "guided_fraction": 0.824999988079071,
+            "route_supervision_count": 33,
+            "step": 14
+          },
+          {
+            "guidance_probability": 0.8125,
+            "guided_events": 30,
+            "guided_fraction": 0.75,
+            "route_supervision_count": 30,
+            "step": 15
+          },
+          {
+            "guidance_probability": 0.800000011920929,
+            "guided_events": 31,
+            "guided_fraction": 0.7749999761581421,
+            "route_supervision_count": 31,
+            "step": 16
+          },
+          {
+            "guidance_probability": 0.7875000238418579,
+            "guided_events": 32,
+            "guided_fraction": 0.800000011920929,
+            "route_supervision_count": 32,
+            "step": 17
+          },
+          {
+            "guidance_probability": 0.7749999761581421,
+            "guided_events": 33,
+            "guided_fraction": 0.824999988079071,
+            "route_supervision_count": 33,
+            "step": 18
+          },
+          {
+            "guidance_probability": 0.762499988079071,
+            "guided_events": 32,
+            "guided_fraction": 0.800000011920929,
+            "route_supervision_count": 32,
+            "step": 19
+          },
+          {
+            "guidance_probability": 0.75,
+            "guided_events": 27,
+            "guided_fraction": 0.675000011920929,
+            "route_supervision_count": 27,
+            "step": 20
+          },
+          {
+            "guidance_probability": 0.737500011920929,
+            "guided_events": 33,
+            "guided_fraction": 0.824999988079071,
+            "route_supervision_count": 33,
+            "step": 21
+          },
+          {
+            "guidance_probability": 0.7250000238418579,
+            "guided_events": 27,
+            "guided_fraction": 0.675000011920929,
+            "route_supervision_count": 27,
+            "step": 22
+          },
+          {
+            "guidance_probability": 0.7124999761581421,
+            "guided_events": 26,
+            "guided_fraction": 0.6499999761581421,
+            "route_supervision_count": 26,
+            "step": 23
+          },
+          {
+            "guidance_probability": 0.699999988079071,
+            "guided_events": 27,
+            "guided_fraction": 0.675000011920929,
+            "route_supervision_count": 27,
+            "step": 24
+          },
+          {
+            "guidance_probability": 0.6875,
+            "guided_events": 23,
+            "guided_fraction": 0.574999988079071,
+            "route_supervision_count": 23,
+            "step": 25
+          },
+          {
+            "guidance_probability": 0.675000011920929,
+            "guided_events": 28,
+            "guided_fraction": 0.699999988079071,
+            "route_supervision_count": 28,
+            "step": 26
+          },
+          {
+            "guidance_probability": 0.6625000238418579,
+            "guided_events": 27,
+            "guided_fraction": 0.675000011920929,
+            "route_supervision_count": 27,
+            "step": 27
+          },
+          {
+            "guidance_probability": 0.6499999761581421,
+            "guided_events": 26,
+            "guided_fraction": 0.6499999761581421,
+            "route_supervision_count": 26,
+            "step": 28
+          },
+          {
+            "guidance_probability": 0.637499988079071,
+            "guided_events": 29,
+            "guided_fraction": 0.7250000238418579,
+            "route_supervision_count": 29,
+            "step": 29
+          },
+          {
+            "guidance_probability": 0.625,
+            "guided_events": 23,
+            "guided_fraction": 0.574999988079071,
+            "route_supervision_count": 23,
+            "step": 30
+          },
+          {
+            "guidance_probability": 0.612500011920929,
+            "guided_events": 23,
+            "guided_fraction": 0.574999988079071,
+            "route_supervision_count": 23,
+            "step": 31
+          },
+          {
+            "guidance_probability": 0.6000000238418579,
+            "guided_events": 24,
+            "guided_fraction": 0.6000000238418579,
+            "route_supervision_count": 24,
+            "step": 32
+          },
+          {
+            "guidance_probability": 0.5874999761581421,
+            "guided_events": 19,
+            "guided_fraction": 0.4749999940395355,
+            "route_supervision_count": 19,
+            "step": 33
+          },
+          {
+            "guidance_probability": 0.574999988079071,
+            "guided_events": 25,
+            "guided_fraction": 0.625,
+            "route_supervision_count": 25,
+            "step": 34
+          },
+          {
+            "guidance_probability": 0.5625,
+            "guided_events": 25,
+            "guided_fraction": 0.625,
+            "route_supervision_count": 25,
+            "step": 35
+          },
+          {
+            "guidance_probability": 0.550000011920929,
+            "guided_events": 23,
+            "guided_fraction": 0.574999988079071,
+            "route_supervision_count": 23,
+            "step": 36
+          },
+          {
+            "guidance_probability": 0.5375000238418579,
+            "guided_events": 23,
+            "guided_fraction": 0.574999988079071,
+            "route_supervision_count": 23,
+            "step": 37
+          },
+          {
+            "guidance_probability": 0.5249999761581421,
+            "guided_events": 18,
+            "guided_fraction": 0.44999998807907104,
+            "route_supervision_count": 18,
+            "step": 38
+          },
+          {
+            "guidance_probability": 0.512499988079071,
+            "guided_events": 25,
+            "guided_fraction": 0.625,
+            "route_supervision_count": 25,
+            "step": 39
+          },
+          {
+            "guidance_probability": 0.5,
+            "guided_events": 20,
+            "guided_fraction": 0.5,
+            "route_supervision_count": 20,
+            "step": 40
+          },
+          {
+            "guidance_probability": 0.48750001192092896,
+            "guided_events": 15,
+            "guided_fraction": 0.375,
+            "route_supervision_count": 15,
+            "step": 41
+          },
+          {
+            "guidance_probability": 0.4749999940395355,
+            "guided_events": 12,
+            "guided_fraction": 0.30000001192092896,
+            "route_supervision_count": 12,
+            "step": 42
+          },
+          {
+            "guidance_probability": 0.4625000059604645,
+            "guided_events": 13,
+            "guided_fraction": 0.32499998807907104,
+            "route_supervision_count": 13,
+            "step": 43
+          },
+          {
+            "guidance_probability": 0.44999998807907104,
+            "guided_events": 19,
+            "guided_fraction": 0.4749999940395355,
+            "route_supervision_count": 19,
+            "step": 44
+          },
+          {
+            "guidance_probability": 0.4375,
+            "guided_events": 15,
+            "guided_fraction": 0.375,
+            "route_supervision_count": 15,
+            "step": 45
+          },
+          {
+            "guidance_probability": 0.42500001192092896,
+            "guided_events": 19,
+            "guided_fraction": 0.4749999940395355,
+            "route_supervision_count": 19,
+            "step": 46
+          },
+          {
+            "guidance_probability": 0.4124999940395355,
+            "guided_events": 19,
+            "guided_fraction": 0.4749999940395355,
+            "route_supervision_count": 19,
+            "step": 47
+          },
+          {
+            "guidance_probability": 0.4000000059604645,
+            "guided_events": 17,
+            "guided_fraction": 0.42500001192092896,
+            "route_supervision_count": 17,
+            "step": 48
+          },
+          {
+            "guidance_probability": 0.38749998807907104,
+            "guided_events": 14,
+            "guided_fraction": 0.3499999940395355,
+            "route_supervision_count": 14,
+            "step": 49
+          },
+          {
+            "guidance_probability": 0.375,
+            "guided_events": 15,
+            "guided_fraction": 0.375,
+            "route_supervision_count": 15,
+            "step": 50
+          },
+          {
+            "guidance_probability": 0.36250001192092896,
+            "guided_events": 18,
+            "guided_fraction": 0.44999998807907104,
+            "route_supervision_count": 18,
+            "step": 51
+          },
+          {
+            "guidance_probability": 0.3499999940395355,
+            "guided_events": 14,
+            "guided_fraction": 0.3499999940395355,
+            "route_supervision_count": 14,
+            "step": 52
+          },
+          {
+            "guidance_probability": 0.3375000059604645,
+            "guided_events": 11,
+            "guided_fraction": 0.2750000059604645,
+            "route_supervision_count": 11,
+            "step": 53
+          },
+          {
+            "guidance_probability": 0.32499998807907104,
+            "guided_events": 11,
+            "guided_fraction": 0.2750000059604645,
+            "route_supervision_count": 11,
+            "step": 54
+          },
+          {
+            "guidance_probability": 0.3125,
+            "guided_events": 15,
+            "guided_fraction": 0.375,
+            "route_supervision_count": 15,
+            "step": 55
+          },
+          {
+            "guidance_probability": 0.30000001192092896,
+            "guided_events": 13,
+            "guided_fraction": 0.32499998807907104,
+            "route_supervision_count": 13,
+            "step": 56
+          },
+          {
+            "guidance_probability": 0.2874999940395355,
+            "guided_events": 9,
+            "guided_fraction": 0.22499999403953552,
+            "route_supervision_count": 9,
+            "step": 57
+          },
+          {
+            "guidance_probability": 0.2750000059604645,
+            "guided_events": 12,
+            "guided_fraction": 0.30000001192092896,
+            "route_supervision_count": 12,
+            "step": 58
+          },
+          {
+            "guidance_probability": 0.26249998807907104,
+            "guided_events": 8,
+            "guided_fraction": 0.20000000298023224,
+            "route_supervision_count": 8,
+            "step": 59
+          },
+          {
+            "guidance_probability": 0.25,
+            "guided_events": 10,
+            "guided_fraction": 0.25,
+            "route_supervision_count": 10,
+            "step": 60
+          },
+          {
+            "guidance_probability": 0.23749999701976776,
+            "guided_events": 8,
+            "guided_fraction": 0.20000000298023224,
+            "route_supervision_count": 8,
+            "step": 61
+          },
+          {
+            "guidance_probability": 0.22499999403953552,
+            "guided_events": 9,
+            "guided_fraction": 0.22499999403953552,
+            "route_supervision_count": 9,
+            "step": 62
+          },
+          {
+            "guidance_probability": 0.21250000596046448,
+            "guided_events": 6,
+            "guided_fraction": 0.15000000596046448,
+            "route_supervision_count": 6,
+            "step": 63
+          },
+          {
+            "guidance_probability": 0.20000000298023224,
+            "guided_events": 11,
+            "guided_fraction": 0.2750000059604645,
+            "route_supervision_count": 11,
+            "step": 64
+          },
+          {
+            "guidance_probability": 0.1875,
+            "guided_events": 5,
+            "guided_fraction": 0.125,
+            "route_supervision_count": 5,
+            "step": 65
+          },
+          {
+            "guidance_probability": 0.17499999701976776,
+            "guided_events": 7,
+            "guided_fraction": 0.17499999701976776,
+            "route_supervision_count": 7,
+            "step": 66
+          },
+          {
+            "guidance_probability": 0.16249999403953552,
+            "guided_events": 8,
+            "guided_fraction": 0.20000000298023224,
+            "route_supervision_count": 8,
+            "step": 67
+          },
+          {
+            "guidance_probability": 0.15000000596046448,
+            "guided_events": 2,
+            "guided_fraction": 0.05000000074505806,
+            "route_supervision_count": 2,
+            "step": 68
+          },
+          {
+            "guidance_probability": 0.13750000298023224,
+            "guided_events": 7,
+            "guided_fraction": 0.17499999701976776,
+            "route_supervision_count": 7,
+            "step": 69
+          },
+          {
+            "guidance_probability": 0.125,
+            "guided_events": 1,
+            "guided_fraction": 0.02500000037252903,
+            "route_supervision_count": 1,
+            "step": 70
+          },
+          {
+            "guidance_probability": 0.11249999701976776,
+            "guided_events": 7,
+            "guided_fraction": 0.17499999701976776,
+            "route_supervision_count": 7,
+            "step": 71
+          },
+          {
+            "guidance_probability": 0.10000000149011612,
+            "guided_events": 3,
+            "guided_fraction": 0.07500000298023224,
+            "route_supervision_count": 3,
+            "step": 72
+          },
+          {
+            "guidance_probability": 0.08749999850988388,
+            "guided_events": 3,
+            "guided_fraction": 0.07500000298023224,
+            "route_supervision_count": 3,
+            "step": 73
+          },
+          {
+            "guidance_probability": 0.07500000298023224,
+            "guided_events": 3,
+            "guided_fraction": 0.07500000298023224,
+            "route_supervision_count": 3,
+            "step": 74
+          },
+          {
+            "guidance_probability": 0.0625,
+            "guided_events": 4,
+            "guided_fraction": 0.10000000149011612,
+            "route_supervision_count": 4,
+            "step": 75
+          },
+          {
+            "guidance_probability": 0.05000000074505806,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 76
+          },
+          {
+            "guidance_probability": 0.03750000149011612,
+            "guided_events": 3,
+            "guided_fraction": 0.07500000298023224,
+            "route_supervision_count": 3,
+            "step": 77
+          },
+          {
+            "guidance_probability": 0.02500000037252903,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 78
+          },
+          {
+            "guidance_probability": 0.012500000186264515,
+            "guided_events": 2,
+            "guided_fraction": 0.05000000074505806,
+            "route_supervision_count": 2,
+            "step": 79
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 80
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 81
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 82
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 83
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 84
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 85
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 86
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 87
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 88
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 89
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 90
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 91
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 92
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 93
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 94
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 95
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 96
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 97
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 98
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 99
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 100
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 101
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 102
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 103
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 104
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 105
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 106
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 107
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 108
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 109
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 110
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 111
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 112
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 113
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 114
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 115
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 116
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 117
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 118
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 119
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 120
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 121
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 122
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 123
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 124
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 125
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 126
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 127
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 128
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 129
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 130
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 131
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 132
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 133
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 134
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 135
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 136
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 137
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 138
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 139
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 140
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 141
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 142
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 143
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 144
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 145
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 146
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 147
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 148
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 149
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 150
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 151
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 152
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 153
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 154
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 155
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 156
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 157
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 158
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 159
+          },
+          {
+            "guidance_probability": 0.0,
+            "guided_events": 0,
+            "guided_fraction": 0.0,
+            "route_supervision_count": 0,
+            "step": 160
+          }
+        ]
+      },
+      "data_seed": 777,
+      "elapsed_training_seconds": 4.827569599990966,
+      "episodes": 4,
+      "evaluation_label_independence": {
+        "logit_element_count": 160,
+        "logit_mismatch_count": 0,
+        "logits_equal": true,
+        "max_abs_logit_difference": 0.0,
+        "passed": true,
+        "route_element_count": 40,
+        "route_logits_equal": true,
+        "route_mismatch_count": 0,
+        "routes_equal": true
+      },
+      "final": {
+        "heldout_query": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "query_count": 0
+        },
+        "query": {
+          "accuracy": 1.0,
+          "correct": 12,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 0.9166666666666666,
+          "consistent_events": 33,
+          "fully_consistent_groups": 9,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 0.8055555555555556,
+          "correct": 29,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 0.8055555555555556
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            19,
+            12,
+            5
+          ],
+          "branch_fractions": [
+            0.5277777777777778,
+            0.3333333333333333,
+            0.1388888888888889
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 1,
+          "global_event_fraction": 0.025,
+          "load_entropy": 0.9776742172397523,
+          "local_event_count": 36,
+          "max_load_fraction": 0.5277777777777778,
+          "mean_active_branches_per_document": 2.5,
+          "mean_assignment_entropy": 0.6124786138534546,
+          "normalized_load_entropy": 0.8899174233933107,
+          "normalized_mean_assignment_entropy": 0.5575020597994458,
+          "null_event_count": 3,
+          "null_event_fraction": 0.075,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 1.0,
+          "correct": 12,
+          "query_count": 12
+        }
+      },
+      "final_guidance": {
+        "guided_events": 0,
+        "guided_fraction": 0.0,
+        "probability": 0.0
+      },
+      "final_loss": {
+        "persistence_pair_count": 24,
+        "query": 0.0026812292635440826,
+        "query_count": 12,
+        "route_curriculum": 0.0,
+        "route_persistence": 0.04537202790379524,
+        "route_supervision_count": 0,
+        "router_balance": 0.01010471023619175,
+        "router_entropy": 0.6109700798988342,
+        "total": 0.006066036410629749
+      },
+      "heldout_batch_sha256": "d4c724787a832e3dc8a12f8f8d6765ec05e090462dd719040ae69bc51eb9ca97",
+      "heldout_evaluation": {
+        "heldout_query": {
+          "accuracy": 0.5,
+          "correct": 3,
+          "query_count": 6
+        },
+        "query": {
+          "accuracy": 0.3333333333333333,
+          "correct": 4,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 0.75,
+          "consistent_events": 27,
+          "fully_consistent_groups": 7,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 0.5277777777777778,
+          "correct": 19,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 0.5277777777777778
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            4,
+            21,
+            11
+          ],
+          "branch_fractions": [
+            0.1111111111111111,
+            0.5833333333333334,
+            0.3055555555555556
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 0,
+          "global_event_fraction": 0.0,
+          "load_entropy": 0.9208245874157344,
+          "local_event_count": 36,
+          "max_load_fraction": 0.5833333333333334,
+          "mean_active_branches_per_document": 3.0,
+          "mean_assignment_entropy": 0.9127180576324463,
+          "normalized_load_entropy": 0.8381706603082746,
+          "normalized_mean_assignment_entropy": 0.8307917789077071,
+          "null_event_count": 4,
+          "null_event_fraction": 0.1,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 0.16666666666666666,
+          "correct": 1,
+          "query_count": 6
+        }
+      },
+      "initial": {
+        "heldout_query": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "query_count": 0
+        },
+        "query": {
+          "accuracy": 0.4166666666666667,
+          "correct": 5,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 0.75,
+          "consistent_events": 27,
+          "fully_consistent_groups": 6,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 0.4444444444444444,
+          "correct": 16,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 0.4444444444444444
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            27,
+            5,
+            4
+          ],
+          "branch_fractions": [
+            0.75,
+            0.1388888888888889,
+            0.1111111111111111
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 0,
+          "global_event_fraction": 0.0,
+          "load_entropy": 0.7340755387681392,
+          "local_event_count": 36,
+          "max_load_fraction": 0.75,
+          "mean_active_branches_per_document": 3.0,
+          "mean_assignment_entropy": 1.098493218421936,
+          "normalized_load_entropy": 0.66818435069399,
+          "normalized_mean_assignment_entropy": 0.9998916175912086,
+          "null_event_count": 4,
+          "null_event_fraction": 0.1,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 0.4166666666666667,
+          "correct": 5,
+          "query_count": 12
+        }
+      },
+      "initial_state_dict_sha256": "eb04890e0d907ff24b0ca9c93ecbd0d207417302ac145ad012d599f9b6ca575b",
+      "model_fingerprint": "cbc6a4db81022f7993914a64154e0bc861029ccfc6efe88b3976b0956d3b9e30",
+      "model_seed": 20260813,
+      "oracle_gaps": {
+        "fixed_train_query": {
+          "autonomous_accuracy": 1.0,
+          "gap": 0.0,
+          "oracle_accuracy": 1.0
+        },
+        "heldout_all_query": {
+          "autonomous_accuracy": 0.3333333333333333,
+          "gap": 0.08333333333333337,
+          "oracle_accuracy": 0.4166666666666667
+        },
+        "heldout_combination_query": {
+          "autonomous_accuracy": 0.5,
+          "gap": 0.0,
+          "oracle_accuracy": 0.5
+        }
+      },
+      "parameter_count": 6895,
+      "parameter_shapes_sha256": "eb9f45a4860c60c3ee574f8dfa78555691a0b242d2c93b4b68f69204f0554e31",
+      "sequence_length": 10,
+      "status": "completed",
+      "steps": 160,
+      "structural_work": {
+        "forest_active_slots": 19,
+        "forest_merge_count": 18,
+        "router_branch_score_work_proxy": 120
+      },
+      "task_fingerprint": "6b4c53fc11790aa68bcf94eed4cfd239f29dacc108a6e0106922b4fc0b04a964",
+      "train_batch_sha256": "91844f5e437c5fb035c983b5c86112d73b8c585a2899f13c846029bbdff47d27"
+    },
+    {
+      "condition": "latent",
+      "config_fingerprint": "44e1c4d52da81543108cfb27da80a165f5b871893e93c806d443a0d84e2d8975",
+      "config_sha256": "7cf3c162e8828869ff18ece2b2380abe1365e8ba0e19b6a1379a70f35ea1af81",
+      "curriculum": null,
+      "data_seed": 777,
+      "elapsed_training_seconds": 3.654909499993664,
+      "episodes": 4,
+      "evaluation_label_independence": null,
+      "final": {
+        "heldout_query": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "query_count": 0
+        },
+        "query": {
+          "accuracy": 1.0,
+          "correct": 12,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 0.7222222222222222,
+          "consistent_events": 26,
+          "fully_consistent_groups": 5,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 0.5833333333333334,
+          "correct": 21,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 0.5833333333333333
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            14,
+            14,
+            8
+          ],
+          "branch_fractions": [
+            0.3888888888888889,
+            0.3888888888888889,
+            0.2222222222222222
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 0,
+          "global_event_fraction": 0.0,
+          "load_entropy": 1.0688206728265008,
+          "local_event_count": 36,
+          "max_load_fraction": 0.3888888888888889,
+          "mean_active_branches_per_document": 3.0,
+          "mean_assignment_entropy": 0.9579547047615051,
+          "normalized_load_entropy": 0.97288250263637,
+          "normalized_mean_assignment_entropy": 0.8719679496056527,
+          "null_event_count": 4,
+          "null_event_fraction": 0.1,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 1.0,
+          "correct": 12,
+          "query_count": 12
+        }
+      },
+      "final_guidance": {
+        "guided_events": 0,
+        "guided_fraction": 0.0,
+        "probability": 0.0
+      },
+      "final_loss": {
+        "persistence_pair_count": 24,
+        "query": 0.003976842388510704,
+        "query_count": 12,
+        "route_curriculum": 0.0,
+        "route_persistence": 0.012537881731987,
+        "route_supervision_count": 0,
+        "router_balance": 0.003546694293618202,
+        "router_entropy": 0.9569304585456848,
+        "total": 0.0057380017824471
+      },
+      "heldout_batch_sha256": "d4c724787a832e3dc8a12f8f8d6765ec05e090462dd719040ae69bc51eb9ca97",
+      "heldout_evaluation": {
+        "heldout_query": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "query_count": 6
+        },
+        "query": {
+          "accuracy": 0.08333333333333333,
+          "correct": 1,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 0.6388888888888888,
+          "consistent_events": 23,
+          "fully_consistent_groups": 3,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 0.5555555555555556,
+          "correct": 20,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 0.5555555555555556
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            13,
+            15,
+            8
+          ],
+          "branch_fractions": [
+            0.3611111111111111,
+            0.4166666666666667,
+            0.2222222222222222
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 0,
+          "global_event_fraction": 0.0,
+          "load_entropy": 1.066834855206893,
+          "local_event_count": 36,
+          "max_load_fraction": 0.4166666666666667,
+          "mean_active_branches_per_document": 3.0,
+          "mean_assignment_entropy": 1.079073429107666,
+          "normalized_load_entropy": 0.9710749335420762,
+          "normalized_mean_assignment_entropy": 0.9822149635845313,
+          "null_event_count": 4,
+          "null_event_fraction": 0.1,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 0.16666666666666666,
+          "correct": 1,
+          "query_count": 6
+        }
+      },
+      "initial": {
+        "heldout_query": {
+          "accuracy": 0.0,
+          "correct": 0,
+          "query_count": 0
+        },
+        "query": {
+          "accuracy": 0.4166666666666667,
+          "correct": 5,
+          "query_count": 12
+        },
+        "route_consistency": {
+          "consistency": 0.75,
+          "consistent_events": 27,
+          "fully_consistent_groups": 6,
+          "group_count": 12,
+          "local_event_count": 36
+        },
+        "route_recovery": {
+          "accuracy": 0.4444444444444444,
+          "correct": 16,
+          "document_count": 4,
+          "local_event_count": 36,
+          "macro_accuracy": 0.4444444444444444
+        },
+        "router_load": {
+          "active_branches": 3,
+          "assignment_entropy_count": 36,
+          "branch_counts": [
+            27,
+            5,
+            4
+          ],
+          "branch_fractions": [
+            0.75,
+            0.1388888888888889,
+            0.1111111111111111
+          ],
+          "collapsed": false,
+          "collapsed_document_count": 0,
+          "collapsed_document_fraction": 0.0,
+          "document_count": 4,
+          "global_event_count": 0,
+          "global_event_fraction": 0.0,
+          "load_entropy": 0.7340755387681392,
+          "local_event_count": 36,
+          "max_load_fraction": 0.75,
+          "mean_active_branches_per_document": 3.0,
+          "mean_assignment_entropy": 1.098493218421936,
+          "normalized_load_entropy": 0.66818435069399,
+          "normalized_mean_assignment_entropy": 0.9998916175912086,
+          "null_event_count": 4,
+          "null_event_fraction": 0.1,
+          "valid_event_count": 40
+        },
+        "seen_query": {
+          "accuracy": 0.4166666666666667,
+          "correct": 5,
+          "query_count": 12
+        }
+      },
+      "initial_state_dict_sha256": "eb04890e0d907ff24b0ca9c93ecbd0d207417302ac145ad012d599f9b6ca575b",
+      "model_fingerprint": "0920a19e3fda4904ac4d47adce132ba41484ed373bbfca5c0d54703372ffaa19",
+      "model_seed": 20260813,
+      "oracle_gaps": {
+        "fixed_train_query": {
+          "autonomous_accuracy": 1.0,
+          "gap": 0.0,
+          "oracle_accuracy": 1.0
+        },
+        "heldout_all_query": {
+          "autonomous_accuracy": 0.08333333333333333,
+          "gap": 0.33333333333333337,
+          "oracle_accuracy": 0.4166666666666667
+        },
+        "heldout_combination_query": {
+          "autonomous_accuracy": 0.0,
+          "gap": 0.5,
+          "oracle_accuracy": 0.5
+        }
+      },
+      "parameter_count": 6895,
+      "parameter_shapes_sha256": "eb9f45a4860c60c3ee574f8dfa78555691a0b242d2c93b4b68f69204f0554e31",
+      "sequence_length": 10,
+      "status": "completed",
+      "steps": 120,
+      "structural_work": {
+        "forest_active_slots": 15,
+        "forest_merge_count": 21,
+        "router_branch_score_work_proxy": 120
+      },
+      "task_fingerprint": "6b4c53fc11790aa68bcf94eed4cfd239f29dacc108a6e0106922b4fc0b04a964",
+      "train_batch_sha256": "91844f5e437c5fb035c983b5c86112d73b8c585a2899f13c846029bbdff47d27"
+    }
+  ],
+  "environment": {
+    "cuda_available": false,
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.13",
+    "torch": "2.13.0+cpu",
+    "torch_num_threads": 1
+  },
+  "gates": {
+    "all_conditions_present": true,
+    "curriculum_autonomous_label_independence": true,
+    "curriculum_final_guidance_zero": true,
+    "curriculum_final_route_supervision_zero": true,
+    "curriculum_fixed_batch_overfit": true,
+    "heldout_queries_present": true,
+    "latent_route_supervision_zero": true,
+    "oracle_fixed_batch_overfit": true,
+    "paired_heldout_batch": true,
+    "paired_initial_weights": true,
+    "paired_parameter_count": true,
+    "paired_parameter_shapes": true,
+    "paired_train_batch": true,
+    "route_loads_complete": true,
+    "router_work_proxy_exact": true
+  },
+  "generated_at_utc": "2026-08-13T11:32:10.253334+00:00",
+  "paired_heldout_batch_sha256": "d4c724787a832e3dc8a12f8f8d6765ec05e090462dd719040ae69bc51eb9ca97",
+  "paired_train_batch_sha256": "91844f5e437c5fb035c983b5c86112d73b8c585a2899f13c846029bbdff47d27",
+  "schema_version": 1,
+  "scope": "deterministic_fixed_batch_smoke_not_scientific_campaign",
+  "status": "passed"
+}

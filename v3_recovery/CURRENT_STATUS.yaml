@@ -17,7 +17,7 @@ validated_reconstruction:
       - deterministic runtime-state serialization and resume
     record: MILESTONE1_VALIDATION.json
   milestone_2_dynamic_binding_and_router:
-    status: source_verified_commit_bound_smoke_pending
+    status: verified
     scope:
       - dynamic document-local binding language and held-out combinations
       - sanitized model-visible architecture boundary
@@ -28,9 +28,14 @@ validated_reconstruction:
       - atomic commit-bound smoke runner with failure records
     tests_passed: 170
     randomized_binding_batches_passed: 400
-    record: MILESTONE2_SOURCE_VALIDATION.json
+    source_record: MILESTONE2_SOURCE_VALIDATION.json
+    commit_bound_smoke:
+      status: passed
+      source_commit: a9935857821ffc6d486f1aa19d0e4059dc4ecb28
+      source_tree: fb5f1a156905deb1b2b36c95e26e913d06a197c1
+      evidence_sha256: 0aa76aefc8ff59da4db822ca297d68faceb2ec1d4ae79527ab2caab77caca494
+      record: MILESTONE2_SMOKE.json
 not_yet_reconstructed:
-  - commit-bound milestone 2 smoke evidence
   - scientific recurrent, cached-transformer, and causal-tree baselines
   - structural truncation and compact model export
   - campaign closure and V3 release
