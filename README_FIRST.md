@@ -1,5 +1,9 @@
 # Read This First — Self-Contained Work Handoff
 
+> Archival note: this document describes the original imported handoff. For the
+> live reconstruction status and newly produced evidence, see
+> `v3_recovery/CURRENT_STATUS.yaml`.
+
 This repository contains the actual V2 project. It does not rely on a ChatGPT sandbox link, a missing prior repository, or an unstated download.
 
 ## What is physically present

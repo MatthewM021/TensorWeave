@@ -1,5 +1,10 @@
 # V3 Recovery Directory
 
-No V3 source tree, checkpoints, or 127 partial run records were recovered from the interrupted execution session. This directory intentionally contains only the recorded status document.
+No V3 source tree, checkpoints, or 127 partial run records were recovered from
+the interrupted execution session. Those unavailable historical artifacts are
+not represented as reproducible evidence.
 
-The V3 implementation must be reconstructed under the top-level `v3/` directory using `HANDOFF.md` and `docs/`. This statement prevents the historical partial results from being mistaken for reproducible evidence.
+The new reconstruction lives under the top-level `v3/` directory. This recovery
+directory now contains machine-readable status and validation records produced
+from that reconstruction. `CURRENT_STATUS.yaml` is the current index;
+`V3_RECOVERY_STATUS.yaml` remains the immutable historical recovery record.

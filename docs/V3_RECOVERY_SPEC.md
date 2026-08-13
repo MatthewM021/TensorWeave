@@ -9,6 +9,7 @@ Add V3 beside V2:
 ```text
 src/tnlm_v3/
   data.py
+  binding.py
   routing.py
   operators.py
   forest.py

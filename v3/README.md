@@ -45,8 +45,40 @@ The CPU reference settings and declared float64 parity tolerances live in
 
 ## Scope boundary
 
-This milestone uses supplied/oracle route IDs only. The constrained causal
-router, dynamic document-local binding task, training stack, scientific
-baselines, structural truncation, compact model export, and campaign closure
-remain later milestones. The state serializer here is not the later compact
-model exporter.
+The state serializer here is not the later compact model exporter.
+
+## Milestone 2: dynamic binding and persistent routing
+
+The second milestone adds:
+
+- a deterministic document-local language with bind, update, copy,
+  invalidate, query, and distractor events;
+- explicit separation of model-visible fields from evaluation-only routes,
+  query targets, generation IDs, and dependency parents;
+- a sanitized model construction object that excludes generator-only held-out
+  combinations, length limits, and mixture probabilities;
+- a prefix-only `O(B)` persistent router with shared branch scoring and bounded
+  prototypes/global state;
+- scientifically distinct oracle, curriculum, and fully latent contracts;
+- deterministic curriculum guidance that becomes fully autonomous in
+  evaluation;
+- exact per-document permutation-aligned route recovery, document consistency,
+  local/global/null load, per-document collapse, aggregate/seen/held-out query
+  accuracy, oracle-gap, and label-independence audits; and
+- a straight-through selected-route surrogate so latent predictive loss has a
+  gradient to the router while the executed forest remains discrete.
+
+The surrogate is an explicitly biased optimization estimator; hard autonomous
+routes and metrics are always evaluated without route labels. The fixed-batch
+smoke matrix is an implementation/optimization check, not scientific evidence.
+Its three strict configs live under `configs/milestone2/`, and the runner is
+`scripts/run_milestone2_smoke.py`.
+
+The runner requires a clean checkout whose `HEAD` exactly matches
+`--code-commit`, and it requires `--output` outside that checkout so source
+integrity can be rechecked after training. It writes atomic progress after each
+condition and records failures as well as success. Once a run passes, copy the
+strict JSON record into `v3_recovery/` in a separate evidence commit.
+
+Scientific baselines, structural truncation, compact model export, paired
+multi-seed campaigns, and campaign closure remain later milestones.

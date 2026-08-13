@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "status": "source_verified_commit_bound_smoke_pending",
+  "generated_at_utc": "2026-08-13T11:24:55.0695724Z",
+  "base_commit": "6984cebb2ec4a8a9bab1a5bf1571ea2bbf49148d",
+  "source_commit": null,
+  "scope": "milestone_2_source_and_precommit_implementation_probe",
+  "environment": {
+    "python": "3.12.13",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.13.0+cpu",
+    "cuda_available": false
+  },
+  "verification": {
+    "v3_tests_collected": 170,
+    "v3_tests_passed": 170,
+    "randomized_binding_batches_checked": 400,
+    "randomized_binding_batches_passed": 400,
+    "v2_tests_passed": 22,
+    "v2_evidence_checks_passed": 161,
+    "self_contained_repository_verification": "passed",
+    "wheel_build": "passed",
+    "isolated_wheel_import": "passed"
+  },
+  "precommit_smoke_probe": {
+    "evidence_class": "implementation_probe_not_commit_bound_not_scientific_campaign",
+    "oracle": {
+      "fixed_train_batch_query_accuracy": 1.0,
+      "heldout_query_count": 6,
+      "heldout_query_accuracy": 0.5,
+      "route_recovery": 1.0
+    },
+    "curriculum": {
+      "fixed_train_batch_query_accuracy": 1.0,
+      "heldout_query_count": 6,
+      "heldout_query_accuracy": 0.5,
+      "route_recovery": 0.8055555555555556,
+      "final_guided_events": 0,
+      "final_route_supervision_count": 0,
+      "evaluation_label_independence": true
+    },
+    "latent": {
+      "fixed_train_batch_query_accuracy": 1.0,
+      "heldout_query_count": 6,
+      "heldout_query_accuracy": 0.0,
+      "route_recovery": 0.5833333333333334,
+      "route_supervision_count": 0
+    },
+    "paired_parameter_shapes": true,
+    "paired_initial_weights": true,
+    "paired_train_batch": true
+  },
+  "next_required_evidence": "Run the strict smoke runner from the exact clean source commit and commit its passed JSON record separately."
+}

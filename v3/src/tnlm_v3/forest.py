@@ -233,6 +233,8 @@ class ScaleSharedBinaryForest(nn.Module):
         event: Tensor,
         route: Tensor,
         valid: Tensor,
+        *,
+        route_strength: Tensor | None = None,
     ) -> ForestRun:
         """Apply one event without mutating ``state``.
 
@@ -256,6 +258,13 @@ class ScaleSharedBinaryForest(nn.Module):
             state, batch_size=n, paths=self.paths, d_model=self.d_model
         )
         validate_routes(route.unsqueeze(1), valid.unsqueeze(1), self.branches)
+        if route_strength is not None:
+            if route_strength.shape != (n,) or not route_strength.is_floating_point():
+                raise ValueError("route_strength must be floating point with shape [N]")
+            if route_strength.device != event.device or route_strength.dtype != event.dtype:
+                raise ValueError("route_strength must match event device and dtype")
+            if not bool(torch.isfinite(route_strength).all()):
+                raise ValueError("route_strength must be finite")
 
         safe_route = route.to(torch.int64).clamp(min=0, max=self.paths - 1)
         routed = valid & (route != NULL_ROUTE)
@@ -287,7 +296,14 @@ class ScaleSharedBinaryForest(nn.Module):
             slots = state.slots
             occupied = state.occupied
 
-        carry = event.unsqueeze(1).expand(-1, self.paths, -1)
+        strength = (
+            torch.ones(n, device=event.device, dtype=event.dtype)
+            if route_strength is None
+            else route_strength
+        )
+        carry = (event * strength.unsqueeze(-1)).unsqueeze(1).expand(
+            -1, self.paths, -1
+        )
         has_carry = lane_mask
         global_path = (
             torch.arange(self.paths, device=event.device) == self.branches

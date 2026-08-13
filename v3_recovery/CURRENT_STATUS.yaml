@@ -16,10 +16,22 @@ validated_reconstruction:
       - query-aware active-slot readout
       - deterministic runtime-state serialization and resume
     record: MILESTONE1_VALIDATION.json
+  milestone_2_dynamic_binding_and_router:
+    status: source_verified_commit_bound_smoke_pending
+    scope:
+      - dynamic document-local binding language and held-out combinations
+      - sanitized model-visible architecture boundary
+      - oracle, curriculum, and fully latent persistent routing
+      - scheduled teacher guidance and scheduled route supervision
+      - exact per-document route alignment and collapse/load diagnostics
+      - seen and held-out query metrics and oracle-gap instrumentation
+      - atomic commit-bound smoke runner with failure records
+    tests_passed: 170
+    randomized_binding_batches_passed: 400
+    record: MILESTONE2_SOURCE_VALIDATION.json
 not_yet_reconstructed:
-  - constrained causal router
-  - dynamic document-local binding benchmark
-  - training and scientific baselines
+  - commit-bound milestone 2 smoke evidence
+  - scientific recurrent, cached-transformer, and causal-tree baselines
   - structural truncation and compact model export
   - campaign closure and V3 release
 evidence_rule: >-

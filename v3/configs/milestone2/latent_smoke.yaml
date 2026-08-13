@@ -1,0 +1,36 @@
+schema_version: 1
+condition: latent
+model_seed: 20260813
+data_seed: 777
+task:
+  num_surface_keys: 5
+  value_cardinality: 4
+  branches: 3
+  max_live_bindings: 3
+  min_length: 10
+  max_length: 18
+  heldout_key_value_pairs: [[0, 0]]
+  global_distractor_probability: 0.5
+model:
+  d_model: 16
+  cp_rank: 8
+  router_hidden_dim: 12
+  scale_feature_dim: 8
+  straight_through_route_surrogate: true
+routing:
+  mode: latent
+  curriculum_seed: 55
+  schedule: null
+loss:
+  query_weight: 1.0
+  route_curriculum_weight: 1.0
+  router_balance_weight: 0.05
+  router_entropy_weight: 0.001
+  route_persistence_weight: 0.05
+training:
+  episodes: 4
+  sequence_length: 10
+  steps: 120
+  learning_rate: 0.007
+  weight_decay: 0.0
+  max_gradient_norm: 5.0

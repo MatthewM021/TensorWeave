@@ -1,6 +1,8 @@
 # Physical Repository Contents
 
-Generated from the actual files in this archive.
+Archival inventory generated from the files in the original import archive.
+It intentionally does not enumerate subsequent reconstruction commits; see
+`v3_recovery/CURRENT_STATUS.yaml` for the live project status.
 
 ```text
 ./.gitattributes

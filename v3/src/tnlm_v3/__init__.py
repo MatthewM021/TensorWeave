@@ -1,5 +1,23 @@
 """TensorWeave TNLM V3 research implementation."""
 
+from .binding import (
+    BindingArchitectureConfig,
+    BindingEventEncoder,
+    BindingModelConfig,
+    BindingModelOutput,
+    RoutedBindingModel,
+)
+from .data import (
+    BindingBatch,
+    BindingEpisode,
+    BindingEvaluation,
+    BindingEventKind,
+    BindingModelInputs,
+    BindingTaskConfig,
+    collate_binding_episodes,
+    generate_binding_episode,
+    generate_binding_episodes,
+)
 from .forest import (
     ForestConfig,
     ForestModelOutput,
@@ -10,10 +28,44 @@ from .forest import (
     RoutedTensorLanguageModel,
     ScaleSharedBinaryForest,
 )
-from .factory import build_model, load_forest_config
-from .routing import NULL_ROUTE
+from .routing import (
+    NULL_ROUTE,
+    CurriculumSchedule,
+    PersistentCausalRouter,
+    RoutingMode,
+)
+from .training import (
+    BindingEvaluationSummary,
+    BindingLoss,
+    BindingLossConfig,
+    compute_binding_loss,
+    evaluate_binding_model,
+    train_binding_step,
+)
+from .factory import (
+    BindingExperimentConfig,
+    build_binding_model,
+    build_model,
+    load_binding_experiment_config,
+    load_forest_config,
+)
 
 __all__ = [
+    "BindingBatch",
+    "BindingArchitectureConfig",
+    "BindingEpisode",
+    "BindingEvaluation",
+    "BindingEvaluationSummary",
+    "BindingEventEncoder",
+    "BindingEventKind",
+    "BindingExperimentConfig",
+    "BindingLoss",
+    "BindingLossConfig",
+    "BindingModelConfig",
+    "BindingModelInputs",
+    "BindingModelOutput",
+    "BindingTaskConfig",
+    "CurriculumSchedule",
     "ForestConfig",
     "ForestModelOutput",
     "ForestPrefixRun",
@@ -21,8 +73,19 @@ __all__ = [
     "ForestRun",
     "ForestState",
     "NULL_ROUTE",
+    "PersistentCausalRouter",
+    "RoutedBindingModel",
     "RoutedTensorLanguageModel",
+    "RoutingMode",
     "ScaleSharedBinaryForest",
+    "build_binding_model",
     "build_model",
+    "collate_binding_episodes",
+    "compute_binding_loss",
+    "evaluate_binding_model",
+    "generate_binding_episode",
+    "generate_binding_episodes",
+    "load_binding_experiment_config",
     "load_forest_config",
+    "train_binding_step",
 ]

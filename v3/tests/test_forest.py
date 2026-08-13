@@ -260,6 +260,28 @@ def test_no_merge_is_executed_for_padding_null_or_first_insert():
         state = run.state
 
 
+def test_straight_through_route_strength_preserves_value_and_carries_gradient():
+    forest = ScaleSharedBinaryForest(
+        d_model=1, branches=2, cp_rank=1, merge=ChronologyMerge()
+    ).to(dtype=torch.float64)
+    initial = forest.initial_state(1, dtype=torch.float64)
+    event = torch.tensor([[3.0]], dtype=torch.float64, requires_grad=True)
+    probability = torch.tensor([0.4], dtype=torch.float64, requires_grad=True)
+    strength = torch.ones_like(probability) - probability.detach() + probability
+    state = forest.step(
+        initial,
+        event,
+        torch.tensor([1]),
+        torch.tensor([True]),
+        route_strength=strength,
+    ).state
+
+    assert state.slots[0, 1, 0, 0].item() == 3.0
+    state.slots.sum().backward()
+    assert event.grad is not None and event.grad.item() == 1.0
+    assert probability.grad is not None and probability.grad.item() == 3.0
+
+
 def test_resume_from_checkpoint_matches_uninterrupted_streaming():
     torch.manual_seed(9)
     forest = make_forest()
@@ -477,16 +499,25 @@ def test_batch_members_are_independent():
     first = model(tokens[:1], routes[:1], valid[:1])
     second = model(tokens[1:], routes[1:], valid[1:])
 
-    torch.testing.assert_close(together.logits[:1], first.logits, rtol=0, atol=0)
-    torch.testing.assert_close(together.logits[1:], second.logits, rtol=0, atol=0)
+    # Dense kernels may choose a different accumulation order when the batch
+    # dimension changes.  Independence is therefore a declared-tolerance
+    # numeric property, while the discrete counters below remain exact.
+    torch.testing.assert_close(
+        together.logits[:1], first.logits, rtol=1e-9, atol=1e-10
+    )
+    torch.testing.assert_close(
+        together.logits[1:], second.logits, rtol=1e-9, atol=1e-10
+    )
     together_first = model.forest.state_for_batch(together.state, 0)
     together_second = model.forest.state_for_batch(together.state, 1)
-    torch.testing.assert_close(together_first.slots, first.state.slots, rtol=0, atol=0)
+    torch.testing.assert_close(
+        together_first.slots, first.state.slots, rtol=1e-9, atol=1e-10
+    )
     torch.testing.assert_close(
         together_second.slots,
         second.state.slots,
-        rtol=0,
-        atol=0,
+        rtol=1e-9,
+        atol=1e-10,
     )
     assert torch.equal(together_second.counts, second.state.counts)
 
