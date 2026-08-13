@@ -35,9 +35,22 @@ validated_reconstruction:
       source_tree: fb5f1a156905deb1b2b36c95e26e913d06a197c1
       evidence_sha256: 0aa76aefc8ff59da4db822ca297d68faceb2ec1d4ae79527ab2caab77caca494
       record: MILESTONE2_SMOKE.json
+  milestone_3_structural_truncation_and_export:
+    status: physical_cp_compaction_core_implemented_audit_pending
+    scope:
+      - deterministic CP-channel parameter-energy selection
+      - dense selected-reference construction
+      - physical slicing of all five CP-axis tensors
+      - compact binding-model construction and strict manifest
+      - explicit unchanged persistent-state interface
+    remaining:
+      - canonical compact-model artifact bytes
+      - fresh-process load and exact replay
+      - real-update carry-boundary parity audit
+      - RSS and wall-time measurement record
 not_yet_reconstructed:
   - scientific recurrent, cached-transformer, and causal-tree baselines
-  - structural truncation and compact model export
+  - commit-bound milestone 3 export audit and artifact
   - campaign closure and V3 release
 evidence_rule: >-
   This file records only newly reconstructed and locally verified work. The

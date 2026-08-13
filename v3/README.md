@@ -82,3 +82,23 @@ strict JSON record into `v3_recovery/` in a separate evidence commit.
 
 Scientific baselines, structural truncation, compact model export, paired
 multi-seed campaigns, and campaign closure remain later milestones.
+
+## Milestone 3: compact CP-rank export (in progress)
+
+The first export layer now selects a deterministic subset of the shared merge
+operator's CP interaction channels, builds a dense zeroed reference, and
+physically slices the five tensors carrying that CP axis. The compact model has
+fewer parameters, fewer raw tensor bytes, and a lower declared merge-operation
+proxy. It contains no dense rank mask or original-rank buffer.
+
+This operation does **not** reduce `d_model`, the number of forest paths, or the
+number of scalars in an occupied persistent-state slot. The export manifest
+records that unchanged state interface explicitly. Whole-state channel pruning
+would require coordinated slicing through embeddings, router, residual and gate
+paths, normalization, scale signals, and readout; it is not implied by this
+CP-rank result.
+
+Parameter-energy selection is a deterministic structural proxy, not evidence
+that a chosen compact rank preserves scientific quality. A canonical model
+artifact codec, fresh-process replay, longer-real-update parity, and measured
+runtime/RSS audit remain required before Milestone 3 is marked verified.

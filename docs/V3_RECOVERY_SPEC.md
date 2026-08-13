@@ -15,6 +15,7 @@ src/tnlm_v3/
   forest.py
   truncation.py
   export.py
+  model_export.py
   baselines.py
   training.py
   benchmark.py

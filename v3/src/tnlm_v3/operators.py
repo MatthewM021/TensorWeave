@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import math
-from typing import Union
+import operator
+from typing import Sequence, Union
 
 import torch
 from torch import Tensor, nn
@@ -217,3 +218,97 @@ class ScaleSharedCPMerge(nn.Module):
             "operation_count_proxy_per_merge": per_merge,
             "operation_count_proxy": per_merge * merge_count,
         }
+
+
+def slice_cp_merge(
+    source: ScaleSharedCPMerge,
+    retained_indices: Sequence[int],
+) -> ScaleSharedCPMerge:
+    """Return a physically compact copy containing selected CP channels.
+
+    ``retained_indices`` names the source CP channels in strictly increasing
+    order.  The returned operator has ``cp_rank == len(retained_indices)``;
+    it contains no dense mask, original-rank buffer, or zero-padded CP axis.
+    Parameters outside the CP interaction are copied without modification.
+    """
+
+    if type(source) is not ScaleSharedCPMerge:
+        raise TypeError("source must be exactly a ScaleSharedCPMerge")
+    if isinstance(retained_indices, (str, bytes)):
+        raise TypeError("retained_indices must be a sequence of integers")
+    try:
+        raw_indices = tuple(retained_indices)
+    except TypeError as error:
+        raise TypeError(
+            "retained_indices must be a sequence of integers"
+        ) from error
+
+    indices: list[int] = []
+    for raw_index in raw_indices:
+        if isinstance(raw_index, bool):
+            raise TypeError("retained_indices must contain only integers")
+        try:
+            index = operator.index(raw_index)
+        except TypeError as error:
+            raise TypeError(
+                "retained_indices must contain only integers"
+            ) from error
+        indices.append(index)
+
+    if not indices:
+        raise ValueError("at least one CP channel must be retained")
+    if indices != sorted(set(indices)):
+        raise ValueError("retained_indices must be sorted and unique")
+    if indices[0] < 0 or indices[-1] >= source.cp_rank:
+        raise ValueError("retained_indices are outside the source CP rank")
+    if len(indices) >= source.cp_rank:
+        raise ValueError("compact CP rank must be smaller than the source rank")
+
+    reference = source.left.weight
+    cpu_rng_state = torch.random.get_rng_state()
+    cuda_rng_state = (
+        torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
+    )
+    try:
+        compact = ScaleSharedCPMerge(
+            d_model=source.d_model,
+            cp_rank=len(indices),
+            scale_feature_dim=source.scale_feature_dim,
+        ).to(device=reference.device, dtype=reference.dtype)
+    finally:
+        torch.random.set_rng_state(cpu_rng_state)
+        if cuda_rng_state is not None:
+            torch.cuda.set_rng_state_all(cuda_rng_state)
+    selected = torch.tensor(indices, device=reference.device, dtype=torch.int64)
+
+    source_state = source.state_dict()
+    compact_state = {
+        name: value.detach().clone() for name, value in source_state.items()
+    }
+    compact_state["left.weight"] = source.left.weight.index_select(
+        0, selected
+    ).detach().clone()
+    compact_state["right.weight"] = source.right.weight.index_select(
+        0, selected
+    ).detach().clone()
+    compact_state["scale_to_rank.weight"] = (
+        source.scale_to_rank.weight.index_select(0, selected).detach().clone()
+    )
+    compact_state["global_rank"] = source.global_rank.index_select(
+        0, selected
+    ).detach().clone()
+    compact_state["output.weight"] = source.output.weight.index_select(
+        1, selected
+    ).detach().clone()
+    compact.load_state_dict(compact_state, strict=True)
+
+    source_parameters = dict(source.named_parameters())
+    for name, parameter in compact.named_parameters():
+        parameter.requires_grad_(source_parameters[name].requires_grad)
+    source_modules = dict(source.named_modules())
+    for name, module in compact.named_modules():
+        module.training = source_modules[name].training
+    return compact
+
+
+__all__ = ["ScaleSharedCPMerge", "analytic_scale_features", "slice_cp_merge"]
