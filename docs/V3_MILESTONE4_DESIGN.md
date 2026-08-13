@@ -95,6 +95,16 @@ Before a baseline source commit is published, tests must cover:
 
 Passing these tests establishes usable controls, not comparable quality.
 
+A shared baseline campaign adapter now trains and evaluates all three controls
+with a query-only predictive objective. The model forward receives exactly
+`BindingModelInputs`; targets are read only after forward, held-out metadata is
+used only to stratify evaluation, and oracle routes are never read. Empty-query
+batches skip backward and optimizer advancement entirely. Overall, seen, and
+held-out query counts, accuracy, cross-entropy, parameter bytes, and exact
+persistent-state tensor bytes are reported under one strict contract. Routed
+oracle, curriculum, and latent models intentionally remain on their separate
+routing-aware training path.
+
 The recurrent, cached-Transformer, and corrected causal-tree source contracts
 are implemented and pass the complete local V3 suite. This establishes source
 behavior only: there is no trained baseline checkpoint, commit-bound campaign

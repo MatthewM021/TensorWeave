@@ -26,6 +26,16 @@ from .causal_ttn import (
     CausalTreeBindingBaselineConfig,
     CausalTreeBindingState,
 )
+from .campaign import (
+    BaselineCampaignEvaluationSummary,
+    BaselineCampaignModel,
+    BaselineQueryLoss,
+    BaselineQueryMetrics,
+    baseline_structural_metrics,
+    compute_baseline_query_loss,
+    evaluate_baseline_model,
+    train_baseline_step,
+)
 from .data import (
     BindingBatch,
     BindingEpisode,
@@ -83,7 +93,11 @@ from .factory import (
 
 __all__ = [
     "BaselineBindingOutput",
+    "BaselineCampaignEvaluationSummary",
+    "BaselineCampaignModel",
     "BaselineModelConfig",
+    "BaselineQueryLoss",
+    "BaselineQueryMetrics",
     "BindingBatch",
     "BindingBaselineExperimentConfig",
     "BindingBaselineKind",
@@ -126,14 +140,17 @@ __all__ = [
     "ScaleSharedBinaryForest",
     "ScaleSharedCPMerge",
     "analytic_scale_features",
+    "baseline_structural_metrics",
     "build_dense_selected_reference",
     "build_binding_baseline",
     "build_binding_model",
     "build_model",
     "collate_binding_episodes",
     "compute_binding_loss",
+    "compute_baseline_query_loss",
     "deserialize_compact_binding_model",
     "evaluate_binding_model",
+    "evaluate_baseline_model",
     "export_compact_binding_model",
     "generate_binding_episode",
     "generate_binding_episodes",
@@ -145,4 +162,5 @@ __all__ = [
     "serialize_compact_binding_model",
     "slice_cp_merge",
     "train_binding_step",
+    "train_baseline_step",
 ]

@@ -150,6 +150,13 @@ L)` persistent state. Tests cover an independent non-associative tree oracle,
 carry boundaries, mixed padding, exact step/chunk continuation, tensor-only
 model/state roundtrip, and complete logical-state and byte accounting.
 
+The shared baseline campaign adapter applies one visible-input-only query
+objective to the GRU, cached Transformer, and causal tree. It reports overall,
+seen, and held-out query results plus exact model/state storage, rejects
+malformed native state and forged tree-work diagnostics, and makes an
+empty-query batch a true optimizer no-op. Routed oracle, curriculum, and latent
+conditions continue to use the explicit routing-aware training path.
+
 This is source-level control infrastructure only. There are no trained baseline
 checkpoints, commit-bound campaign records, matched-quality results, TTN or MERA
 scientific results, or speed/RSS wins. The functional cache path deliberately
