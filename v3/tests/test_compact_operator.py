@@ -67,7 +67,11 @@ def test_compact_operator_matches_dense_selected_across_broadcasts(
     expected = dense(left, right, scale=scale, global_path=global_path)
     actual = compact(left, right, scale=scale, global_path=global_path)
 
-    torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+    # Dense zeroed and physically sliced matrix products may accumulate in a
+    # different order across BLAS backends even though they represent the same
+    # retained CP channels.  Keep this at a strict float64 numerical tolerance
+    # rather than requiring platform-specific bit identity.
+    torch.testing.assert_close(actual, expected, rtol=1e-12, atol=1e-12)
 
 
 def test_slice_is_physical_smaller_and_does_not_mutate_source() -> None:
