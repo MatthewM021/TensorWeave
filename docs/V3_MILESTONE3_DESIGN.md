@@ -70,3 +70,11 @@ Before a pruned reference campaign, a separate commit-bound audit must verify:
 - parameter, raw byte, operation, state-scalar, RSS, and wall-time records; and
 - explicit wording that wall-time or memory differences are measurements, not
   matched-quality wins.
+
+The strict source for this gate lives in
+`v3/configs/milestone3/export_audit.yaml`. The commit-bound runner is
+`v3/scripts/run_milestone3_export_audit.py`; it delegates every model/length
+runtime and sampled-RSS observation to a separate
+`v3/scripts/measure_milestone3_runtime.py` process. Implementing these runners
+does not itself satisfy the gate: only a successful clean-commit execution and
+reviewed machine-readable evidence record can do so.

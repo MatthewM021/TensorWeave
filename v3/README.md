@@ -106,6 +106,14 @@ worker reloads it in a fresh process and hashes all predictions, routes, and
 persistent router/forest state under both execution engines.
 
 Parameter-energy selection is a deterministic structural proxy, not evidence
-that a chosen compact rank preserves scientific quality. The commit-bound
-longer-real-update parity, midstream resume, and measured runtime/RSS audit
-remain required before Milestone 3 is marked verified.
+that a chosen compact rank preserves scientific quality. The strict audit
+configuration is `configs/milestone3/export_audit.yaml`; the commit-bound
+runner is `scripts/run_milestone3_export_audit.py`, with isolated runtime/RSS
+measurements performed by `scripts/measure_milestone3_runtime.py`.
+
+The audit source is implemented, but no commit-bound Milestone-3 audit record
+or audited compact artifact is represented as evidence yet. Longer-real-update
+parity, carry-boundary checks, midstream resume, and isolated runtime/RSS
+measurements must all pass from the clean published commit before Milestone 3
+is marked verified. Runtime and RSS differences are descriptive implementation
+measurements, not matched-quality or scientific wins.

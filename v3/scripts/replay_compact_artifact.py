@@ -12,12 +12,14 @@ import os
 from pathlib import Path
 import platform
 import struct
+import subprocess
 import sys
 import tempfile
 from typing import Mapping
 
 import torch
 from torch import Tensor
+import tnlm_v3
 
 from tnlm_v3.compact_artifact import deserialize_compact_binding_model
 from tnlm_v3.data import BindingModelInputs
@@ -52,6 +54,113 @@ def _strict_sha256(value: str, name: str) -> str:
     if len(value) != 64 or any(character not in _HEX_DIGITS for character in value):
         raise ValueError(f"{name} must be a lowercase SHA-256 digest")
     return value
+
+
+def _strict_git_oid(value: str, name: str) -> str:
+    if len(value) != 40 or any(character not in _HEX_DIGITS for character in value):
+        raise ValueError(f"{name} must be an exact lowercase 40-character Git OID")
+    return value
+
+
+def _find_checkout(path: Path) -> Path:
+    resolved = path.resolve(strict=True)
+    for candidate in (resolved.parent, *resolved.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    raise ValueError(f"{resolved} is not inside a Git checkout")
+
+
+def _git(
+    checkout: Path, *arguments: str, check: bool = True
+) -> subprocess.CompletedProcess[str]:
+    completed = subprocess.run(
+        [
+            "git",
+            "-c",
+            f"safe.directory={checkout}",
+            "-C",
+            str(checkout),
+            *arguments,
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    if check and completed.returncode != 0:
+        detail = completed.stderr.strip() or completed.stdout.strip()
+        raise RuntimeError(f"Git provenance query failed: {detail}")
+    return completed
+
+
+def _tracked(checkout: Path, relative_path: str) -> bool:
+    return _git(
+        checkout,
+        "ls-files",
+        "--error-unmatch",
+        "--",
+        relative_path,
+        check=False,
+    ).returncode == 0
+
+
+def _collect_code_provenance() -> dict[str, object]:
+    script_path = Path(__file__).resolve(strict=True)
+    if tnlm_v3.__file__ is None:
+        raise ValueError("tnlm_v3 must be loaded from a filesystem checkout")
+    package_path = Path(tnlm_v3.__file__).resolve(strict=True)
+    script_checkout = _find_checkout(script_path)
+    package_checkout = _find_checkout(package_path)
+    if script_checkout != package_checkout:
+        raise ValueError("worker and tnlm_v3 package are from different checkouts")
+    checkout = script_checkout
+    try:
+        script_relative = script_path.relative_to(checkout).as_posix()
+        package_relative = package_path.relative_to(checkout).as_posix()
+    except ValueError as error:
+        raise ValueError(
+            "worker and package paths must stay inside the checkout"
+        ) from error
+
+    code_commit = _git(checkout, "rev-parse", "--verify", "HEAD").stdout.strip()
+    code_tree = _git(checkout, "rev-parse", "HEAD^{tree}").stdout.strip()
+    _strict_git_oid(code_commit, "checkout HEAD")
+    _strict_git_oid(code_tree, "checkout tree")
+    status = _git(
+        checkout, "status", "--porcelain=v1", "--untracked-files=all"
+    ).stdout
+    return {
+        "checkout_path": str(checkout),
+        "code_commit": code_commit,
+        "code_tree": code_tree,
+        "package_path": str(package_path),
+        "package_relative_path": package_relative,
+        "package_sha256": _sha256(package_path.read_bytes()),
+        "package_committed": _tracked(checkout, package_relative),
+        "worker_path": str(script_path),
+        "worker_relative_path": script_relative,
+        "worker_sha256": _sha256(script_path.read_bytes()),
+        "worker_committed": _tracked(checkout, script_relative),
+        "worktree_clean": status == "",
+    }
+
+
+def _validate_code_provenance(
+    provenance: Mapping[str, object], args: argparse.Namespace
+) -> None:
+    if provenance["code_commit"] != args.expected_code_commit:
+        raise ValueError("code commit does not match the trusted expectation")
+    if provenance["code_tree"] != args.expected_code_tree:
+        raise ValueError("code tree does not match the trusted expectation")
+    if provenance["worker_sha256"] != args.expected_worker_sha256:
+        raise ValueError("replay-worker SHA-256 does not match the trusted expectation")
+    if provenance["worker_committed"] is not True:
+        raise ValueError("replay worker is not committed in the bound checkout")
+    if provenance["package_committed"] is not True:
+        raise ValueError("tnlm_v3 package is not committed in the bound checkout")
+    if provenance["worktree_clean"] is not True:
+        raise ValueError("bound Git worktree is not completely clean")
 
 
 def _read_bounded(path: Path, limit: int, name: str) -> bytes:
@@ -285,9 +394,13 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--fixture", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--expected-artifact-sha256", required=True)
+    parser.add_argument("--expected-fixture-sha256", required=True)
     parser.add_argument("--expected-source-fingerprint", required=True)
     parser.add_argument("--expected-manifest-fingerprint", required=True)
     parser.add_argument("--expected-selection-fingerprint", required=True)
+    parser.add_argument("--expected-code-commit", required=True)
+    parser.add_argument("--expected-code-tree", required=True)
+    parser.add_argument("--expected-worker-sha256", required=True)
     args = parser.parse_args()
     for name in ("artifact", "fixture", "output"):
         value = getattr(args, name)
@@ -298,12 +411,26 @@ def _parse_args() -> argparse.Namespace:
         parser.error("--artifact, --fixture, and --output must be distinct paths")
     for name in (
         "expected_artifact_sha256",
+        "expected_fixture_sha256",
         "expected_source_fingerprint",
         "expected_manifest_fingerprint",
         "expected_selection_fingerprint",
+        "expected_worker_sha256",
     ):
         try:
-            setattr(args, name, _strict_sha256(getattr(args, name), f"--{name.replace('_', '-')}"))
+            option = f"--{name.replace('_', '-')}"
+            setattr(args, name, _strict_sha256(getattr(args, name), option))
+        except ValueError as error:
+            parser.error(str(error))
+    for name in ("expected_code_commit", "expected_code_tree"):
+        try:
+            setattr(
+                args,
+                name,
+                _strict_git_oid(
+                    getattr(args, name), f"--{name.replace('_', '-')}"
+                ),
+            )
         except ValueError as error:
             parser.error(str(error))
     return args
@@ -319,20 +446,29 @@ def main() -> None:
     }
     _atomic_json(args.output, record)
     try:
-        artifact_bytes = _read_bounded(
-            args.artifact, _MAX_ARTIFACT_BYTES, "artifact"
-        )
-        record["artifact_sha256"] = _sha256(artifact_bytes)
         record["expected_provenance"] = {
             "artifact_sha256": args.expected_artifact_sha256,
+            "fixture_sha256": args.expected_fixture_sha256,
             "source_model_fingerprint": args.expected_source_fingerprint,
             "manifest_fingerprint": args.expected_manifest_fingerprint,
             "selection_fingerprint": args.expected_selection_fingerprint,
+            "code_commit": args.expected_code_commit,
+            "code_tree": args.expected_code_tree,
+            "worker_sha256": args.expected_worker_sha256,
         }
+        code_provenance = _collect_code_provenance()
+        record["code_provenance"] = code_provenance
+        _validate_code_provenance(code_provenance, args)
         fixture_bytes = _read_bounded(
             args.fixture, _MAX_FIXTURE_BYTES, "fixture"
         )
         record["fixture_sha256"] = _sha256(fixture_bytes)
+        if record["fixture_sha256"] != args.expected_fixture_sha256:
+            raise ValueError("fixture SHA-256 does not match the trusted expectation")
+        artifact_bytes = _read_bounded(
+            args.artifact, _MAX_ARTIFACT_BYTES, "artifact"
+        )
+        record["artifact_sha256"] = _sha256(artifact_bytes)
         if record["artifact_sha256"] != args.expected_artifact_sha256:
             raise ValueError("artifact SHA-256 does not match the trusted expectation")
         inputs = _load_fixture(fixture_bytes)
@@ -355,6 +491,10 @@ def main() -> None:
             parallel = model(inputs, implementation="parallel")
         streaming_hashes = _output_hashes(streaming)
         parallel_hashes = _output_hashes(parallel)
+        final_code_provenance = _collect_code_provenance()
+        _validate_code_provenance(final_code_provenance, args)
+        if final_code_provenance != code_provenance:
+            raise ValueError("code provenance changed during replay")
         record.update(
             {
                 "status": "passed",

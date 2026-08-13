@@ -36,7 +36,7 @@ validated_reconstruction:
       evidence_sha256: 0aa76aefc8ff59da4db822ca297d68faceb2ec1d4ae79527ab2caab77caca494
       record: MILESTONE2_SMOKE.json
   milestone_3_structural_truncation_and_export:
-    status: physical_cp_compaction_and_portable_artifact_source_implemented_audit_pending
+    status: physical_cp_compaction_portable_artifact_and_audit_runner_source_implemented_evidence_pending
     scope:
       - deterministic CP-channel parameter-energy selection
       - dense selected-reference construction
@@ -46,14 +46,15 @@ validated_reconstruction:
       - canonical non-executable compact-model artifact codec
       - strict bounded load with checksums and architecture reconstruction
       - independent-process exact replay and corruption failure records
-    current_source_tests_passed: 304
+      - strict commit-bound export-audit runner and predeclared configuration
+      - isolated per-model/per-length runtime and sampled-RSS worker
+    current_source_tests_passed: 330
     remaining:
-      - real-update carry-boundary parity audit
-      - compact midstream state serialize-reload-resume audit
-      - RSS and wall-time measurement record
+      - commit-bound export-audit execution and strict machine-readable record
+      - reviewed audited compact artifact
 not_yet_reconstructed:
   - scientific recurrent, cached-transformer, and causal-tree baselines
-  - commit-bound milestone 3 export audit and artifact
+  - commit-bound milestone 3 audit evidence and audited artifact
   - campaign closure and V3 release
 evidence_rule: >-
   This file records only newly reconstructed and locally verified work. The
