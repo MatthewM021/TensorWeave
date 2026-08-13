@@ -1,0 +1,163 @@
+schema_version: 1
+campaign_id: m4-pilot-smoke
+stage: pilot
+description: Small deterministic end-to-end exercise of every Milestone 4 model lineage.
+claim_eligible: false
+implementation_policy:
+  require_clean_head: true
+  require_committed_inputs: true
+  require_external_output_root: true
+  deterministic_algorithms: true
+  intraop_threads: 1
+  interop_threads: 1
+task:
+  num_surface_keys: 5
+  value_cardinality: 4
+  branches: 3
+  max_live_bindings: 3
+  min_length: 10
+  max_length: 64
+  heldout_key_value_pairs:
+    - [0, 0]
+  global_distractor_probability: 0.5
+models:
+  - model_id: routed-oracle
+    family: routed
+    role: trainable_source
+    routing_mode: oracle
+    parent_model_id: null
+    architecture:
+      d_model: 8
+      cp_rank: 4
+      router_hidden_dim: 8
+      scale_feature_dim: 4
+      straight_through_route_surrogate: true
+      curriculum_seed: 0
+      schedule: null
+    export: null
+  - model_id: routed-source
+    family: routed
+    role: trainable_source
+    routing_mode: curriculum
+    parent_model_id: null
+    architecture:
+      d_model: 8
+      cp_rank: 4
+      router_hidden_dim: 8
+      scale_feature_dim: 4
+      straight_through_route_surrogate: true
+      curriculum_seed: 1701
+      schedule:
+        start_step: 0
+        end_step: 8
+        start_probability: 1.0
+        end_probability: 0.0
+    export: null
+  - model_id: routed-latent
+    family: routed
+    role: trainable_source
+    routing_mode: latent
+    parent_model_id: null
+    architecture:
+      d_model: 8
+      cp_rank: 4
+      router_hidden_dim: 8
+      scale_feature_dim: 4
+      straight_through_route_surrogate: true
+      curriculum_seed: 0
+      schedule: null
+    export: null
+  - model_id: routed-compact
+    family: routed
+    role: derived_compact
+    routing_mode: curriculum
+    parent_model_id: routed-source
+    architecture:
+      d_model: 8
+      cp_rank: 2
+      router_hidden_dim: 8
+      scale_feature_dim: 4
+      straight_through_route_surrogate: true
+      curriculum_seed: 1701
+      schedule:
+        start_step: 0
+        end_step: 8
+        start_probability: 1.0
+        end_probability: 0.0
+    export:
+      selection_method: parameter_energy_v1
+      target_cp_rank: 2
+  - model_id: gru-control
+    family: gru
+    role: trainable_source
+    routing_mode: null
+    parent_model_id: null
+    architecture:
+      d_model: 8
+      hidden_dim: 12
+      num_layers: 2
+    export: null
+  - model_id: transformer-control
+    family: cached_transformer
+    role: trainable_source
+    routing_mode: null
+    parent_model_id: null
+    architecture:
+      d_model: 8
+      num_heads: 2
+      num_layers: 2
+      ff_dim: 16
+    export: null
+  - model_id: ttn-control
+    family: causal_ttn
+    role: trainable_source
+    routing_mode: null
+    parent_model_id: null
+    architecture:
+      d_model: 8
+      cp_rank: 4
+      scale_feature_dim: 4
+    export: null
+pairs:
+  - pair_id: development-pair-1
+    model_seed: 1101
+    train_seed: 1201
+    validation_seed: 1301
+    statistics_seed: 1401
+data:
+  generator_version: binding-v1
+  train:
+    batch_size: 3
+    length_schedule: [10, 12, 16]
+    deterministic_step_stream: true
+  validation:
+    lengths: [16, 32, 64]
+    episodes_per_length: 2
+training:
+  optimizer: adamw
+  learning_rate: 0.001
+  weight_decay: 0.01
+  max_gradient_norm: 1.0
+  optimizer_steps: 12
+  train_token_budget: 456
+  checkpoint_interval: 4
+  dtype: float64
+  device: cpu
+quality:
+  primary_reference_model_id: routed-source
+  metric: macro_length_query_accuracy
+  max_absolute_drop: 0.05
+  operational_rule: mean_paired_delta_gte_negative_margin
+  claim_rule: one_sided_95pct_lower_bound_gt_negative_margin
+statistics:
+  paired_unit: pair_id
+  confidence_level: 0.95
+  method: paired_percentile_bootstrap_v1
+  resamples: 1000
+runtime:
+  semantics: batch1_full_document_streaming
+  warmups: 1
+  timed_iterations: 2
+  process_repetitions: 1
+  raw_samples_required: true
+  condition: operational_quality_gate
