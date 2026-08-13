@@ -7,6 +7,16 @@ from .binding import (
     BindingModelOutput,
     RoutedBindingModel,
 )
+from .baselines import (
+    BaselineBindingOutput,
+    BindingBaselineKind,
+    CachedCausalTransformerBindingBaseline,
+    CachedTransformerBindingBaselineConfig,
+    CachedTransformerBindingState,
+    RecurrentBindingBaseline,
+    RecurrentBindingBaselineConfig,
+    RecurrentBindingState,
+)
 from .compact_artifact import (
     deserialize_compact_binding_model,
     serialize_compact_binding_model,
@@ -55,15 +65,23 @@ from .truncation import (
     select_cp_rank_by_parameter_energy,
 )
 from .factory import (
+    BaselineModelConfig,
+    BindingBaselineExperimentConfig,
     BindingExperimentConfig,
+    build_binding_baseline,
     build_binding_model,
     build_model,
+    load_binding_baseline_experiment_config,
     load_binding_experiment_config,
     load_forest_config,
 )
 
 __all__ = [
+    "BaselineBindingOutput",
+    "BaselineModelConfig",
     "BindingBatch",
+    "BindingBaselineExperimentConfig",
+    "BindingBaselineKind",
     "BindingArchitectureConfig",
     "BindingEpisode",
     "BindingEvaluation",
@@ -77,6 +95,9 @@ __all__ = [
     "BindingModelInputs",
     "BindingModelOutput",
     "BindingTaskConfig",
+    "CachedCausalTransformerBindingBaseline",
+    "CachedTransformerBindingBaselineConfig",
+    "CachedTransformerBindingState",
     "CPRankSelection",
     "CompactExportManifest",
     "CurriculumSchedule",
@@ -88,6 +109,9 @@ __all__ = [
     "ForestState",
     "NULL_ROUTE",
     "PersistentCausalRouter",
+    "RecurrentBindingBaseline",
+    "RecurrentBindingBaselineConfig",
+    "RecurrentBindingState",
     "RoutedBindingModel",
     "RoutedTensorLanguageModel",
     "RoutingMode",
@@ -95,6 +119,7 @@ __all__ = [
     "ScaleSharedCPMerge",
     "analytic_scale_features",
     "build_dense_selected_reference",
+    "build_binding_baseline",
     "build_binding_model",
     "build_model",
     "collate_binding_episodes",
@@ -104,6 +129,7 @@ __all__ = [
     "export_compact_binding_model",
     "generate_binding_episode",
     "generate_binding_episodes",
+    "load_binding_baseline_experiment_config",
     "load_binding_experiment_config",
     "load_forest_config",
     "model_state_fingerprint",

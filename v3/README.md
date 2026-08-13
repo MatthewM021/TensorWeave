@@ -80,8 +80,10 @@ integrity can be rechecked after training. It writes atomic progress after each
 condition and records failures as well as success. Once a run passes, copy the
 strict JSON record into `v3_recovery/` in a separate evidence commit.
 
-Scientific baselines, structural truncation, compact model export, paired
-multi-seed campaigns, and campaign closure remain later milestones.
+Structural CP-rank export is verified in Milestone 3. Recurrent and
+cached-Transformer control source is implemented in Milestone 4, but trained
+scientific baseline comparisons, the corrected causal-tree control, paired
+multi-seed campaigns, and campaign closure remain pending.
 
 ## Milestone 3: compact CP-rank export (verified implementation audit)
 
@@ -124,3 +126,24 @@ This verifies the export implementation, not the predictive merit of rank 4.
 The selector is a data-independent parameter-energy proxy, no quality threshold
 was applied, persistent-state width is unchanged, and runtime/RSS observations
 remain descriptive measurements rather than matched-quality or scientific wins.
+
+## Milestone 4: recurrent and cached-Transformer controls (source contracts)
+
+The first reference-control checkpoint adds a stacked GRU with bounded
+persistent state and a causal Transformer with an explicit key/value cache for
+every attention layer. Both accept only `BindingModelInputs`, keep generator and
+evaluation metadata outside model configuration, support one-event stepping and
+chunked continuation, and use no learned maximum-length parameter table.
+
+Their strict configurations live under `configs/milestone4/`. Contract tests
+cover full/step/chunk parity in float32 and float64, prefix causality, padding
+and empty-input no-ops, finite forward/backward behavior, cache gradients,
+counter overflow, canonical state validation, independent returned state, real
+event cache growth, and parameter-count independence from evaluation length.
+
+This is source-level control infrastructure only. There are no trained baseline
+checkpoints, commit-bound campaign records, matched-quality results, causal TTN
+or MERA results, or speed/RSS wins. The functional cache path deliberately
+performs strict public-state validation and immutable growth; comparative timing
+must first use a predeclared, fair measurement path that accounts for that
+overhead consistently across opponents.

@@ -1,0 +1,25 @@
+schema_version: 1
+kind: cached_transformer
+model_seed: 20260813
+data_seed: 777
+task:
+  num_surface_keys: 5
+  value_cardinality: 4
+  branches: 3
+  max_live_bindings: 3
+  min_length: 10
+  max_length: 18
+  heldout_key_value_pairs: [[0, 0]]
+  global_distractor_probability: 0.5
+model:
+  d_model: 16
+  num_heads: 4
+  num_layers: 2
+  ff_dim: 32
+training:
+  episodes: 4
+  sequence_length: 10
+  steps: 20
+  learning_rate: 0.005
+  weight_decay: 0.0
+  max_gradient_norm: 5.0
