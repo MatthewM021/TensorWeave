@@ -12,7 +12,7 @@ The first source checkpoint contains:
 - a recurrent binding baseline with bounded hidden state; and
 - a causal Transformer baseline with a real per-layer key/value cache.
 
-A corrected causal complete-tree TTN control follows as a separate checkpoint.
+A separate source checkpoint adds a corrected causal complete-tree TTN control.
 MERA remains an optional identity-initialized ablation and cannot support a
 positive claim without a paired multi-seed TTN comparison. Whole-`d_model`
 state-channel pruning is not part of this milestone: the verified Milestone-3
@@ -56,6 +56,29 @@ training, token stepping, and chunked resume must produce the same causal
 outputs within tolerance. Campaign runtime measurements must use the cached
 step path rather than repeatedly recomputing a dense prefix.
 
+## Corrected causal complete-tree TTN control
+
+The tree control is a fixed, single-lane causal opponent rather than a routed
+forest. Its persistent state is a canonical binary frontier. Each real event is
+appended by chronological binary carry, and the current complete-tree root is
+reconstructed from occupied scales from low to high: an older block is always
+the left child, a newer suffix is always the right child, and an absent child is
+promoted unchanged. The same scale-shared CP merge is used at every depth with
+its global conditioning path active. A simple root readout replaces routed
+forest attention.
+
+Positions are analytic functions of real-event counts, so the model has no
+learned maximum-length table, per-depth parameter list, route input, or
+constructor depth limit. State grows as `O(d_model log L)`, between the bounded
+GRU state and linear Transformer cache. Full execution, token stepping, chunked
+continuation, and a tensor-only model/state roundtrip follow the identical
+causal transition.
+
+This corrects the V2 control's learned maximum-length position buffer,
+length-dependent level modules, whole-context-only output, and missing
+persistent continuation contract. It does not revive V2 adaptive rank gates or
+make a MERA claim.
+
 ## Source-checkpoint gates
 
 Before a baseline source commit is published, tests must cover:
@@ -72,14 +95,14 @@ Before a baseline source commit is published, tests must cover:
 
 Passing these tests establishes usable controls, not comparable quality.
 
-The recurrent and cached-Transformer source contracts are implemented and pass
-the complete local V3 suite. This establishes source behavior only: there is no
-trained baseline checkpoint, commit-bound campaign evidence, matched-quality
-comparison, causal TTN or MERA control, or scientific result. The public cached
-step path prioritizes strict state validation and immutable continuation; a
-comparative runtime campaign must predeclare a measurement path that accounts
-for validation and cache-growth costs consistently before making efficiency
-claims.
+The recurrent, cached-Transformer, and corrected causal-tree source contracts
+are implemented and pass the complete local V3 suite. This establishes source
+behavior only: there is no trained baseline checkpoint, commit-bound campaign
+evidence, matched-quality comparison, MERA result, or scientific result. The
+public cached step path prioritizes strict state validation and immutable
+continuation; a comparative runtime campaign must predeclare a measurement path
+that accounts for validation and cache-growth costs consistently before making
+efficiency claims.
 
 ## Paired campaign boundary
 

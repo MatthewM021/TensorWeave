@@ -7,6 +7,7 @@ from enum import Enum
 import hashlib
 import json
 import math
+from typing import Generic, TypeVar
 
 import torch
 from torch import Tensor, nn
@@ -19,6 +20,7 @@ from .data import BindingEventKind, BindingModelInputs, BindingTaskConfig
 class BindingBaselineKind(str, Enum):
     GRU = "gru"
     CACHED_TRANSFORMER = "cached_transformer"
+    CAUSAL_TREE = "causal_tree"
 
 
 def _architecture(
@@ -92,10 +94,13 @@ class CachedTransformerBindingState:
     valid_steps: Tensor
 
 
+BaselineStateT = TypeVar("BaselineStateT")
+
+
 @dataclass
-class BaselineBindingOutput:
+class BaselineBindingOutput(Generic[BaselineStateT]):
     value_logits: Tensor
-    final_state: RecurrentBindingState | CachedTransformerBindingState
+    final_state: BaselineStateT
     diagnostics: dict[str, Tensor]
 
     @property
@@ -234,7 +239,7 @@ class RecurrentBindingBaseline(nn.Module):
 
     def step(
         self, inputs: BindingModelInputs, state: RecurrentBindingState
-    ) -> BaselineBindingOutput:
+    ) -> BaselineBindingOutput[RecurrentBindingState]:
         encoded = self.encoder(inputs)
         if encoded.shape[1] != 1:
             raise ValueError("step requires exactly one time position")
@@ -265,7 +270,7 @@ class RecurrentBindingBaseline(nn.Module):
         self,
         inputs: BindingModelInputs,
         initial_state: RecurrentBindingState | None = None,
-    ) -> BaselineBindingOutput:
+    ) -> BaselineBindingOutput[RecurrentBindingState]:
         _validate_inputs(inputs, self.config.task)
         batch, time = inputs.token_ids.shape
         parameter = next(self.parameters())
@@ -423,7 +428,7 @@ class CachedCausalTransformerBindingBaseline(nn.Module):
         self,
         inputs: BindingModelInputs,
         state: CachedTransformerBindingState,
-    ) -> BaselineBindingOutput:
+    ) -> BaselineBindingOutput[CachedTransformerBindingState]:
         encoded = self.encoder(inputs)
         if encoded.shape[1] != 1:
             raise ValueError("step requires exactly one time position")
@@ -499,7 +504,7 @@ class CachedCausalTransformerBindingBaseline(nn.Module):
         self,
         inputs: BindingModelInputs,
         initial_state: CachedTransformerBindingState | None = None,
-    ) -> BaselineBindingOutput:
+    ) -> BaselineBindingOutput[CachedTransformerBindingState]:
         _validate_inputs(inputs, self.config.task)
         batch, time = inputs.token_ids.shape
         parameter = next(self.parameters())

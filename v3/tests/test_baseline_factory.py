@@ -15,6 +15,10 @@ from tnlm_v3.baselines import (
     RecurrentBindingBaselineConfig,
 )
 from tnlm_v3.binding import BindingArchitectureConfig
+from tnlm_v3.causal_ttn import (
+    CausalCompleteTreeBindingBaseline,
+    CausalTreeBindingBaselineConfig,
+)
 from tnlm_v3.data import collate_binding_episodes, generate_binding_episodes
 from tnlm_v3.factory import (
     BindingBaselineExperimentConfig,
@@ -26,6 +30,8 @@ from tnlm_v3.factory import (
 CONFIGS = Path(__file__).parents[1] / "configs" / "milestone4"
 GRU = CONFIGS / "gru_smoke.yaml"
 TRANSFORMER = CONFIGS / "cached_transformer_smoke.yaml"
+CAUSAL_TREE = CONFIGS / "causal_tree_smoke.yaml"
+BASELINE_CONFIGS = (GRU, TRANSFORMER, CAUSAL_TREE)
 
 
 def _write_document(tmp_path: Path, document: object, name: str = "config.yaml") -> Path:
@@ -49,6 +55,12 @@ def _document(path: Path) -> dict[str, object]:
             BindingBaselineKind.CACHED_TRANSFORMER,
             CachedTransformerBindingBaselineConfig,
             CachedCausalTransformerBindingBaseline,
+        ),
+        (
+            CAUSAL_TREE,
+            BindingBaselineKind.CAUSAL_TREE,
+            CausalTreeBindingBaselineConfig,
+            CausalCompleteTreeBindingBaseline,
         ),
     ],
 )
@@ -96,7 +108,7 @@ def test_milestone4_yaml_is_strict_deterministic_and_executable(
 
 
 def test_baseline_model_receives_only_sanitized_architecture() -> None:
-    for path in (GRU, TRANSFORMER):
+    for path in BASELINE_CONFIGS:
         config = load_binding_baseline_experiment_config(path)
         assert config.model.task == BindingArchitectureConfig.from_task(config.task)
         assert set(asdict(config.model.task)) == {
@@ -121,13 +133,23 @@ def test_baseline_model_receives_only_sanitized_architecture() -> None:
 def test_kind_and_model_settings_are_bound_into_config_fingerprints() -> None:
     gru = load_binding_baseline_experiment_config(GRU)
     transformer = load_binding_baseline_experiment_config(TRANSFORMER)
+    causal_tree = load_binding_baseline_experiment_config(CAUSAL_TREE)
     assert '"kind":"gru"' in gru.canonical_json()
     assert '"kind":"cached_transformer"' in transformer.canonical_json()
-    assert gru.fingerprint() != transformer.fingerprint()
-    assert gru.model.fingerprint() != transformer.model.fingerprint()
+    assert '"kind":"causal_tree"' in causal_tree.canonical_json()
+    assert len(
+        {gru.fingerprint(), transformer.fingerprint(), causal_tree.fingerprint()}
+    ) == 3
+    assert len(
+        {
+            gru.model.fingerprint(),
+            transformer.model.fingerprint(),
+            causal_tree.model.fingerprint(),
+        }
+    ) == 3
 
 
-@pytest.mark.parametrize("path", [GRU, TRANSFORMER])
+@pytest.mark.parametrize("path", BASELINE_CONFIGS)
 @pytest.mark.parametrize("version", [True, 1.0, "1", 2])
 def test_loader_rejects_noninteger_or_unsupported_schema(
     tmp_path: Path, path: Path, version: object
@@ -138,7 +160,7 @@ def test_loader_rejects_noninteger_or_unsupported_schema(
         load_binding_baseline_experiment_config(_write_document(tmp_path, document))
 
 
-@pytest.mark.parametrize("path", [GRU, TRANSFORMER])
+@pytest.mark.parametrize("path", BASELINE_CONFIGS)
 def test_loader_rejects_unknown_and_missing_root_fields(
     tmp_path: Path, path: Path
 ) -> None:
@@ -188,7 +210,11 @@ def test_loader_rejects_oversized_configuration(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize(
     ("source", "wrong_field"),
-    [(GRU, "num_heads"), (TRANSFORMER, "hidden_dim")],
+    [
+        (GRU, "num_heads"),
+        (TRANSFORMER, "hidden_dim"),
+        (CAUSAL_TREE, "num_heads"),
+    ],
 )
 def test_loader_enforces_kind_specific_exact_model_fields(
     tmp_path: Path, source: Path, wrong_field: str
@@ -203,7 +229,11 @@ def test_loader_enforces_kind_specific_exact_model_fields(
 
 @pytest.mark.parametrize(
     ("source", "field"),
-    [(GRU, "hidden_dim"), (TRANSFORMER, "num_heads")],
+    [
+        (GRU, "hidden_dim"),
+        (TRANSFORMER, "num_heads"),
+        (CAUSAL_TREE, "cp_rank"),
+    ],
 )
 def test_loader_rejects_missing_model_fields(
     tmp_path: Path, source: Path, field: str
@@ -216,7 +246,7 @@ def test_loader_rejects_missing_model_fields(
         load_binding_baseline_experiment_config(_write_document(tmp_path, document))
 
 
-@pytest.mark.parametrize("source", [GRU, TRANSFORMER])
+@pytest.mark.parametrize("source", BASELINE_CONFIGS)
 @pytest.mark.parametrize("forbidden", ["route_labels", "heldout_key_value_pairs"])
 def test_loader_rejects_routing_and_generator_metadata_in_model(
     tmp_path: Path, source: Path, forbidden: str
@@ -229,7 +259,7 @@ def test_loader_rejects_routing_and_generator_metadata_in_model(
         load_binding_baseline_experiment_config(_write_document(tmp_path, document))
 
 
-@pytest.mark.parametrize("source", [GRU, TRANSFORMER])
+@pytest.mark.parametrize("source", BASELINE_CONFIGS)
 def test_loader_rejects_routing_condition_at_root(
     tmp_path: Path, source: Path
 ) -> None:
@@ -241,7 +271,11 @@ def test_loader_rejects_routing_condition_at_root(
 
 @pytest.mark.parametrize(
     ("source", "field"),
-    [(GRU, "num_layers"), (TRANSFORMER, "num_heads")],
+    [
+        (GRU, "num_layers"),
+        (TRANSFORMER, "num_heads"),
+        (CAUSAL_TREE, "cp_rank"),
+    ],
 )
 def test_loader_rejects_boolean_model_dimensions(
     tmp_path: Path, source: Path, field: str
@@ -254,7 +288,7 @@ def test_loader_rejects_boolean_model_dimensions(
         load_binding_baseline_experiment_config(_write_document(tmp_path, document))
 
 
-@pytest.mark.parametrize("path", [GRU, TRANSFORMER])
+@pytest.mark.parametrize("path", BASELINE_CONFIGS)
 @pytest.mark.parametrize(
     ("section", "field", "value", "message"),
     [

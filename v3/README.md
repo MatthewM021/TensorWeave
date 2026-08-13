@@ -80,10 +80,10 @@ integrity can be rechecked after training. It writes atomic progress after each
 condition and records failures as well as success. Once a run passes, copy the
 strict JSON record into `v3_recovery/` in a separate evidence commit.
 
-Structural CP-rank export is verified in Milestone 3. Recurrent and
-cached-Transformer control source is implemented in Milestone 4, but trained
-scientific baseline comparisons, the corrected causal-tree control, paired
-multi-seed campaigns, and campaign closure remain pending.
+Structural CP-rank export is verified in Milestone 3. Recurrent,
+cached-Transformer, and corrected causal-tree control source is implemented in
+Milestone 4, but trained scientific baseline comparisons, paired multi-seed
+campaigns, and campaign closure remain pending.
 
 ## Milestone 3: compact CP-rank export (verified implementation audit)
 
@@ -127,7 +127,7 @@ The selector is a data-independent parameter-energy proxy, no quality threshold
 was applied, persistent-state width is unchanged, and runtime/RSS observations
 remain descriptive measurements rather than matched-quality or scientific wins.
 
-## Milestone 4: recurrent and cached-Transformer controls (source contracts)
+## Milestone 4: causal reference controls (source contracts)
 
 The first reference-control checkpoint adds a stacked GRU with bounded
 persistent state and a causal Transformer with an explicit key/value cache for
@@ -141,9 +141,18 @@ and empty-input no-ops, finite forward/backward behavior, cache gradients,
 counter overflow, canonical state validation, independent returned state, real
 event cache growth, and parameter-count independence from evaluation length.
 
+The second control checkpoint adds a fixed, one-lane causal complete-tree TTN.
+It stores a canonical binary frontier, appends real events with chronological
+binary carries, and rebuilds one complete-tree root using the same scale-shared
+merge at every depth. It has analytic real-event positions, no route input,
+learned maximum-length table, or per-level parameter list, and `O(d_model log
+L)` persistent state. Tests cover an independent non-associative tree oracle,
+carry boundaries, mixed padding, exact step/chunk continuation, tensor-only
+model/state roundtrip, and complete logical-state and byte accounting.
+
 This is source-level control infrastructure only. There are no trained baseline
-checkpoints, commit-bound campaign records, matched-quality results, causal TTN
-or MERA results, or speed/RSS wins. The functional cache path deliberately
+checkpoints, commit-bound campaign records, matched-quality results, TTN or MERA
+scientific results, or speed/RSS wins. The functional cache path deliberately
 performs strict public-state validation and immutable growth; comparative timing
 must first use a predeclared, fair measurement path that accounts for that
 overhead consistently across opponents.

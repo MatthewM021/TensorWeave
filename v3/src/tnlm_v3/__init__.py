@@ -21,6 +21,11 @@ from .compact_artifact import (
     deserialize_compact_binding_model,
     serialize_compact_binding_model,
 )
+from .causal_ttn import (
+    CausalCompleteTreeBindingBaseline,
+    CausalTreeBindingBaselineConfig,
+    CausalTreeBindingState,
+)
 from .data import (
     BindingBatch,
     BindingEpisode,
@@ -98,6 +103,9 @@ __all__ = [
     "CachedCausalTransformerBindingBaseline",
     "CachedTransformerBindingBaselineConfig",
     "CachedTransformerBindingState",
+    "CausalCompleteTreeBindingBaseline",
+    "CausalTreeBindingBaselineConfig",
+    "CausalTreeBindingState",
     "CPRankSelection",
     "CompactExportManifest",
     "CurriculumSchedule",

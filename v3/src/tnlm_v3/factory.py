@@ -20,6 +20,10 @@ from .baselines import (
     RecurrentBindingBaseline,
     RecurrentBindingBaselineConfig,
 )
+from .causal_ttn import (
+    CausalCompleteTreeBindingBaseline,
+    CausalTreeBindingBaselineConfig,
+)
 from .data import BindingTaskConfig
 from .routing import CurriculumSchedule, RoutingMode
 from .training import BindingLossConfig
@@ -185,7 +189,9 @@ class BindingExperimentConfig:
 
 
 BaselineModelConfig = (
-    RecurrentBindingBaselineConfig | CachedTransformerBindingBaselineConfig
+    RecurrentBindingBaselineConfig
+    | CachedTransformerBindingBaselineConfig
+    | CausalTreeBindingBaselineConfig
 )
 
 
@@ -209,7 +215,9 @@ class BindingBaselineExperimentConfig:
         try:
             kind = BindingBaselineKind(self.kind)
         except (TypeError, ValueError) as error:
-            raise ValueError("kind must be gru or cached_transformer") from error
+            raise ValueError(
+                "kind must be gru, cached_transformer, or causal_tree"
+            ) from error
         object.__setattr__(self, "kind", kind)
         if not isinstance(self.task, BindingTaskConfig):
             raise TypeError("task must be a BindingTaskConfig")
@@ -219,6 +227,7 @@ class BindingBaselineExperimentConfig:
             BindingBaselineKind.CACHED_TRANSFORMER: (
                 CachedTransformerBindingBaselineConfig
             ),
+            BindingBaselineKind.CAUSAL_TREE: CausalTreeBindingBaselineConfig,
         }[kind]
         if not isinstance(self.model, expected_model_type):
             raise TypeError(
@@ -364,7 +373,7 @@ def load_binding_experiment_config(path: str | Path) -> BindingExperimentConfig:
 def load_binding_baseline_experiment_config(
     path: str | Path,
 ) -> BindingBaselineExperimentConfig:
-    """Load one strict GRU or cached-Transformer binding configuration."""
+    """Load one strict GRU, cached-Transformer, or causal-tree configuration."""
 
     document = _mapping(_load_yaml(path), "configuration")
     _exact_keys(
@@ -386,7 +395,9 @@ def load_binding_baseline_experiment_config(
     try:
         kind = BindingBaselineKind(document["kind"])
     except (TypeError, ValueError) as error:
-        raise ValueError("kind must be gru or cached_transformer") from error
+        raise ValueError(
+            "kind must be gru, cached_transformer, or causal_tree"
+        ) from error
 
     task_values = dict(_mapping(document["task"], "task"))
     _exact_keys(task_values, {field.name for field in fields(BindingTaskConfig)}, "task")
@@ -402,13 +413,22 @@ def load_binding_baseline_experiment_config(
         model: BaselineModelConfig = RecurrentBindingBaselineConfig(
             task=architecture, **model_values
         )
-    else:
+    elif kind is BindingBaselineKind.CACHED_TRANSFORMER:
         _exact_keys(
             model_values,
             {"d_model", "num_heads", "num_layers", "ff_dim"},
             "model",
         )
         model = CachedTransformerBindingBaselineConfig(
+            task=architecture, **model_values
+        )
+    else:
+        _exact_keys(
+            model_values,
+            {"d_model", "cp_rank", "scale_feature_dim"},
+            "model",
+        )
+        model = CausalTreeBindingBaselineConfig(
             task=architecture, **model_values
         )
 
@@ -453,7 +473,11 @@ def build_binding_model(
 
 def build_binding_baseline(
     config: BindingBaselineExperimentConfig | BaselineModelConfig | str | Path,
-) -> RecurrentBindingBaseline | CachedCausalTransformerBindingBaseline:
+) -> (
+    RecurrentBindingBaseline
+    | CachedCausalTransformerBindingBaseline
+    | CausalCompleteTreeBindingBaseline
+):
     """Build one causal baseline from a validated config or YAML path."""
 
     if isinstance(config, (str, Path)):
@@ -466,6 +490,8 @@ def build_binding_baseline(
         return RecurrentBindingBaseline(resolved)
     if isinstance(resolved, CachedTransformerBindingBaselineConfig):
         return CachedCausalTransformerBindingBaseline(resolved)
+    if isinstance(resolved, CausalTreeBindingBaselineConfig):
+        return CausalCompleteTreeBindingBaseline(resolved)
     raise TypeError(
         "config must be a baseline model/experiment config or YAML path"
     )
