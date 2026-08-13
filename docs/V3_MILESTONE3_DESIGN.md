@@ -60,7 +60,7 @@ The independent replay worker accepts only bounded structured fixtures, loads
 the artifact in a fresh Python process, and hashes all logits, routes, router
 state, and forest state for both streaming and parallel execution.
 
-## Remaining verification gate
+## Commit-bound verification
 
 Before a pruned reference campaign, a separate commit-bound audit must verify:
 
@@ -75,6 +75,20 @@ The strict source for this gate lives in
 `v3/configs/milestone3/export_audit.yaml`. The commit-bound runner is
 `v3/scripts/run_milestone3_export_audit.py`; it delegates every model/length
 runtime and sampled-RSS observation to a separate
-`v3/scripts/measure_milestone3_runtime.py` process. Implementing these runners
-does not itself satisfy the gate: only a successful clean-commit execution and
-reviewed machine-readable evidence record can do so.
+`v3/scripts/measure_milestone3_runtime.py` process.
+
+That implementation gate passed on clean published commit
+`7f1c9ead80e93dddb03c51bf608ed24d7e41d719` (tree
+`f129139655fc6542904c96128976e2d5b6b282c0`). The reviewed evidence is
+`v3_recovery/MILESTONE3_EXPORT_AUDIT.json`, accompanied by the exact evaluation
+fixture, fresh-process replay record, native compact artifact, and checksum
+manifest. All 24 top-level gates passed, including declared-tolerance parity,
+local and global carry depths 4/5/6, canonical resume, and 18 isolated runtime
+workers. The native artifact is 41,049 bytes with SHA-256
+`27fdb5df3cc236bdbfd8f4a69a2344c2d26c03f2f565e8923d8eb6d12ddc9d4d`.
+
+This is an implementation audit, not a scientific compactness campaign. The
+rank-4 choice was made by the data-independent `parameter_energy_v1` structural
+proxy; no predictive-quality threshold was applied. Runtime and RSS values are
+descriptive, and the audit does not claim a speed, memory, matched-quality, or
+persistent-state-width win.

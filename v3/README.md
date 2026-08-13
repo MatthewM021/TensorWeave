@@ -83,7 +83,7 @@ strict JSON record into `v3_recovery/` in a separate evidence commit.
 Scientific baselines, structural truncation, compact model export, paired
 multi-seed campaigns, and campaign closure remain later milestones.
 
-## Milestone 3: compact CP-rank export (in progress)
+## Milestone 3: compact CP-rank export (verified implementation audit)
 
 The first export layer now selects a deterministic subset of the shared merge
 operator's CP interaction channels, builds a dense zeroed reference, and
@@ -111,9 +111,16 @@ configuration is `configs/milestone3/export_audit.yaml`; the commit-bound
 runner is `scripts/run_milestone3_export_audit.py`, with isolated runtime/RSS
 measurements performed by `scripts/measure_milestone3_runtime.py`.
 
-The audit source is implemented, but no commit-bound Milestone-3 audit record
-or audited compact artifact is represented as evidence yet. Longer-real-update
-parity, carry-boundary checks, midstream resume, and isolated runtime/RSS
-measurements must all pass from the clean published commit before Milestone 3
-is marked verified. Runtime and RSS differences are descriptive implementation
-measurements, not matched-quality or scientific wins.
+The commit-bound audit passed from clean published commit
+`7f1c9ead80e93dddb03c51bf608ed24d7e41d719`. Its strict record and native
+compact artifact live in `../v3_recovery/`. The audit covers real evaluation
+lengths 15, 16, 31, 32, 63, and 64; local and global carry depths 4, 5, and 6;
+canonical midstream state resume; fresh-process replay; and 18 isolated
+runtime/RSS workers. Dense-selected versus compact parity and streaming versus
+parallel parity passed under the predeclared tolerances. The fresh worker also
+matched the parent hashes separately for each execution engine.
+
+This verifies the export implementation, not the predictive merit of rank 4.
+The selector is a data-independent parameter-energy proxy, no quality threshold
+was applied, persistent-state width is unchanged, and runtime/RSS observations
+remain descriptive measurements rather than matched-quality or scientific wins.

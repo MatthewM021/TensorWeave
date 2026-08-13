@@ -36,7 +36,7 @@ validated_reconstruction:
       evidence_sha256: 0aa76aefc8ff59da4db822ca297d68faceb2ec1d4ae79527ab2caab77caca494
       record: MILESTONE2_SMOKE.json
   milestone_3_structural_truncation_and_export:
-    status: physical_cp_compaction_portable_artifact_and_audit_runner_source_implemented_evidence_pending
+    status: verified_implementation_audit
     scope:
       - deterministic CP-channel parameter-energy selection
       - dense selected-reference construction
@@ -45,16 +45,68 @@ validated_reconstruction:
       - explicit unchanged persistent-state interface
       - canonical non-executable compact-model artifact codec
       - strict bounded load with checksums and architecture reconstruction
-      - independent-process exact replay and corruption failure records
+      - independent-process per-engine exact replay and corruption failure records
       - strict commit-bound export-audit runner and predeclared configuration
       - isolated per-model/per-length runtime and sampled-RSS worker
-    current_source_tests_passed: 330
+      - real-length local and global carry-boundary and resume verification
+    source_tests_passed: 330
+    commit_bound_audit:
+      status: passed
+      scope: deterministic_milestone3_implementation_audit_not_scientific_campaign
+      source_commit: 7f1c9ead80e93dddb03c51bf608ed24d7e41d719
+      source_tree: f129139655fc6542904c96128976e2d5b6b282c0
+      ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31709607770
+      completed_at_utc: 2026-08-13T14:24:46.935246+00:00
+      top_level_gates_passed: 24
+      calibration_lengths: [10, 12, 16, 18]
+      evaluation_lengths: [15, 16, 31, 32, 63, 64]
+      isolated_runtime_processes_passed: 18
+      runtime_and_rss: descriptive_no_win_gate
+      audit_record:
+        path: MILESTONE3_EXPORT_AUDIT.json
+        bytes: 291848
+        sha256: 2a06ef6a353e85a8de0a0f62f6aa6ab7ae64951db0e87778f5cb8dd025548c5a
+      evaluation_fixture:
+        path: MILESTONE3_EVAL_FIXTURE.json
+        bytes: 6791
+        sha256: bccd1e03ceecf2d5b6a97ba27f8ce703d4c409f773dc8be47039766783ecbc13
+      fresh_process_replay:
+        path: MILESTONE3_REPLAY.json
+        bytes: 9290
+        sha256: deeaaa8b4f3de64da8bddf4f25f8e1a3aa38f267c169aebc74b1a35c5c52a5da
+      compact_artifact:
+        path: MILESTONE3_COMPACT_ARTIFACT.tnlm3
+        bytes: 41049
+        sha256: 27fdb5df3cc236bdbfd8f4a69a2344c2d26c03f2f565e8923d8eb6d12ddc9d4d
+      checksum_manifest: MILESTONE3_EVIDENCE.sha256
+      structural_measurements:
+        cp_rank_source: 8
+        cp_rank_compact: 4
+        parameters_source: 6895
+        parameters_compact: 6667
+        raw_tensor_bytes_source: 27580
+        raw_tensor_bytes_compact: 26668
+        operation_proxy_per_merge_source: 1520
+        operation_proxy_per_merge_compact: 1272
+        state_scalars_per_occupied_slot_source: 16
+        state_scalars_per_occupied_slot_compact: 16
+      quality_observation_only:
+        selection_method: parameter_energy_v1
+        compact_queries_correct: 15
+        compact_queries_total: 69
+        compact_seen_queries_correct: 12
+        compact_seen_queries_total: 53
+        compact_heldout_queries_correct: 3
+        compact_heldout_queries_total: 16
+        quality_threshold_applied: false
+        matched_quality_claim: false
+        scientific_campaign: pending
     remaining:
-      - commit-bound export-audit execution and strict machine-readable record
-      - reviewed audited compact artifact
+      - paired multi-seed matched-quality compactness campaign
+      - scientific baseline comparison
 not_yet_reconstructed:
   - scientific recurrent, cached-transformer, and causal-tree baselines
-  - commit-bound milestone 3 audit evidence and audited artifact
+  - paired multi-seed matched-quality compactness campaign
   - campaign closure and V3 release
 evidence_rule: >-
   This file records only newly reconstructed and locally verified work. The
