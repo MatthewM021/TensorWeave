@@ -1,0 +1,36 @@
+{
+  "baseline_commit": "3cdd76f1beeefd9f92f54ccbf4c790c3ae653040",
+  "branch": "v3-recovery",
+  "environment": {
+    "cuda_available": false,
+    "matplotlib": "3.11.1",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "psutil": "7.2.2",
+    "pytest": "9.1.1",
+    "python": "3.12.13 (main, Aug  7 2026, 02:26:41) [MSC v.1944 64 bit (AMD64)]",
+    "pyyaml": "6.0.3",
+    "scipy": "1.18.0",
+    "torch": "2.13.0+cpu"
+  },
+  "recorded_at": "2026-08-13T02:17:03.5744230+01:00",
+  "repository_verifier": {
+    "original_v2_archive_sha256": "d93c7510e5d5f36d7b0f7ab37029ec3d7d9d3c2226fd63d0059da8cb04441089",
+    "status": "passed",
+    "verified_file_bytes": 6759670,
+    "verified_files": 193
+  },
+  "status": "passed",
+  "test_suite": {
+    "failed": 0,
+    "passed": 22
+  },
+  "validation": {
+    "checks_failed": 0,
+    "checks_passed": 161,
+    "path": "v3_recovery/V2_VALIDATION_REPRODUCED.json",
+    "sha256": "304b315160cc2a7c92488f8618a6d4b1bbc105c8612c3ce2c1b4fda79e30581b",
+    "status": "passed"
+  }
+}

@@ -1,0 +1,660 @@
+{
+  "check_count": 161,
+  "checks": [
+    {
+      "name": "results/reference_cpu: expected row count",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: expected run count",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: manifest row count",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: manifest run count",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload adaptive_rank__routed_ttn_oracle_adaptive__seed20300819",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload combined_stress__fixed_ttn__seed20310819",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload combined_stress__gru__seed20311119",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload combined_stress__routed_mera_oracle__seed20311019",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload combined_stress__routed_ttn_oracle__seed20310919",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload combined_stress__transformer__seed20311219",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_disentangler__fixed_mera__seed20280919",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_disentangler__fixed_ttn__seed20280819",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_disentangler__gru__seed20281419",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_disentangler__routed_mera_learned__seed20281319",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_disentangler__routed_mera_oracle__seed20281119",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_disentangler__routed_ttn_learned__seed20281219",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_disentangler__routed_ttn_oracle__seed20281019",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_disentangler__transformer__seed20281519",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_low_rank__routed_mera_oracle__seed20290919",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_low_rank__routed_ttn_oracle__seed20290819",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload detail_low_rank__routed_ttn_oracle_widecore__seed20291019",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload hierarchy_topology__fixed_mera__seed20270919",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload hierarchy_topology__fixed_ttn__seed20270819",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload hierarchy_topology__gru__seed20271219",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload hierarchy_topology__routed_ttn_learned__seed20271119",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload hierarchy_topology__routed_ttn_oracle__seed20271019",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload hierarchy_topology__transformer__seed20271319",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__fixed_mera__seed20261019",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__fixed_ttn__seed20260919",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__gru__seed20261519",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__mps__seed20260819",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__routed_mera_learned__seed20261419",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__routed_mera_oracle__seed20261319",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__routed_ttn_learned__seed20261219",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__routed_ttn_oracle__seed20261119",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: run payload interleaved_tournament__transformer__seed20261619",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/adaptive_rank__routed_ttn_oracle_adaptive__seed20300819.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/combined_stress__fixed_ttn__seed20310819.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/combined_stress__gru__seed20311119.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/combined_stress__routed_mera_oracle__seed20311019.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/combined_stress__routed_ttn_oracle__seed20310919.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/combined_stress__transformer__seed20311219.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_disentangler__fixed_mera__seed20280919.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_disentangler__fixed_ttn__seed20280819.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_disentangler__gru__seed20281419.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_disentangler__routed_mera_learned__seed20281319.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_disentangler__routed_mera_oracle__seed20281119.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_disentangler__routed_ttn_learned__seed20281219.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_disentangler__routed_ttn_oracle__seed20281019.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_disentangler__transformer__seed20281519.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_low_rank__routed_mera_oracle__seed20290919.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_low_rank__routed_ttn_oracle__seed20290819.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/detail_low_rank__routed_ttn_oracle_widecore__seed20291019.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/hierarchy_topology__fixed_mera__seed20270919.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/hierarchy_topology__fixed_ttn__seed20270819.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/hierarchy_topology__gru__seed20271219.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/hierarchy_topology__routed_ttn_learned__seed20271119.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/hierarchy_topology__routed_ttn_oracle__seed20271019.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/hierarchy_topology__transformer__seed20271319.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__fixed_mera__seed20261019.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__fixed_ttn__seed20260919.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__gru__seed20261519.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__mps__seed20260819.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__routed_mera_learned__seed20261419.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__routed_mera_oracle__seed20261319.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__routed_ttn_learned__seed20261219.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__routed_ttn_oracle__seed20261119.pt",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu: checkpoint checkpoints/interleaved_tournament__transformer__seed20261619.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: expected row count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: expected run count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: manifest row count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: manifest run count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload mera_chi4_rank4__seed4101",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload mera_chi4_rank4__seed4102",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload mera_chi4_rank4__seed4103",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload ttn_chi4_rank4__seed4101",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload ttn_chi4_rank4__seed4102",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload ttn_chi4_rank4__seed4103",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload ttn_chi4_rank9__seed4101",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload ttn_chi4_rank9__seed4102",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: run payload ttn_chi4_rank9__seed4103",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/mera_chi4_rank4__seed4101.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/mera_chi4_rank4__seed4102.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/mera_chi4_rank4__seed4103.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/ttn_chi4_rank4__seed4101.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/ttn_chi4_rank4__seed4102.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/ttn_chi4_rank4__seed4103.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/ttn_chi4_rank9__seed4101.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/ttn_chi4_rank9__seed4102.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep: checkpoint checkpoints/ttn_chi4_rank9__seed4103.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: expected row count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: expected run count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: manifest row count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: manifest run count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: run payload mera_chi4_rank4__seed20290919",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: run payload ttn_chi4_rank4__seed20290919",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: run payload ttn_chi4_rank9__seed20290919",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: checkpoint checkpoints/mera_chi4_rank4__seed20290919.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: checkpoint checkpoints/ttn_chi4_rank4__seed20290919.pt",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control: checkpoint checkpoints/ttn_chi4_rank9__seed20290919.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: expected row count",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: expected run count",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: manifest row count",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: manifest run count",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__fixed_mera__seed220",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__fixed_ttn__seed120",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__gru__seed720",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__mps__seed20",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__routed_mera_learned__seed620",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__routed_mera_oracle__seed520",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__routed_ttn_learned__seed420",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__routed_ttn_oracle__seed320",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_all__transformer__seed820",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_combined__routed_ttn_oracle__seed30020",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_detail__routed_mera_oracle__seed20020",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_detail__routed_ttn_oracle_adaptive__seed20120",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: run payload smoke_hierarchy__routed_ttn_oracle__seed10020",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__fixed_mera__seed220.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__fixed_ttn__seed120.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__gru__seed720.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__mps__seed20.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__routed_mera_learned__seed620.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__routed_mera_oracle__seed520.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__routed_ttn_learned__seed420.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__routed_ttn_oracle__seed320.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_all__transformer__seed820.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_combined__routed_ttn_oracle__seed30020.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_detail__routed_mera_oracle__seed20020.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_detail__routed_ttn_oracle_adaptive__seed20120.pt",
+      "passed": true
+    },
+    {
+      "name": "results/smoke: checkpoint checkpoints/smoke_hierarchy__routed_ttn_oracle__seed10020.pt",
+      "passed": true
+    },
+    {
+      "name": "main campaign contains all four tasks",
+      "passed": true
+    },
+    {
+      "name": "main campaign contains required model families",
+      "passed": true
+    },
+    {
+      "name": "main campaign has no recorded failures",
+      "passed": true
+    },
+    {
+      "name": "main executed-config hash matches manifest",
+      "passed": true
+    },
+    {
+      "name": "paired sweep contains all declared seeds",
+      "passed": true
+    },
+    {
+      "name": "paired sweep seed 4101: shared data splits",
+      "passed": true
+    },
+    {
+      "name": "paired sweep seed 4101: all variants",
+      "passed": true
+    },
+    {
+      "name": "paired sweep seed 4102: shared data splits",
+      "passed": true
+    },
+    {
+      "name": "paired sweep seed 4102: all variants",
+      "passed": true
+    },
+    {
+      "name": "paired sweep seed 4103: shared data splits",
+      "passed": true
+    },
+    {
+      "name": "paired sweep seed 4103: all variants",
+      "passed": true
+    },
+    {
+      "name": "reference-initialization control uses seed 20290919",
+      "passed": true
+    },
+    {
+      "name": "reference-initialization control uses shared data splits",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu/replay_verification.json: replay status",
+      "passed": true
+    },
+    {
+      "name": "results/reference_cpu/replay_verification.json: replay count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep/replay_verification.json: replay status",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_seed_sweep/replay_verification.json: replay count",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control/replay_verification.json: replay status",
+      "passed": true
+    },
+    {
+      "name": "results/low_rank_reference_seed_control/replay_verification.json: replay count",
+      "passed": true
+    },
+    {
+      "name": "summary accounts for 44 research runs",
+      "passed": true
+    },
+    {
+      "name": "summary accounts separately for 13 smoke runs",
+      "passed": true
+    },
+    {
+      "name": "summary records corrected low-rank conclusion",
+      "passed": true
+    },
+    {
+      "name": "all required plots exist",
+      "passed": true
+    },
+    {
+      "name": "combined paired-control table exists",
+      "passed": true
+    },
+    {
+      "name": "documentation exists: README.md",
+      "passed": true
+    },
+    {
+      "name": "documentation exists: reports/V2_REPORT.md",
+      "passed": true
+    },
+    {
+      "name": "documentation exists: reports/V2_ARCHITECTURE.md",
+      "passed": true
+    },
+    {
+      "name": "documentation exists: results/reference_cpu/README.md",
+      "passed": true
+    },
+    {
+      "name": "documentation exists: results/low_rank_seed_sweep/README.md",
+      "passed": true
+    },
+    {
+      "name": "documentation exists: results/low_rank_reference_seed_control/README.md",
+      "passed": true
+    },
+    {
+      "name": "build verification manifest exists",
+      "passed": true
+    }
+  ],
+  "evidence": {
+    "main_rows": 87,
+    "main_runs": 32,
+    "paired_control_rows": 24,
+    "paired_control_runs": 12,
+    "research_trained_runs": 44,
+    "smoke_runs": 13,
+    "total_included_runs": 57
+  },
+  "root": "v2_baseline",
+  "status": "passed"
+}
