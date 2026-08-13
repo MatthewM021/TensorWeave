@@ -32,6 +32,7 @@ from tnlm_v3.campaign_manifest import (
     heartbeat_campaign_attempt,
     initialize_campaign_manifest,
     load_campaign_manifest,
+    load_campaign_attempt_record,
     make_artifact_reference,
     reconcile_campaign_manifest,
     start_campaign_attempt,
@@ -83,6 +84,24 @@ def write_artifact(external: Path, name: str, raw: bytes) -> str:
     path.parent.mkdir(exist_ok=True)
     path.write_bytes(raw)
     return path.relative_to(external).as_posix()
+
+
+def test_artifact_hash_preserves_windows_control_z_binary_byte(
+    tmp_path: Path,
+) -> None:
+    external = tmp_path / "external"
+    checkout = tmp_path / "checkout"
+    external.mkdir()
+    checkout.mkdir()
+    raw = b"before\x1aafter\x00binary"
+    relative = write_artifact(external, "binary.twcp", raw)
+    reference = make_artifact_reference(
+        relative,
+        external_root=external.resolve(),
+        checkout_root=checkout.resolve(),
+    )
+    assert reference.size_bytes == len(raw)
+    assert reference.sha256 == hashlib.sha256(raw).hexdigest()
 
 
 def manifest_path(authority: CampaignAuthority, external: Path) -> Path:
@@ -172,6 +191,27 @@ def test_complete_lifecycle_is_canonical_and_content_addressed(
     records = list((external / "campaigns" / "m4-pilot" / "records").rglob("*.json"))
     assert len(records) == 3
     assert len({read_bytes(path) for path in records}) == 3
+    state = next(item for item in manifest.runs if item.run_id == run_id)
+    loaded_record = load_campaign_attempt_record(
+        authority, state.attempts[-1].record, **options
+    )
+    assert loaded_record == completed
+
+
+def test_attempt_record_accessor_rejects_unreachable_reference(
+    campaign: tuple[CampaignAuthority, Path, Path],
+) -> None:
+    authority, external, checkout = campaign
+    options = roots(external, checkout)
+    manifest = initialize_campaign_manifest(authority, **options)
+    run_id = manifest.runs[0].run_id
+    manifest, _ = start_campaign_attempt(
+        authority, run_id, timestamp_ns=1, expected_generation=0, **options
+    )
+    reachable = next(run for run in manifest.runs if run.run_id == run_id).attempts[-1]
+    forged = replace(reachable.record, sha256="f" * 64)
+    with pytest.raises(CampaignManifestError, match="reachable"):
+        load_campaign_attempt_record(authority, forged, **options)
 
 
 def test_failure_is_durable_and_retry_counter_is_monotonic(

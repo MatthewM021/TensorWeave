@@ -174,12 +174,15 @@ the curriculum parent's declared final cursor. The checkpoint codec is
 non-pickle, allocation-bounded, canonical, checksum-bound, and restores the
 exact model/optimizer/RNG continuation transactionally. The manifest stores
 immutable content-addressed attempt transitions with atomic generation checks,
-crash reconciliation, and checksum-bound external artifacts. The eventual
-isolated worker must derive its trusted checkpoint contract from the resolved
-plan and verify the manifest artifact digest.
+crash reconciliation, and checksum-bound external artifacts. The isolated
+pilot worker derives its trusted checkpoint contract from the resolved plan,
+while the parent independently verifies the clean tree, paired streams, every
+checkpoint and compact artifact, and the manifest history. A complete local
+seven-lineage pilot passes; it is explicitly non-claiming.
 
-This remains source-level control infrastructure only. There are no trained baseline
-checkpoints, commit-bound campaign records, matched-quality results, TTN or MERA
+This remains implementation-level control infrastructure only. There are no
+published trained baseline checkpoints or commit-bound campaign evidence,
+matched-quality results, TTN or MERA
 scientific results, or speed/RSS wins. The functional cache path deliberately
 performs strict public-state validation and immutable growth; comparative timing
 must first use a predeclared, fair measurement path that accounts for that

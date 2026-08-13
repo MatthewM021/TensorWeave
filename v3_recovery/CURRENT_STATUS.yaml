@@ -105,7 +105,7 @@ validated_reconstruction:
       - paired multi-seed matched-quality compactness campaign
       - scientific baseline comparison
   milestone_4_causal_reference_controls:
-    status: verified_source_contracts
+    status: pilot_runner_source_and_local_execution_verified
     scope:
       - stacked GRU control with context-length-independent persistent state
       - causal Transformer control with explicit per-layer key/value cache
@@ -121,6 +121,8 @@ validated_reconstruction:
       - pair-bound deterministic execution adapter and canonical paired batch hashes
       - non-pickle bounded canonical model-optimizer-RNG checkpoint codec
       - immutable crash-reconciling attempt records and atomic manifest index
+      - isolated seven-lineage pilot worker with exact checkpoint resume and compact derivation
+      - commit-bound parent runner with provenance, artifact, and manifest verification
     published_checkpoints:
       recurrent_and_cached_transformer:
         source_commit: 832e6de01e2b7d8b6c9e0ab9c1eae4b9a68db9f8
@@ -132,15 +134,15 @@ validated_reconstruction:
         source_tree: e59ca383e984177ea337c1a2037bfbe48687cdda
         ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31720252790
         ci_status: passed
-    v3_source_tests_collected: 673
-    v3_source_tests_passed: 672
+    v3_source_tests_collected: 702
+    v3_source_tests_passed: 701
     v3_source_tests_skipped: 1
     baseline_contract_tests_passed: 164
     baseline_contract_test_files: 3
     evidence_scope: deterministic_source_contracts_not_scientific_campaign
     remaining:
       - trained baseline checkpoints and commit-bound run records
-      - isolated pilot worker and commit-bound pilot execution
+      - published commit-bound pilot execution record
       - optional identity-initialized MERA ablation
       - fair predeclared cached-runtime measurement path
       - paired multi-seed matched-quality campaign

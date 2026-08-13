@@ -346,7 +346,7 @@ def _read_safe_file(
         raise CampaignManifestError("referenced file must be a non-linked regular file")
     if before.st_size > maximum_bytes:
         raise CampaignManifestError("referenced JSON file exceeds its byte limit")
-    flags = os.O_RDONLY
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0)
     if hasattr(os, "O_NOFOLLOW"):
         flags |= os.O_NOFOLLOW
     descriptor = os.open(_system_path(path), flags)
@@ -363,6 +363,8 @@ def _read_safe_file(
             raw = handle.read(maximum_bytes + 1)
     finally:
         os.close(descriptor)
+    if len(raw) != before.st_size:
+        raise CampaignManifestError("referenced file was not read in full")
     if len(raw) > maximum_bytes:
         raise CampaignManifestError("referenced JSON file exceeds its byte limit")
     after = _lstat(path)
@@ -387,7 +389,9 @@ def _read_safe_file(
 
 def _fsync_directory(path: Path) -> None:
     try:
-        descriptor = os.open(_system_path(path), os.O_RDONLY)
+        descriptor = os.open(
+            _system_path(path), os.O_RDONLY | getattr(os, "O_BINARY", 0)
+        )
     except OSError:
         return
     try:
@@ -843,7 +847,7 @@ def make_artifact_reference(
         raise CampaignManifestError("artifact exceeds the supported size range")
     digest = hashlib.sha256()
     measured = 0
-    flags = os.O_RDONLY
+    flags = os.O_RDONLY | getattr(os, "O_BINARY", 0)
     if hasattr(os, "O_NOFOLLOW"):
         flags |= os.O_NOFOLLOW
     descriptor = os.open(_system_path(path), flags)
@@ -868,6 +872,8 @@ def make_artifact_reference(
     finally:
         os.close(descriptor)
     after = _lstat(path)
+    if measured != before.st_size:
+        raise CampaignManifestError("artifact was not hashed in full")
     if (
         (before.st_dev, before.st_ino, before.st_size, before.st_mtime_ns, before.st_nlink)
         != (after.st_dev, after.st_ino, after.st_size, after.st_mtime_ns, after.st_nlink)
@@ -1099,7 +1105,7 @@ def _write_manifest(manifest: CampaignManifest, authority: CampaignAuthority, ro
 def _campaign_lock(authority: CampaignAuthority, roots: _Roots) -> Iterator[None]:
     campaign_directory = _ensure_directory(roots, _campaign_directory(authority))
     lock_path = campaign_directory / "manifest.lock"
-    flags = os.O_RDWR | os.O_CREAT
+    flags = os.O_RDWR | os.O_CREAT | getattr(os, "O_BINARY", 0)
     if hasattr(os, "O_NOFOLLOW"):
         flags |= os.O_NOFOLLOW
     descriptor = os.open(_system_path(lock_path), flags, 0o600)
@@ -1421,6 +1427,54 @@ def _record_for_reference(reference: RecordReference, roots: _Roots) -> AttemptR
     return _attempt_record_from_json(_parse_canonical_json(raw, name="attempt record"))
 
 
+def load_campaign_attempt_record(
+    authority: CampaignAuthority,
+    reference: RecordReference,
+    *,
+    external_root: str | Path,
+    checkout_root: str | Path,
+) -> AttemptRecord:
+    """Load one artifact-verified attempt record reachable from the manifest."""
+
+    if type(authority) is not CampaignAuthority:
+        raise TypeError("authority must be CampaignAuthority")
+    if type(reference) is not RecordReference:
+        raise TypeError("reference must be an exact RecordReference")
+    authority.__post_init__()
+    roots = _validated_roots(external_root, checkout_root)
+    with _campaign_lock(authority, roots):
+        manifest, recovered = _load_and_reconcile(
+            authority, roots, write_recovery=False
+        )
+        if recovered:
+            raise ReconciliationRequiredError(
+                "immutable records are newer than the manifest; reconcile first"
+            )
+        reachable = {
+            attempt.record
+            for run in manifest.runs
+            for attempt in run.attempts
+        }
+        if reference not in reachable:
+            raise CampaignManifestError("attempt record is not reachable from the manifest")
+        record = _record_for_reference(reference, roots)
+        expected_runs = {run.run_id: run for run in authority.resolved_plan}
+        run = expected_runs.get(record.run_id)
+        if (
+            run is None
+            or record.campaign_id != authority.config.campaign_id
+            or record.plan_sha256 != authority.plan_sha256
+            or record.model_id != run.model_id
+            or record.pair_id != run.pair_id
+            or record.run_sha256 != _run_sha256(run)
+        ):
+            raise CampaignManifestError("attempt record does not match its authority")
+        for artifact in (record.checkpoint, record.output, record.result):
+            if artifact is not None:
+                _verify_artifact(artifact, roots)
+        return record
+
+
 def _write_record(record: AttemptRecord, roots: _Roots) -> _LoadedRecord:
     raw = attempt_record_canonical_bytes(record)
     if len(raw) > _MAX_RECORD_BYTES:
@@ -1717,6 +1771,7 @@ __all__ = [
     "heartbeat_campaign_attempt",
     "initialize_campaign_manifest",
     "load_campaign_manifest",
+    "load_campaign_attempt_record",
     "make_artifact_reference",
     "reconcile_campaign_manifest",
     "start_campaign_attempt",

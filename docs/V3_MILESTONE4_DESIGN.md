@@ -136,8 +136,11 @@ requires a curriculum parent at its final optimizer cursor before compact
 derivation. A runner must additionally bind every checkpoint/artifact to the
 completed manifest attempt and clean executable bundle.
 
-These are source contracts only. The isolated pilot runner and its
-commit-bound execution record remain pending.
+The isolated pilot worker and manifest-driven parent runner are implemented.
+A complete local seven-lineage pilot passed with exact paired streams,
+checkpoint resume, compact-parent derivation, and durable manifest transitions.
+This verifies implementation plumbing only; a published commit-bound execution
+record remains pending.
 
 The recurrent, cached-Transformer, and corrected causal-tree source contracts
 are implemented and pass the complete local V3 suite. This establishes source
