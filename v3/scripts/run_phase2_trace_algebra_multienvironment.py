@@ -1,11 +1,17 @@
-"""Run the frozen Phase-II two-phase outer-omission campaign.
+"""Run the forward-only Phase-II V4 corrective outer-omission campaign.
 
-This is prospective execution robustness inside known binding semantics, not
+V4 was designed after the V3 outer results were opened.  It is a disclosed,
+nonconfirmatory corrective replication inside known binding semantics, not
 secret-law discovery, representation discovery, or a confirmatory experiment.
+The correction makes the already-nonfocal output-balance padding uniform; it
+does not add a new semantic case or new focal evidence.  The immutable failed
+V3 formal result is preserved and committed by exact predecessor hashes.
+
 All forty trace-supervised fit/selection shards must be written and committed
-by a terminal preopen aggregate before any outer probe is constructed.  Batch
-opening is permitted only when all 1,520 fold candidates and all forty final
-fits attain zero training mistakes and zero local residuals.
+by a terminal preopen aggregate before any V4 fitted model is evaluated on the
+sealed outer instrument or any such prediction is opened.  Batch opening is
+permitted only when all 1,520 fold candidates and all forty final fits attain
+zero training mistakes and zero local residuals.
 
 Repeated numeric seed labels balance their assignment to omitted cells.  They
 are not common-random-number matches: the heldout-dependent task fingerprint
@@ -51,6 +57,8 @@ from tnlm_v3.algebra_discovery import (
     run_outer_rotation,
 )
 from tnlm_v3.algebra_discovery_probes import (
+    ProbeFamily,
+    ProbeQueryRole,
     build_balanced_probe_suite,
     cyclic_cell_rotation_inventory,
     evaluate_probe_suite,
@@ -60,16 +68,18 @@ from tnlm_v3.campaign_config import load_milestone4_campaign_config
 from tnlm_v3.data import apply_value_transform
 
 
-PROTOCOL_SCHEMA = "tnlm-v3-phase2-outer-rotation-protocol-v3"
-PROTOCOL_SHA256 = "8689ab0ad06a1268c96690da27a6f8573b1536ca19c3bc18c403fdc07ffe2649"
-PROTOCOL_RELATIVE_PATH = "v3/configs/phase2/outer_rotation_v3.json"
-SUPERSEDED_PROTOCOL_SHA256 = (
-    "9aef5525f3abf67a9c111b412ad1a5443817ebb1b1afd83a1a0050c0fb6092ce"
+PROTOCOL_SCHEMA = "tnlm-v3-phase2-outer-rotation-protocol-v4"
+# Frozen after the source-bound Power Control V2 record passed independent
+# reconstruction and adversarial validation.
+PROTOCOL_SHA256 = "966601e683b647b8f68ed0e99c1deca7a449f977027b5579fd6617522d42ec7b"
+PROTOCOL_RELATIVE_PATH = "v3/configs/phase2/outer_rotation_v4.json"
+PREDECESSOR_PROTOCOL_SHA256 = (
+    "8689ab0ad06a1268c96690da27a6f8573b1536ca19c3bc18c403fdc07ffe2649"
 )
-PREOPEN_ENVIRONMENT_SCHEMA = "tnlm-v3-phase2-trace-algebra-preopen-environment-v3"
-PREOPEN_AGGREGATE_SCHEMA = "tnlm-v3-phase2-trace-algebra-terminal-preopen-v3"
-OPEN_ENVIRONMENT_SCHEMA = "tnlm-v3-phase2-trace-algebra-open-environment-v3"
-CAMPAIGN_SCHEMA = "tnlm-v3-phase2-trace-algebra-open-campaign-v3"
+PREOPEN_ENVIRONMENT_SCHEMA = "tnlm-v3-phase2-trace-algebra-preopen-environment-v4"
+PREOPEN_AGGREGATE_SCHEMA = "tnlm-v3-phase2-trace-algebra-terminal-preopen-v4"
+OPEN_ENVIRONMENT_SCHEMA = "tnlm-v3-phase2-trace-algebra-open-environment-v4"
+CAMPAIGN_SCHEMA = "tnlm-v3-phase2-trace-algebra-open-campaign-v4"
 TEST_FIXTURE_ENVIRONMENT_SCHEMA = (
     "tnlm-v3-phase2-trace-algebra-synthetic-preopen-test-fixture-v1"
 )
@@ -88,9 +98,23 @@ EXPECTED_ACTUAL_QUERY_COUNT = 96
 EXPECTED_ACTUAL_FOCAL_QUERY_COUNT = 24
 EXPECTED_PATH_RELATION_COUNT = 3
 EXPECTED_ROTATED_CASE_COUNT = 300
-EXPECTED_ROTATED_QUERY_COUNT = 1_800
+EXPECTED_ROTATED_QUERY_COUNT = 1_920
 EXPECTED_ROTATED_FOCAL_QUERY_COUNT = 480
 MIN_PSEUDO_DEPENDENT_QUERIES_PER_FOLD = 16
+EXPECTED_SHORTCUT_COUNT = 4
+EXPECTED_SHORTCUT_NAMES = (
+    "constant_class_0",
+    "last_visible_argument",
+    "latest_bind_argument_for_query_key",
+    "source_key_bind_echo",
+)
+EXPECTED_POSTOPEN_MODEL_QUERY_EVALUATIONS_PER_ENVIRONMENT = 2_400
+DEFAULT_MAX_PRIMARY_POSTOPEN_MODEL_QUERY_EVALUATIONS = 96_000
+DEFAULT_MAX_VALIDATION_REPLAY_POSTOPEN_MODEL_QUERY_EVALUATIONS = 96_000
+DEFAULT_MAX_ALL_POSTOPEN_MODEL_QUERY_EVALUATIONS = 192_000
+PENDING_POWER_CONTROL_V2_SHA256 = (
+    "PENDING_SOURCE_FREEZE_AND_POWER_CONTROL_V2_EXECUTION"
+)
 
 
 class EnvironmentSpec(NamedTuple):
@@ -107,6 +131,8 @@ class EnvironmentSpec(NamedTuple):
 class FrozenProtocol(NamedTuple):
     protocol_id: str
     protocol_sha256: str
+    execution_ready: bool
+    predecessor_evidence_commitment_sha256: str
     base_task_relative_path: str
     base_task_sha256: str
     num_surface_keys: int
@@ -124,9 +150,16 @@ class FrozenProtocol(NamedTuple):
     required_admissible_fold_candidates: int
     exact_supported_transition_entries: int
     exact_probe_families: int
+    probe_source_sha256: str
+    probe_family_names: tuple[str, ...]
+    probe_family_query_counts: tuple[int, ...]
+    probe_family_output_class_counts: tuple[tuple[int, ...], ...]
+    probe_suite_hashes: tuple[tuple[tuple[int, int], str, str], ...]
+    probe_suite_hash_inventory_sha256: str
     implementation_manifest_relative_path: str
     implementation_required_paths: tuple[str, ...]
     power_control_relative_path: str
+    power_control_expected_file_sha256: str | None
     expected_python_version: str
     expected_torch_version: str
     expected_pyyaml_version: str
@@ -141,6 +174,10 @@ class FrozenProtocol(NamedTuple):
     max_scored_event_work_per_environment: int
     conservative_scored_event_work_total: int
     max_scored_event_work_total: int
+    postopen_model_query_evaluations_per_environment: int
+    max_primary_postopen_model_query_evaluations_total: int
+    max_validation_replay_postopen_model_query_evaluations_total: int
+    max_all_postopen_model_query_evaluations_total: int
     schedule: tuple[EnvironmentSpec, ...]
     schedule_sha256: str
 
@@ -199,18 +236,18 @@ def _repository_root() -> Path:
 
 
 def default_protocol_path() -> Path:
-    return _v3_root() / "configs" / "phase2" / "outer_rotation_v3.json"
+    return _v3_root() / "configs" / "phase2" / "outer_rotation_v4.json"
 
 
 def default_implementation_manifest_path() -> Path:
     return _repository_root() / "v3_recovery" / (
-        "PHASE2_OUTER_ROTATION_V3_IMPLEMENTATION.sha256"
+        "PHASE2_OUTER_ROTATION_V4_IMPLEMENTATION.sha256"
     )
 
 
 def default_power_control_record_path() -> Path:
     return _repository_root() / "v3_recovery" / (
-        "PHASE2_ALGEBRA_POWER_CONTROL_V1.json"
+        "PHASE2_ALGEBRA_POWER_CONTROL_V2.json"
     )
 
 
@@ -410,18 +447,144 @@ def _incidence_connected(schedule: tuple[EnvironmentSpec, ...], count: int) -> b
     return len(reached) == 2 * count
 
 
+def _expected_v3_predecessor_commitment() -> dict[str, object]:
+    return {
+        "v3_protocol": {
+            "path": "v3/configs/phase2/outer_rotation_v3.json",
+            "file_sha256": PREDECESSOR_PROTOCOL_SHA256,
+        },
+        "v3_implementation_manifest": {
+            "path": "v3_recovery/PHASE2_OUTER_ROTATION_V3_IMPLEMENTATION.sha256",
+            "file_sha256": (
+                "6ff8b9e54d5fe7710fe605e2f7615046275f54eb20fd2f75147bbd840e6e7858"
+            ),
+        },
+        "v3_terminal_preopen": {
+            "path": "v3_recovery/phase2_outer_rotation_v3/terminal-preopen.json",
+            "file_sha256": (
+                "0aacf91a3bca23946ab5f9b399da56dc1b786b99abb3f9b27ad5a4b2655bf313"
+            ),
+            "record_sha256": (
+                "fe994db05879ee4dbaaf13245942a5161a464824184d505de0dc985ffccbd0aa"
+            ),
+            "outer_open_permitted": True,
+        },
+        "v3_open_campaign": {
+            "path": "v3_recovery/phase2_outer_rotation_v3/open-campaign.json",
+            "file_sha256": (
+                "ae1132f831e9c87ca34452b7960071f3febec5693f2b59bdf95671b3fe78937a"
+            ),
+            "record_sha256": (
+                "b4d16f49fb02ddc661bc6de931a9710f74b6d47b539494f6776c39a1668f9ebe"
+            ),
+            "campaign_passed": False,
+            "passing_environment_count": 10,
+            "environment_count": 40,
+            "all_realized_probe_answers_correct": True,
+        },
+        "v3_evidence_manifest": {
+            "path": "v3_recovery/phase2_outer_rotation_v3/EVIDENCE.sha256",
+            "file_sha256": (
+                "51f413facc401dd85c6ec0a0af93b512a405fe9d8c37f09c178d21b5d184296e"
+            ),
+        },
+        "v3_summary": {
+            "path": "v3_recovery/phase2_outer_rotation_v3/SUMMARY.json",
+            "file_sha256": (
+                "eb22adba8c7449bdf4374eecd7584d8254c3c70734b80eceecd8dbabb179efa5"
+            ),
+        },
+        "v3_formal_result_remains_failed_and_is_not_rewritten": True,
+        "v4_was_designed_after_v3_outer_results_were_opened": True,
+        "v3_outer_results_informed_the_probe_inventory_correction": True,
+        "v3_labels_models_or_scores_used_for_v4_fit_or_selection": False,
+    }
+
+
+def _validate_v3_predecessor_commitment(document: Mapping[str, object]) -> str:
+    expected = _expected_v3_predecessor_commitment()
+    raw = _mapping(
+        "V3 predecessor evidence commitment",
+        document.get("predecessor_evidence_commitment"),
+    )
+    if dict(raw) != expected:
+        raise ValueError("V3 predecessor evidence commitment changed")
+    repository = _repository_root().resolve()
+    for name in (
+        "v3_protocol",
+        "v3_implementation_manifest",
+        "v3_terminal_preopen",
+        "v3_open_campaign",
+        "v3_evidence_manifest",
+        "v3_summary",
+    ):
+        row = _mapping(f"{name} commitment", raw[name])
+        relative = row.get("path")
+        if type(relative) is not str or not relative:
+            raise TypeError("V3 predecessor path must be a nonempty string")
+        candidate = (repository / relative).resolve()
+        try:
+            candidate.relative_to(repository)
+        except ValueError as error:
+            raise ValueError("V3 predecessor path escapes the repository") from error
+        payload = candidate.read_bytes()
+        if _sha256_bytes(payload) != row.get("file_sha256"):
+            raise ValueError(f"immutable V3 predecessor bytes changed: {relative}")
+        if name in {"v3_terminal_preopen", "v3_open_campaign"}:
+            predecessor_record = _mapping(
+                f"{name} record", json.loads(payload)
+            )
+            if predecessor_record.get("record_sha256") != row.get("record_sha256"):
+                raise ValueError(f"immutable V3 predecessor record changed: {relative}")
+    terminal = _mapping(
+        "V3 terminal record",
+        json.loads(
+            (
+                repository
+                / expected["v3_terminal_preopen"]["path"]
+            ).read_bytes()
+        ),
+    )
+    terminal_acceptance = _mapping(
+        "V3 terminal acceptance", terminal.get("acceptance")
+    )
+    if terminal_acceptance.get("outer_open_permitted") is not True:
+        raise ValueError("committed V3 terminal gate no longer permits its historical open")
+    campaign = _mapping(
+        "V3 campaign record",
+        json.loads(
+            (repository / expected["v3_open_campaign"]["path"]).read_bytes()
+        ),
+    )
+    acceptance = _mapping("V3 campaign acceptance", campaign.get("acceptance"))
+    aggregate = _mapping("V3 campaign aggregate", campaign.get("aggregate"))
+    if (
+        acceptance.get("campaign_passed") is not False
+        or aggregate.get("environment_count") != 40
+        or aggregate.get("passing_environment_count") != 10
+        or aggregate.get("actual_cell_probe_query_count") != 3_600
+        or aggregate.get("actual_cell_probe_correct_count") != 3_600
+        or aggregate.get("rotated_control_query_count") != 72_000
+        or aggregate.get("rotated_control_correct_count") != 72_000
+    ):
+        raise ValueError("committed V3 corrective trigger facts changed")
+    return _sha256_bytes(_canonical_bytes(expected))
+
+
 def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
-    """Load and validate the exact frozen v3 preregistration."""
+    """Load the exact forward-only V4 corrective preregistration."""
 
     protocol_path = default_protocol_path() if path is None else path
     if not isinstance(protocol_path, Path):
         raise TypeError("protocol path must be pathlib.Path")
     payload = protocol_path.read_bytes()
     digest = _sha256_bytes(payload)
-    if digest == SUPERSEDED_PROTOCOL_SHA256:
-        raise ValueError("the v2 protocol was superseded before new environment fitting")
+    if digest == PREDECESSOR_PROTOCOL_SHA256:
+        raise ValueError(
+            "the immutable V3 evidence protocol is not executable through V4"
+        )
     if digest != PROTOCOL_SHA256:
-        raise ValueError("protocol bytes do not match the frozen v3 SHA-256")
+        raise ValueError("protocol bytes do not match the frozen V4 SHA-256")
     document = _mapping("protocol", json.loads(payload))
     if document.get("schema") != PROTOCOL_SCHEMA:
         raise ValueError("unknown protocol schema")
@@ -429,6 +592,32 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
         raise ValueError("protocol was not frozen before execution")
     if document.get("claim_eligible") is not False:
         raise ValueError("this protocol cannot be claim eligible")
+    execution_ready = document.get("execution_ready")
+    if type(execution_ready) is not bool:
+        raise TypeError("V4 execution_ready must be an exact boolean")
+    blocker = document.get("execution_blocker")
+    if execution_ready:
+        if blocker is not None:
+            raise ValueError("execution-ready V4 protocol cannot retain a blocker")
+    elif blocker != (
+        "power_control_v2_file_sha256_and_v4_implementation_manifest_pending_source_freeze"
+    ):
+        raise ValueError("draft V4 execution blocker changed")
+    predecessor_sha = _validate_v3_predecessor_commitment(document)
+    correction = _mapping(
+        "corrective replication disclosure",
+        document.get("corrective_replication_disclosure"),
+    )
+    if (
+        correction.get("semantic_cases_changed") is not False
+        or correction.get("focal_queries_changed") is not False
+        or correction.get("added_queries_are_nonfocal_balance_padding") is not True
+        or correction.get("added_queries_are_new_independent_semantic_evidence")
+        is not False
+        or correction.get("corrective_replication_is_confirmatory") is not False
+        or correction.get("post_hoc_choice_disclosed") is not True
+    ):
+        raise ValueError("V4 post-open corrective disclosure changed")
 
     base = _mapping("base task", document.get("base_task_config"))
     base_path = base.get("path")
@@ -490,6 +679,22 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
     ):
         raise ValueError("fold-candidate cleanliness gate changed")
 
+    seed_inventory = _mapping(
+        "seed pair inventory", document.get("seed_pair_inventory")
+    )
+    if (
+        seed_inventory.get("train_seed_formula")
+        != "40000_plus_seed_pair_index"
+        or seed_inventory.get("validation_seed_formula")
+        != "50000_plus_seed_pair_index"
+        or seed_inventory.get("optimizer_seed_formula")
+        != "60000_plus_seed_pair_index"
+        or seed_inventory.get("zero_overlap_with_v3_numeric_seed_domains") is not True
+        or seed_inventory.get("numeric_data_seed_reuse_is_not_common_random_numbers")
+        is not True
+    ):
+        raise ValueError("V4 fresh seed-domain commitment changed")
+
     raw_blocks = _exact_list("crossed blocks", document.get("crossed_blocks"))
     schedule_rows: list[EnvironmentSpec] = []
     for block_number, raw in enumerate(raw_blocks):
@@ -510,15 +715,15 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
                     outer_cell_index=cell_index,
                     outer_cell=(cell_index // values, cell_index % values),
                     seed_pair_index=seed_index,
-                    train_seed=10_000 + seed_index,
-                    validation_seed=20_000 + seed_index,
-                    optimizer_seed=30_000 + seed_index,
+                    train_seed=40_000 + seed_index,
+                    validation_seed=50_000 + seed_index,
+                    optimizer_seed=60_000 + seed_index,
                 )
             )
     schedule = tuple(schedule_rows)
     universe = {(key, value) for key in range(keys) for value in range(values)}
     if len(schedule) != 40 or tuple(row.environment_index for row in schedule) != tuple(range(40)):
-        raise ValueError("v3 schedule must contain forty canonical environments")
+        raise ValueError("V4 schedule must contain forty canonical environments")
     if len({(row.outer_cell, row.seed_pair_index) for row in schedule}) != len(schedule):
         raise ValueError("crossed schedule repeats a cell/seed-label assignment")
     if any(
@@ -534,17 +739,36 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
         or expanded.get("gold_standard_full_cell_by_seed_cross_not_claimed") is not True
     ):
         raise ValueError("expanded-design claims changed")
+    schedule_sha = _sha256_bytes(
+        _canonical_bytes([_environment_spec_payload(row) for row in schedule])
+    )
+    if expanded.get("expanded_schedule_sha256") != schedule_sha:
+        raise ValueError("expanded V4 schedule hash changed")
 
     phases = _mapping("execution phases", document.get("execution_phases"))
+    phase0 = _mapping(
+        "probe instrument freeze phase",
+        phases.get("phase_0_precommitted_probe_instrument_freeze"),
+    )
     phase1 = _mapping("preopen phase", phases.get("phase_1_preopen"))
     phase2 = _mapping(
         "terminal preopen phase", phases.get("phase_2_terminal_preopen_aggregate")
     )
     phase3 = _mapping("batch open phase", phases.get("phase_3_batch_open"))
+    if (
+        phase0.get("occurred_after_v3_open_and_before_any_v4_model_fit") is not True
+        or phase0.get("suite_construction_is_not_v4_model_evaluation") is not True
+        or set(_exact_list("phase-zero forbidden actions", phase0.get("forbidden")))
+        != {
+            "evaluate_any_v4_fitted_model",
+            "use_any_v4_prediction_to_choose_or_modify_the_instrument",
+        }
+    ):
+        raise ValueError("phase-zero corrective instrument disclosure changed")
     if set(_exact_list("preopen forbidden actions", phase1.get("forbidden"))) != {
-        "construct_outer_probe_suite",
-        "read_outer_probe_answers",
-        "evaluate_outer_or_rotated_probes",
+        "construct_outer_probe_suite_during_v4_preopen_execution",
+        "read_outer_probe_answers_during_v4_preopen_execution",
+        "evaluate_v4_model_on_outer_or_rotated_probes",
     }:
         raise ValueError("preopen probe firewall changed")
     if (
@@ -556,6 +780,112 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
         or phase3.get("evaluates_all_40_frozen_models") is not True
     ):
         raise ValueError("two-phase execution protocol changed")
+
+    instrument = _mapping(
+        "probe instrument commitment", document.get("probe_instrument_commitment")
+    )
+    probe_source_sha = _require_sha256(
+        "probe source SHA-256",
+        instrument.get("probe_source_sha256_at_v4_design_freeze"),
+    )
+    active_probe_source = _v3_root() / "src" / "tnlm_v3" / (
+        "algebra_discovery_probes.py"
+    )
+    if _sha256_bytes(active_probe_source.read_bytes()) != probe_source_sha:
+        raise ValueError("corrected V4 probe source bytes changed")
+    family_names = tuple(
+        str(item)
+        for item in _exact_list("probe family order", instrument.get("family_order"))
+    )
+    if family_names != tuple(family.value for family in ProbeFamily):
+        raise ValueError("V4 probe family order changed")
+    family_query_counts = tuple(
+        _plain_int("family query count", item, 1)
+        for item in _exact_list(
+            "family query counts", instrument.get("family_query_counts_per_cell")
+        )
+    )
+    expected_family_query_counts = (4, 4, 4, 4, 8, 12, 4, 8, 16, 8, 8, 16)
+    if family_query_counts != expected_family_query_counts:
+        raise ValueError("corrected V4 family-query inventory changed")
+    family_class_counts = tuple(
+        tuple(
+            _plain_int("family output class count", count, 1)
+            for count in _exact_list("family output class counts", row)
+        )
+        for row in _exact_list(
+            "family output-class inventory",
+            instrument.get("family_output_class_counts_per_cell"),
+        )
+    )
+    if (
+        len(family_class_counts) != len(ProbeFamily)
+        or any(len(row) != values or len(set(row)) != 1 for row in family_class_counts)
+        or tuple(sum(row) for row in family_class_counts) != family_query_counts
+    ):
+        raise ValueError("corrected V4 family output balance changed")
+    raw_suite_rows = _exact_list(
+        "probe suite hashes", instrument.get("suite_hashes_by_outer_cell")
+    )
+    suite_hashes: list[tuple[tuple[int, int], str, str]] = []
+    for index, raw_row in enumerate(raw_suite_rows):
+        row = _mapping("probe suite hash row", raw_row)
+        raw_cell = _exact_list("probe suite outer cell", row.get("outer_cell"))
+        if len(raw_cell) != 2:
+            raise ValueError("probe suite outer cell must have two coordinates")
+        cell = (
+            _plain_int("probe suite key", raw_cell[0]),
+            _plain_int("probe suite value", raw_cell[1]),
+        )
+        if cell != (index // values, index % values):
+            raise ValueError("probe suite hash rows must use canonical cell order")
+        suite_hashes.append(
+            (
+                cell,
+                _require_sha256("actual probe suite SHA-256", row.get("actual_suite_sha256")),
+                _require_sha256("rotated probe suite SHA-256", row.get("rotated_suite_sha256")),
+            )
+        )
+    if len(suite_hashes) != cell_count:
+        raise ValueError("probe suite hashes must cover every cell")
+    suite_hash_inventory_sha = _require_sha256(
+        "probe suite hash inventory SHA-256",
+        instrument.get("suite_hash_inventory_sha256"),
+    )
+    normalized_suite_rows = [
+        {
+            "outer_cell": list(cell),
+            "actual_suite_sha256": actual_sha,
+            "rotated_suite_sha256": rotated_sha,
+        }
+        for cell, actual_sha, rotated_sha in suite_hashes
+    ]
+    if _sha256_bytes(_canonical_bytes(normalized_suite_rows)) != suite_hash_inventory_sha:
+        raise ValueError("probe suite hash inventory digest changed")
+    if (
+        instrument.get("probe_suite_schema")
+        != "tnlm-v3-balanced-sealed-probes-v1"
+        or instrument.get("balance_policy")
+        != "each_case_total_query_count_equals_4_times_case_focal_query_count"
+        or instrument.get("added_queries_are_nonfocal_output_balance_padding")
+        is not True
+        or instrument.get("case_count_per_cell") != EXPECTED_ACTUAL_CASE_COUNT
+        or instrument.get("query_count_per_cell") != EXPECTED_ACTUAL_QUERY_COUNT
+        or instrument.get("focal_query_count_per_cell")
+        != EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+        or instrument.get("rotated_case_count") != EXPECTED_ROTATED_CASE_COUNT
+        or instrument.get("rotated_query_count") != EXPECTED_ROTATED_QUERY_COUNT
+        or instrument.get("rotated_focal_query_count")
+        != EXPECTED_ROTATED_FOCAL_QUERY_COUNT
+        or instrument.get("rotated_pair_count") != cell_count
+        or instrument.get("rotated_queries_per_pair") != EXPECTED_ACTUAL_QUERY_COUNT
+        or instrument.get("rotated_focal_queries_per_pair")
+        != EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+        or instrument.get("inner_seen_cell_inventory_queries")
+        != (cell_count - 1) * EXPECTED_ACTUAL_QUERY_COUNT
+        or tuple(instrument.get("shortcut_names", ())) != EXPECTED_SHORTCUT_NAMES
+    ):
+        raise ValueError("corrected V4 probe instrument inventory changed")
 
     implementation = _mapping(
         "implementation commitment", document.get("implementation_commitment")
@@ -605,6 +935,15 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
     power_path = prerequisite.get("record_path")
     if type(power_path) is not str or not power_path:
         raise TypeError("power-control record path must be nonempty")
+    raw_power_file_sha = prerequisite.get("expected_file_sha256")
+    if raw_power_file_sha == PENDING_POWER_CONTROL_V2_SHA256:
+        power_file_sha: str | None = None
+    else:
+        power_file_sha = _require_sha256(
+            "Power Control V2 file SHA-256", raw_power_file_sha
+        )
+    if power_path != "v3_recovery/PHASE2_ALGEBRA_POWER_CONTROL_V2.json":
+        raise ValueError("V4 must use the source-frozen Power Control V2 path")
     if (
         prerequisite.get("observed_transition_address_exception_power_control_required")
         is not True
@@ -613,6 +952,10 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
         is not True
     ):
         raise ValueError("power-control prerequisite changed")
+    if execution_ready != (power_file_sha is not None):
+        raise ValueError(
+            "V4 execution readiness must agree with the frozen Power Control V2 SHA"
+        )
 
     budget = _mapping("work budget", document.get("work_budget"))
     planned_evaluations = _plain_int(
@@ -649,6 +992,26 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
     max_all = _plain_int(
         "max all generation", budget.get("max_all_generation_work_total"), 1
     )
+    postopen_per_environment = _plain_int(
+        "postopen model-query evaluations per environment",
+        budget.get("postopen_model_query_evaluations_per_environment"),
+        1,
+    )
+    primary_postopen_total = _plain_int(
+        "maximum primary postopen model-query evaluations",
+        budget.get("max_primary_postopen_model_query_evaluations_total"),
+        1,
+    )
+    validation_postopen_total = _plain_int(
+        "maximum validation-replay postopen model-query evaluations",
+        budget.get("max_validation_replay_postopen_model_query_evaluations_total"),
+        1,
+    )
+    all_postopen_total = _plain_int(
+        "maximum all postopen model-query evaluations",
+        budget.get("max_all_postopen_model_query_evaluations_total"),
+        1,
+    )
     prototype_count = len(prototype_inventory(values))
     expected_evaluations = restarts * (
         1
@@ -668,6 +1031,18 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
         or conservative_total != len(schedule) * expected_environment_work
         or max_primary != len(schedule) * 2 * train_events
         or max_all != max_primary + max_replay
+        or budget.get("postopen_learned_actual_query_evaluations_per_environment")
+        != EXPECTED_ACTUAL_QUERY_COUNT
+        or budget.get("postopen_learned_rotated_query_evaluations_per_environment")
+        != EXPECTED_ROTATED_QUERY_COUNT
+        or budget.get("postopen_shortcut_count") != EXPECTED_SHORTCUT_COUNT
+        or budget.get("postopen_shortcut_query_evaluations_per_environment")
+        != EXPECTED_SHORTCUT_COUNT * EXPECTED_ACTUAL_QUERY_COUNT
+        or postopen_per_environment
+        != EXPECTED_POSTOPEN_MODEL_QUERY_EVALUATIONS_PER_ENVIRONMENT
+        or primary_postopen_total != len(schedule) * postopen_per_environment
+        or validation_postopen_total != primary_postopen_total
+        or all_postopen_total != primary_postopen_total + validation_postopen_total
         or max_per_fit < train_events * expected_evaluations
         or max_environment < conservative_environment
         or max_total < conservative_total
@@ -700,8 +1075,13 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
         or family_rows != [12, 12]
         or postopen.get("exact_path_relations") != [3, 3]
         or postopen.get("rotated_control_cases") != [300, 300]
-        or postopen.get("rotated_control_queries") != [1800, 1800]
+        or postopen.get("rotated_control_queries") != [1920, 1920]
         or postopen.get("rotated_control_focal_queries") != [480, 480]
+        or postopen.get("rotated_control_pairs") != [20, 20]
+        or postopen.get("queries_per_rotated_pair") != [96, 96]
+        or postopen.get("focal_queries_per_rotated_pair") != [24, 24]
+        or tuple(postopen.get("family_query_counts_per_cell", ()))
+        != family_query_counts
         or postopen.get("all_shortcut_controls_strictly_below_learned_model")
         is not True
         or postopen.get("no_pooled_average_rescue") is not True
@@ -711,6 +1091,8 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
     return FrozenProtocol(
         protocol_id=str(document["protocol_id"]),
         protocol_sha256=digest,
+        execution_ready=execution_ready,
+        predecessor_evidence_commitment_sha256=predecessor_sha,
         base_task_relative_path=base_path,
         base_task_sha256=base_sha,
         num_surface_keys=keys,
@@ -728,9 +1110,16 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
         required_admissible_fold_candidates=required_candidates,
         exact_supported_transition_entries=exact_entries,
         exact_probe_families=family_rows[0],
+        probe_source_sha256=probe_source_sha,
+        probe_family_names=family_names,
+        probe_family_query_counts=family_query_counts,
+        probe_family_output_class_counts=family_class_counts,
+        probe_suite_hashes=tuple(suite_hashes),
+        probe_suite_hash_inventory_sha256=suite_hash_inventory_sha,
         implementation_manifest_relative_path=manifest_path,
         implementation_required_paths=implementation_paths,
         power_control_relative_path=power_path,
+        power_control_expected_file_sha256=power_file_sha,
         expected_python_version=expected_runtime_values["python"],
         expected_torch_version=expected_runtime_values["torch"],
         expected_pyyaml_version=expected_runtime_values["pyyaml"],
@@ -745,10 +1134,14 @@ def load_frozen_protocol(path: Path | None = None) -> FrozenProtocol:
         max_scored_event_work_per_environment=max_environment,
         conservative_scored_event_work_total=conservative_total,
         max_scored_event_work_total=max_total,
-        schedule=schedule,
-        schedule_sha256=_sha256_bytes(
-            _canonical_bytes([_environment_spec_payload(row) for row in schedule])
+        postopen_model_query_evaluations_per_environment=postopen_per_environment,
+        max_primary_postopen_model_query_evaluations_total=primary_postopen_total,
+        max_validation_replay_postopen_model_query_evaluations_total=(
+            validation_postopen_total
         ),
+        max_all_postopen_model_query_evaluations_total=all_postopen_total,
+        schedule=schedule,
+        schedule_sha256=schedule_sha,
     )
 
 
@@ -931,7 +1324,13 @@ def load_power_control_commitment(
     expected_path = (_repository_root() / protocol.power_control_relative_path).resolve()
     if record_path.resolve() != expected_path:
         raise ValueError("power-control record must use the preregistered path")
+    if protocol.power_control_expected_file_sha256 is None:
+        raise ValueError(
+            "Power Control V2 file SHA-256 is pending; V4 fitting is forbidden"
+        )
     payload = record_path.read_bytes()
+    if _sha256_bytes(payload) != protocol.power_control_expected_file_sha256:
+        raise ValueError("Power Control V2 bytes differ from the frozen prerequisite")
     document = _load_power_runner().validate_evidence_record(json.loads(payload))
     acceptance = _mapping("power acceptance", document.get("acceptance"))
     positive = _mapping("positive power condition", acceptance.get("positive"))
@@ -965,7 +1364,22 @@ def _protocol_record(protocol: FrozenProtocol) -> dict[str, object]:
         "protocol_file": PROTOCOL_RELATIVE_PATH,
         "protocol_file_sha256": protocol.protocol_sha256,
         "schedule_sha256": protocol.schedule_sha256,
-        "superseded_v2_sha256": SUPERSEDED_PROTOCOL_SHA256,
+        "v3_predecessor_evidence_commitment": (
+            _expected_v3_predecessor_commitment()
+        ),
+        "v3_predecessor_evidence_commitment_sha256": (
+            protocol.predecessor_evidence_commitment_sha256
+        ),
+        "v3_formal_campaign_passed": False,
+        "v4_designed_after_v3_outer_results_opened": True,
+        "v4_is_nonconfirmatory_corrective_replication": True,
+        "corrected_probe_source_sha256": protocol.probe_source_sha256,
+        "corrected_probe_suite_hash_inventory_sha256": (
+            protocol.probe_suite_hash_inventory_sha256
+        ),
+        "corrected_actual_queries_per_cell": EXPECTED_ACTUAL_QUERY_COUNT,
+        "corrected_rotated_queries_per_environment": EXPECTED_ROTATED_QUERY_COUNT,
+        "added_queries_are_nonfocal_balance_padding": True,
         "max_pairwise_rounds": protocol.max_pairwise_rounds,
     }
 
@@ -1005,8 +1419,20 @@ def _power_record(power: PowerControlCommitment) -> dict[str, object]:
 
 def _base_claims() -> dict[str, bool]:
     return {
-        "prospective_execution_schedule_frozen_before_model_fitting": True,
-        "prospective_execution_robustness_inside_known_semantics": True,
+        "forward_execution_schedule_frozen_before_v4_model_fitting": True,
+        "post_v3_corrective_execution_inside_known_semantics": True,
+        "v4_designed_after_v3_outer_results_were_opened": True,
+        "v3_formal_campaign_result_remains_failed": True,
+        "v3_evidence_preserved_immutable": True,
+        "v3_outer_results_informed_v4_probe_inventory_fix": True,
+        "v4_is_post_open_corrective_replication": True,
+        "v4_corrective_replication_is_confirmatory": False,
+        "trusted_probe_instrument_constructed_and_sealed_before_v4_model_fit": True,
+        "v4_model_prediction_or_evaluation_used_to_choose_probe_instrument": False,
+        "added_probe_queries_are_nonfocal_balance_padding": True,
+        "added_probe_queries_are_new_independent_semantic_evidence": False,
+        "semantic_probe_case_inventory_changed_from_v3": False,
+        "focal_probe_inventory_changed_from_v3": False,
         "trusted_controller_knows_outer_identifier": True,
         "known_event_semantics_used_by_trusted_attester": True,
         "outer_identifier_received_by_coefficient_estimator": False,
@@ -1037,17 +1463,17 @@ def _base_claims() -> dict[str, bool]:
 def _preopen_claims() -> dict[str, bool]:
     return {
         **_base_claims(),
-        "outer_probe_suite_constructed": False,
-        "outer_probe_answers_read": False,
-        "outer_or_rotated_probe_evaluation_performed": False,
-        "terminal_preopen_aggregate_required_before_any_outer_probe": True,
+        "outer_probe_suite_constructed_during_v4_preopen_execution": False,
+        "outer_probe_answers_read_during_v4_preopen_execution": False,
+        "v4_model_outer_or_rotated_probe_evaluation_performed": False,
+        "terminal_preopen_aggregate_required_before_any_v4_model_probe_evaluation": True,
     }
 
 
 def _open_claims() -> dict[str, bool]:
     return {
         **_base_claims(),
-        "terminal_preopen_aggregate_validated_before_any_outer_probe": True,
+        "terminal_preopen_aggregate_validated_before_any_v4_model_probe_evaluation": True,
         "all_forty_frozen_models_opened_in_one_batch_phase": True,
         "failed_environment_replacement_permitted": False,
         "cell_rotation_called_program_conjugacy_or_equivariance": False,
@@ -1259,6 +1685,10 @@ def _prerequisites(
     power_control_record_path: Path | None,
 ) -> tuple[ImplementationManifest, RuntimeRecord, PowerControlCommitment]:
     # Ordering is deliberate: every item is validated before generation/fitting.
+    if protocol.execution_ready is not True:
+        raise ValueError(
+            "V4 protocol is not execution-ready; no generation, fitting, or open is permitted"
+        )
     manifest = load_implementation_manifest(protocol, implementation_manifest_path)
     runtime = validate_runtime(protocol)
     power = load_power_control_commitment(protocol, power_control_record_path)
@@ -1332,8 +1762,8 @@ def build_preopen_environment_record(
     body: dict[str, object] = {
         "schema": PREOPEN_ENVIRONMENT_SCHEMA,
         "scope": (
-            "prospective_execution_robustness_inside_known_binding_semantics_"
-            "not_secret_law_or_representation_discovery"
+            "post_v3_open_nonconfirmatory_corrective_preopen_inside_known_"
+            "binding_semantics_not_secret_law_or_representation_discovery"
         ),
         "protocol": _protocol_record(protocol),
         "implementation": _implementation_record(manifest),
@@ -1426,8 +1856,8 @@ def _validate_preopen_material(
     if body.get("schema") != PREOPEN_ENVIRONMENT_SCHEMA:
         raise ValueError("unknown preopen environment schema")
     if body.get("scope") != (
-        "prospective_execution_robustness_inside_known_binding_semantics_"
-        "not_secret_law_or_representation_discovery"
+        "post_v3_open_nonconfirmatory_corrective_preopen_inside_known_"
+        "binding_semantics_not_secret_law_or_representation_discovery"
     ):
         raise ValueError("preopen scope changed")
     if _mapping("protocol", body.get("protocol")) != _protocol_record(protocol):
@@ -1780,8 +2210,8 @@ def _build_terminal_preopen_from_validated(
     body: dict[str, object] = {
         "schema": PREOPEN_AGGREGATE_SCHEMA,
         "scope": (
-            "terminal_preopen_commitment_for_prospective_execution_robustness_"
-            "inside_known_semantics"
+            "terminal_preopen_commitment_for_post_v3_nonconfirmatory_corrective_"
+            "replication_inside_known_semantics"
         ),
         "protocol": _protocol_record(protocol),
         "implementation": _implementation_record(manifest),
@@ -1984,6 +2414,121 @@ def _path_relation_satisfied(raw: object) -> bool:
     raise ValueError("unknown path relation")
 
 
+def _probe_query_inventory(suite: object) -> tuple[int, int, tuple[int, ...]]:
+    query_count = sum(len(case.expected_answers) for case in suite.cases)
+    focal_count = sum(
+        sum(role is ProbeQueryRole.FOCAL for role in case.query_roles)
+        for case in suite.cases
+    )
+    family_counts = tuple(
+        sum(
+            len(case.expected_answers)
+            for case in suite.cases
+            if case.family is family
+        )
+        for family in ProbeFamily
+    )
+    return query_count, focal_count, family_counts
+
+
+def _serialized_family_class_counts(
+    raw_balance: object, name: str
+) -> tuple[tuple[str, tuple[int, ...]], ...]:
+    balance = _mapping(name, raw_balance)
+    rows: list[tuple[str, tuple[int, ...]]] = []
+    for raw in _exact_list(f"{name} family class counts", balance.get("family_class_counts")):
+        row = _exact_list(f"{name} family class row", raw)
+        if len(row) != 2 or type(row[0]) is not str:
+            raise ValueError(f"{name} family class row is malformed")
+        rows.append(
+            (
+                row[0],
+                tuple(
+                    _plain_int(f"{name} family class count", count, 1)
+                    for count in _exact_list(f"{name} family counts", row[1])
+                ),
+            )
+        )
+    return tuple(rows)
+
+
+def _validate_constructed_probe_instrument(
+    protocol: FrozenProtocol,
+    spec: EnvironmentSpec,
+    actual_suite: object,
+    rotated_suite: object,
+) -> None:
+    expected_by_cell = {
+        cell: (actual_sha, rotated_sha)
+        for cell, actual_sha, rotated_sha in protocol.probe_suite_hashes
+    }
+    expected_actual_sha, expected_rotated_sha = expected_by_cell[spec.outer_cell]
+    if (
+        actual_suite.schema != "tnlm-v3-balanced-sealed-probes-v1"
+        or actual_suite.suite_sha256 != expected_actual_sha
+        or rotated_suite.schema != "tnlm-v3-balanced-sealed-probes-v1"
+        or rotated_suite.suite_sha256 != expected_rotated_sha
+    ):
+        raise ValueError("constructed probe suite differs from the frozen V4 instrument")
+    actual_inventory = _probe_query_inventory(actual_suite)
+    rotated_inventory = _probe_query_inventory(rotated_suite)
+    if (
+        len(actual_suite.cases) != EXPECTED_ACTUAL_CASE_COUNT
+        or actual_inventory
+        != (
+            EXPECTED_ACTUAL_QUERY_COUNT,
+            EXPECTED_ACTUAL_FOCAL_QUERY_COUNT,
+            protocol.probe_family_query_counts,
+        )
+        or len(rotated_suite.cases) != EXPECTED_ROTATED_CASE_COUNT
+        or rotated_inventory
+        != (
+            EXPECTED_ROTATED_QUERY_COUNT,
+            EXPECTED_ROTATED_FOCAL_QUERY_COUNT,
+            tuple(20 * count for count in protocol.probe_family_query_counts),
+        )
+    ):
+        raise ValueError("constructed probe query inventory differs from V4")
+    actual_class_counts = tuple(
+        counts for _, counts in actual_suite.balance.family_class_counts
+    )
+    rotated_class_counts = tuple(
+        counts for _, counts in rotated_suite.balance.family_class_counts
+    )
+    if (
+        actual_class_counts != protocol.probe_family_output_class_counts
+        or rotated_class_counts
+        != tuple(
+            tuple(20 * count for count in row)
+            for row in protocol.probe_family_output_class_counts
+        )
+    ):
+        raise ValueError("constructed family output-class inventory differs from V4")
+    if any(
+        len(case.expected_answers)
+        != protocol.value_cardinality
+        * sum(role is ProbeQueryRole.FOCAL for role in case.query_roles)
+        for case in actual_suite.cases + rotated_suite.cases
+    ):
+        raise ValueError("constructed probe violates the frozen balance-padding policy")
+    expected_pairs = {
+        (key, value)
+        for key in range(protocol.num_surface_keys)
+        for value in range(protocol.value_cardinality)
+    }
+    if (
+        set(rotated_suite.probe_pairs) != expected_pairs
+        or rotated_suite.balance.pair_case_counts
+        != tuple((cell, EXPECTED_ACTUAL_CASE_COUNT) for cell in sorted(expected_pairs))
+        or rotated_suite.balance.pair_focal_query_counts
+        != tuple(
+            (cell, EXPECTED_ACTUAL_FOCAL_QUERY_COUNT)
+            for cell in sorted(expected_pairs)
+        )
+    ):
+        raise ValueError("rotated probe pair inventory differs from frozen V4")
+
+
 def _postfit_report(
     protocol: FrozenProtocol,
     spec: EnvironmentSpec,
@@ -1997,8 +2542,6 @@ def _postfit_report(
         protocol.value_cardinality,
         (spec.outer_cell,),
     )
-    evaluation = evaluate_probe_suite(selection.final_model, suite)
-    shortcuts = evaluate_shortcut_controls(suite)
     rotations = cyclic_cell_rotation_inventory(
         protocol.num_surface_keys,
         protocol.value_cardinality,
@@ -2010,9 +2553,35 @@ def _postfit_report(
         (spec.outer_cell,),
         cell_rotations=rotations,
     )
+    _validate_constructed_probe_instrument(
+        protocol, spec, suite, rotated_suite
+    )
+    evaluation = evaluate_probe_suite(selection.final_model, suite)
+    shortcuts = evaluate_shortcut_controls(suite)
+    if tuple(row.name for row in shortcuts) != EXPECTED_SHORTCUT_NAMES:
+        raise ValueError("shortcut-control inventory differs from frozen V4")
     rotated_evaluation = evaluate_probe_suite(selection.final_model, rotated_suite)
     return {
         "outer_labels_opened_after_terminal_campaign_preopen": True,
+        "probe_instrument": {
+            "corrected_after_v3_open": True,
+            "nonconfirmatory_corrective_replication": True,
+            "added_queries_are_nonfocal_balance_padding": True,
+            "actual_suite_sha256": suite.suite_sha256,
+            "rotated_suite_sha256": rotated_suite.suite_sha256,
+            "actual_balance_certificate": _jsonable(suite.balance),
+            "rotated_balance_certificate": _jsonable(rotated_suite.balance),
+            "family_order": list(protocol.probe_family_names),
+            "family_query_counts_per_cell": list(
+                protocol.probe_family_query_counts
+            ),
+            "family_output_class_counts_per_cell": [
+                list(row) for row in protocol.probe_family_output_class_counts
+            ],
+            "actual_queries_per_cell": EXPECTED_ACTUAL_QUERY_COUNT,
+            "rotated_queries_per_pair": EXPECTED_ACTUAL_QUERY_COUNT,
+            "rotated_pair_count": 20,
+        },
         "transition_table": _transition_table_assessment(selection.final_model),
         "actual_cell_probe": {
             "outer_cell": list(spec.outer_cell),
@@ -2059,6 +2628,7 @@ def _environment_acceptance(
     rotated_evaluation = _mapping(
         "rotated evaluation", rotated.get("evaluation")
     )
+    instrument = _mapping("probe instrument", postfit.get("probe_instrument"))
     transition_exact = (
         transition.get("supported_entry_count")
         == transition.get("exact_entry_count")
@@ -2073,7 +2643,45 @@ def _environment_acceptance(
         evaluation.get("focal_query_count") == EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
         and evaluation.get("focal_correct_count") == EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
     )
-    families_exact = postfit.get("exact_probe_family_count") == protocol.exact_probe_families
+    actual_family_rows = tuple(
+        _mapping("actual family result", row)
+        for row in _exact_list("actual family results", evaluation.get("families"))
+    )
+    rotated_family_rows = tuple(
+        _mapping("rotated family result", row)
+        for row in _exact_list(
+            "rotated family results", rotated_evaluation.get("families")
+        )
+    )
+    families_exact = (
+        postfit.get("exact_probe_family_count") == protocol.exact_probe_families
+        and len(actual_family_rows) == len(protocol.probe_family_names)
+        and len(rotated_family_rows) == len(protocol.probe_family_names)
+        and all(
+            row.get("family") == name
+            and row.get("query_count") == count
+            and row.get("correct_count") == count
+            and row.get("exact_case_count") == row.get("case_count")
+            for row, name, count in zip(
+                actual_family_rows,
+                protocol.probe_family_names,
+                protocol.probe_family_query_counts,
+                strict=True,
+            )
+        )
+        and all(
+            row.get("family") == name
+            and row.get("query_count") == 20 * count
+            and row.get("correct_count") == 20 * count
+            and row.get("exact_case_count") == row.get("case_count")
+            for row, name, count in zip(
+                rotated_family_rows,
+                protocol.probe_family_names,
+                protocol.probe_family_query_counts,
+                strict=True,
+            )
+        )
+    )
     paths_exact = (
         len(relations) == EXPECTED_PATH_RELATION_COUNT
         and all(_path_relation_satisfied(row) for row in relations)
@@ -2088,8 +2696,111 @@ def _environment_acceptance(
         and rotated_evaluation.get("focal_correct_count")
         == EXPECTED_ROTATED_FOCAL_QUERY_COUNT
     )
+    actual_pairs = tuple(
+        _mapping("actual pair result", row)
+        for row in _exact_list("actual pair results", evaluation.get("pairs"))
+    )
+    rotated_pairs = tuple(
+        _mapping("rotated pair result", row)
+        for row in _exact_list(
+            "rotated pair results", rotated_evaluation.get("pairs")
+        )
+    )
+    pair_inventory_exact = (
+        len(actual_pairs) == 1
+        and actual_pairs[0].get("query_count") == EXPECTED_ACTUAL_QUERY_COUNT
+        and actual_pairs[0].get("correct_count") == EXPECTED_ACTUAL_QUERY_COUNT
+        and actual_pairs[0].get("focal_query_count")
+        == EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+        and actual_pairs[0].get("focal_correct_count")
+        == EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+        and len(rotated_pairs) == 20
+        and all(
+            row.get("query_count") == EXPECTED_ACTUAL_QUERY_COUNT
+            and row.get("correct_count") == EXPECTED_ACTUAL_QUERY_COUNT
+            and row.get("focal_query_count") == EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+            and row.get("focal_correct_count")
+            == EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+            and row.get("exact_case_count") == row.get("case_count")
+            for row in rotated_pairs
+        )
+    )
+    raw_outer_cell = _exact_list("actual probe outer cell", actual.get("outer_cell"))
+    if len(raw_outer_cell) != 2:
+        raise ValueError("actual probe outer cell must have two coordinates")
+    outer_cell = (
+        _plain_int("actual probe outer key", raw_outer_cell[0]),
+        _plain_int("actual probe outer value", raw_outer_cell[1]),
+    )
+    expected_pair_order = tuple(
+        (key, value)
+        for key in range(protocol.num_surface_keys)
+        for value in range(protocol.value_cardinality)
+    )
+    pair_inventory_exact = (
+        pair_inventory_exact
+        and tuple(actual_pairs[0].get("probe_pair", ())) == outer_cell
+        and tuple(tuple(row.get("probe_pair", ())) for row in rotated_pairs)
+        == expected_pair_order
+    )
+    expected_suite_hashes = {
+        cell: (actual_sha, rotated_sha)
+        for cell, actual_sha, rotated_sha in protocol.probe_suite_hashes
+    }[outer_cell]
+    actual_balance_counts = _serialized_family_class_counts(
+        instrument.get("actual_balance_certificate"), "actual balance certificate"
+    )
+    rotated_balance_counts = _serialized_family_class_counts(
+        instrument.get("rotated_balance_certificate"), "rotated balance certificate"
+    )
+    expected_actual_balance = tuple(
+        (name, counts)
+        for name, counts in zip(
+            protocol.probe_family_names,
+            protocol.probe_family_output_class_counts,
+            strict=True,
+        )
+    )
+    expected_rotated_balance = tuple(
+        (name, tuple(20 * count for count in counts))
+        for name, counts in zip(
+            protocol.probe_family_names,
+            protocol.probe_family_output_class_counts,
+            strict=True,
+        )
+    )
+    declared_family_class_counts = tuple(
+        tuple(
+            _plain_int("declared family output class count", count, 1)
+            for count in _exact_list("declared family output class counts", row)
+        )
+        for row in _exact_list(
+            "declared family output-class inventory",
+            instrument.get("family_output_class_counts_per_cell"),
+        )
+    )
+    instrument_exact = (
+        instrument.get("corrected_after_v3_open") is True
+        and instrument.get("nonconfirmatory_corrective_replication") is True
+        and instrument.get("added_queries_are_nonfocal_balance_padding") is True
+        and tuple(instrument.get("family_order", ())) == protocol.probe_family_names
+        and tuple(instrument.get("family_query_counts_per_cell", ()))
+        == protocol.probe_family_query_counts
+        and declared_family_class_counts
+        == protocol.probe_family_output_class_counts
+        and instrument.get("actual_queries_per_cell") == EXPECTED_ACTUAL_QUERY_COUNT
+        and instrument.get("rotated_queries_per_pair") == EXPECTED_ACTUAL_QUERY_COUNT
+        and instrument.get("rotated_pair_count") == 20
+        and instrument.get("actual_suite_sha256") == expected_suite_hashes[0]
+        and instrument.get("rotated_suite_sha256") == expected_suite_hashes[1]
+        and actual_balance_counts == expected_actual_balance
+        and rotated_balance_counts == expected_rotated_balance
+    )
     shortcuts = _exact_list("shortcut controls", postfit.get("shortcut_controls"))
-    shortcuts_clear = bool(shortcuts) and all(
+    shortcuts_clear = (
+        tuple(_mapping("shortcut", row).get("name") for row in shortcuts)
+        == EXPECTED_SHORTCUT_NAMES
+        and all(
         _mapping(
             "shortcut evaluation", _mapping("shortcut", row).get("evaluation")
         ).get("correct_count")
@@ -2098,7 +2809,16 @@ def _environment_acceptance(
             "shortcut evaluation", _mapping("shortcut", row).get("evaluation")
         ).get("focal_correct_count")
         < evaluation.get("focal_correct_count")
-        for row in shortcuts
+        and _mapping(
+            "shortcut evaluation", _mapping("shortcut", row).get("evaluation")
+        ).get("query_count")
+        == EXPECTED_ACTUAL_QUERY_COUNT
+        and _mapping(
+            "shortcut evaluation", _mapping("shortcut", row).get("evaluation")
+        ).get("focal_query_count")
+        == EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+            for row in shortcuts
+        )
     )
     fit = selection.final_model.fit
     fold_clean = gate.get("environment_preopen_gate_passed") is True
@@ -2113,6 +2833,8 @@ def _environment_acceptance(
             families_exact,
             paths_exact,
             rotated_exact,
+            pair_inventory_exact,
+            instrument_exact,
             shortcuts_clear,
         )
     )
@@ -2124,7 +2846,9 @@ def _environment_acceptance(
         "actual_cell_24_of_24_focal_queries_correct": focal_exact,
         "all_12_probe_families_exact": families_exact,
         "all_3_path_relations_satisfied": paths_exact,
-        "rotated_control_1800_of_1800_and_480_focal_exact": rotated_exact,
+        "rotated_control_1920_of_1920_and_480_focal_exact": rotated_exact,
+        "actual_and_rotated_pair_inventories_exact": pair_inventory_exact,
+        "corrected_probe_instrument_exact": instrument_exact,
         "all_shortcut_controls_strictly_worse_overall_and_focal": shortcuts_clear,
         "selected_penalty_is_not_an_acceptance_gate": True,
         "environment_passed": passed,
@@ -2148,8 +2872,8 @@ def _build_open_environment_record(
     body: dict[str, object] = {
         "schema": OPEN_ENVIRONMENT_SCHEMA,
         "scope": (
-            "post_terminal_batch_open_inside_known_binding_semantics_not_"
-            "secret_law_or_representation_discovery"
+            "post_terminal_batch_open_for_post_v3_nonconfirmatory_corrective_"
+            "replication_inside_known_semantics_not_representation_discovery"
         ),
         "protocol": _protocol_record(protocol),
         "implementation": _implementation_record(manifest),
@@ -2235,7 +2959,22 @@ def _build_open_campaign_record(
                 "environment_passed": acceptance["environment_passed"],
             }
         )
-    campaign_passed = passing == protocol.required_passing_environments
+    aggregate_probe_inventory_exact = (
+        actual_queries == len(protocol.schedule) * EXPECTED_ACTUAL_QUERY_COUNT
+        and actual_correct == actual_queries
+        and actual_focal
+        == len(protocol.schedule) * EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+        and actual_focal_correct == actual_focal
+        and rotated_queries == len(protocol.schedule) * EXPECTED_ROTATED_QUERY_COUNT
+        and rotated_correct == rotated_queries
+        and rotated_focal
+        == len(protocol.schedule) * EXPECTED_ROTATED_FOCAL_QUERY_COUNT
+        and rotated_focal_correct == rotated_focal
+    )
+    campaign_passed = (
+        passing == protocol.required_passing_environments
+        and aggregate_probe_inventory_exact
+    )
     primary_events = protocol.max_primary_generated_events_total
     terminal_accounting = _mapping(
         "terminal generation accounting",
@@ -2256,8 +2995,8 @@ def _build_open_campaign_record(
     body: dict[str, object] = {
         "schema": CAMPAIGN_SCHEMA,
         "scope": (
-            "prospective_execution_robustness_inside_known_binding_semantics_"
-            "not_secret_law_or_representation_discovery"
+            "post_v3_open_nonconfirmatory_corrective_replication_inside_known_"
+            "binding_semantics_not_secret_law_or_representation_discovery"
         ),
         "protocol": _protocol_record(protocol),
         "implementation": _implementation_record(manifest),
@@ -2287,6 +3026,33 @@ def _build_open_campaign_record(
             "protocol_all_generation_cap": protocol.max_all_generation_work_total,
             "replay_is_validation_only_never_refit_or_reselection": True,
         },
+        "postopen_model_query_work_accounting": {
+            "learned_actual_queries_per_environment": EXPECTED_ACTUAL_QUERY_COUNT,
+            "learned_rotated_queries_per_environment": EXPECTED_ROTATED_QUERY_COUNT,
+            "shortcut_count": EXPECTED_SHORTCUT_COUNT,
+            "shortcut_queries_per_environment": (
+                EXPECTED_SHORTCUT_COUNT * EXPECTED_ACTUAL_QUERY_COUNT
+            ),
+            "total_model_query_evaluations_per_environment": (
+                protocol.postopen_model_query_evaluations_per_environment
+            ),
+            "primary_batch_open_model_query_evaluations": (
+                protocol.max_primary_postopen_model_query_evaluations_total
+            ),
+            "validation_replay_model_query_evaluations_in_this_record_build": 0,
+            "protocol_primary_open_model_query_evaluation_cap": (
+                protocol.max_primary_postopen_model_query_evaluations_total
+            ),
+            "protocol_validation_replay_model_query_evaluation_cap": (
+                protocol.max_validation_replay_postopen_model_query_evaluations_total
+            ),
+            "protocol_all_open_and_validation_model_query_evaluation_cap": (
+                protocol.max_all_postopen_model_query_evaluations_total
+            ),
+            "projected_cumulative_after_one_independent_validation_replay": (
+                protocol.max_all_postopen_model_query_evaluations_total
+            ),
+        },
         "aggregate": {
             "environment_count": len(open_records),
             "passing_environment_count": passing,
@@ -2302,12 +3068,16 @@ def _build_open_campaign_record(
             "rotated_control_correct_count": rotated_correct,
             "rotated_control_focal_query_count": rotated_focal,
             "rotated_control_focal_correct_count": rotated_focal_correct,
+            "corrected_probe_inventory_exact_without_pooling": (
+                aggregate_probe_inventory_exact
+            ),
         },
         "acceptance": {
             "required_passing_environments": protocol.required_passing_environments,
             "selected_penalty_not_used_as_gate": True,
             "no_pooled_average_rescue": True,
             "every_environment_must_pass": True,
+            "corrected_probe_inventory_must_match_exactly": True,
             "campaign_passed": campaign_passed,
         },
         "claims": _open_claims(),
@@ -2325,10 +3095,30 @@ def open_campaign(
     max_validation_replay_generated_events: int = (
         DEFAULT_MAX_TOTAL_VALIDATION_REPLAY_EVENTS
     ),
+    max_primary_postopen_model_query_evaluations: int = (
+        DEFAULT_MAX_PRIMARY_POSTOPEN_MODEL_QUERY_EVALUATIONS
+    ),
 ) -> dict[str, object]:
     """Validate all preopen evidence, then open all forty models as one batch."""
 
     protocol, _ = preflight_campaign(protocol_path)
+    postopen_cap = _plain_int(
+        "max_primary_postopen_model_query_evaluations",
+        max_primary_postopen_model_query_evaluations,
+        1,
+    )
+    planned_postopen = (
+        len(protocol.schedule)
+        * protocol.postopen_model_query_evaluations_per_environment
+    )
+    if (
+        planned_postopen > postopen_cap
+        or planned_postopen
+        > protocol.max_primary_postopen_model_query_evaluations_total
+    ):
+        raise SequenceDiscoveryLimitError(
+            "batch-open model-query evaluation exceeds its budget before probes"
+        )
     manifest, runtime, power = _prerequisites(
         protocol, implementation_manifest_path, power_control_record_path
     )
@@ -2429,10 +3219,52 @@ def validate_campaign_record(
     max_validation_replay_generated_events: int = (
         DEFAULT_MAX_TOTAL_VALIDATION_REPLAY_EVENTS
     ),
+    max_primary_postopen_model_query_evaluations: int = (
+        DEFAULT_MAX_PRIMARY_POSTOPEN_MODEL_QUERY_EVALUATIONS
+    ),
+    max_validation_replay_postopen_model_query_evaluations: int = (
+        DEFAULT_MAX_VALIDATION_REPLAY_POSTOPEN_MODEL_QUERY_EVALUATIONS
+    ),
+    max_all_postopen_model_query_evaluations: int = (
+        DEFAULT_MAX_ALL_POSTOPEN_MODEL_QUERY_EVALUATIONS
+    ),
 ) -> None:
     """Replay exact preopen artifacts and every postopen probe from frozen models."""
 
     protocol = load_frozen_protocol(protocol_path)
+    one_open_query_work = (
+        len(protocol.schedule)
+        * protocol.postopen_model_query_evaluations_per_environment
+    )
+    primary_query_cap = _plain_int(
+        "max_primary_postopen_model_query_evaluations",
+        max_primary_postopen_model_query_evaluations,
+        1,
+    )
+    validation_query_cap = _plain_int(
+        "max_validation_replay_postopen_model_query_evaluations",
+        max_validation_replay_postopen_model_query_evaluations,
+        1,
+    )
+    all_query_cap = _plain_int(
+        "max_all_postopen_model_query_evaluations",
+        max_all_postopen_model_query_evaluations,
+        1,
+    )
+    if (
+        one_open_query_work > primary_query_cap
+        or one_open_query_work > validation_query_cap
+        or 2 * one_open_query_work > all_query_cap
+        or one_open_query_work
+        > protocol.max_primary_postopen_model_query_evaluations_total
+        or one_open_query_work
+        > protocol.max_validation_replay_postopen_model_query_evaluations_total
+        or 2 * one_open_query_work
+        > protocol.max_all_postopen_model_query_evaluations_total
+    ):
+        raise SequenceDiscoveryLimitError(
+            "postopen validation model-query replay exceeds its cumulative budget"
+        )
     terminal_body = _record_body(terminal_preopen)
     terminal_accounting = _mapping(
         "terminal generation accounting",
@@ -2475,6 +3307,9 @@ def validate_campaign_record(
         power_control_record_path=power_control_record_path,
         max_validation_replay_generated_events=(
             max_validation_replay_generated_events
+        ),
+        max_primary_postopen_model_query_evaluations=(
+            max_primary_postopen_model_query_evaluations
         ),
     )
     if dict(record) != expected:
@@ -2835,6 +3670,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         type=int,
         default=DEFAULT_MAX_TOTAL_VALIDATION_REPLAY_EVENTS,
     )
+    opening.add_argument(
+        "--max-primary-postopen-model-query-evaluations",
+        type=int,
+        default=DEFAULT_MAX_PRIMARY_POSTOPEN_MODEL_QUERY_EVALUATIONS,
+    )
 
     all_preopen = commands.add_parser(
         "preopen-all", help="run/resume all preopen shards; never opens probes"
@@ -2900,6 +3740,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 **common,
                 max_validation_replay_generated_events=(
                     arguments.max_validation_replay_generated_events
+                ),
+                max_primary_postopen_model_query_evaluations=(
+                    arguments.max_primary_postopen_model_query_evaluations
                 ),
             )
             _write_atomic(arguments.output, _encoded(record))

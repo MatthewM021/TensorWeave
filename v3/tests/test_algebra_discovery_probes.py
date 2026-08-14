@@ -17,6 +17,7 @@ from tnlm_v3.algebra_discovery_probes import (
     ProbeFamily,
     ProbePathRelation,
     ProbeProtocolStatus,
+    ProbeQueryRole,
     VisibleProbeProgram,
     build_balanced_probe_suite,
     cyclic_cell_rotation_inventory,
@@ -198,7 +199,7 @@ def test_all_nineteen_rotations_are_balanced_and_never_touch_outer_cell(
     assert inner_suite.probe_pairs == INNER_CELLS
     assert inner_suite.forbidden_pairs == (OUTER_CELL,)
     assert len(inner_suite.cases) == 285
-    assert sum(case.program.query_count for case in inner_suite.cases) == 1_704
+    assert sum(case.program.query_count for case in inner_suite.cases) == 1_824
     assert inner_suite.balance.every_family_output_balanced
     assert inner_suite.balance.rotated_cells_equally_weighted
     assert {count for _, count in inner_suite.balance.pair_case_counts} == {15}
@@ -234,11 +235,40 @@ def test_all_nineteen_rotations_are_balanced_and_never_touch_outer_cell(
     } == {BindingEventKind.COPY}
 
 
+@pytest.mark.parametrize("probe_pair", ALL_CELLS)
+def test_every_screen_cell_has_the_same_balanced_probe_inventory(
+    probe_pair: tuple[int, int],
+) -> None:
+    suite = build_balanced_probe_suite(KEYS, VALUES, (probe_pair,))
+    focal_query_count = sum(
+        case.query_roles.count(ProbeQueryRole.FOCAL) for case in suite.cases
+    )
+
+    assert len(suite.cases) == 15
+    assert sum(case.program.query_count for case in suite.cases) == 96
+    assert focal_query_count == 24
+    assert all(
+        case.program.query_count
+        == VALUES * case.query_roles.count(ProbeQueryRole.FOCAL)
+        for case in suite.cases
+    )
+    assert suite.balance.every_family_output_balanced
+    assert all(
+        len(set(counts)) == 1
+        for _, counts in suite.balance.family_class_counts
+    )
+    assert suite.balance.pair_case_counts == ((probe_pair, 15),)
+    assert suite.balance.pair_focal_query_counts == ((probe_pair, 24),)
+
+
 def test_actual_cell_has_a_first_class_undiluted_pair_result(rotated_suite) -> None:
     evaluation = evaluate_probe_suite(ExactVisiblePredictor(), rotated_suite)
     actual = evaluation.result_for_pair(OUTER_CELL)
     assert len(rotated_suite.cases) == 300
     assert len(evaluation.pair_results) == 20
+    assert (evaluation.query_count, evaluation.focal_query_count) == (1_920, 480)
+    assert {row.query_count for row in evaluation.pair_results} == {96}
+    assert {row.focal_query_count for row in evaluation.pair_results} == {24}
     assert evaluation.query_count == sum(
         row.query_count for row in evaluation.pair_results
     )

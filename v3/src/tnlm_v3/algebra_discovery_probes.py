@@ -1468,7 +1468,10 @@ def _append_balance_controls(
     ):
         raise ValueError("focal roles must align with the unbalanced prefix")
     counts = Counter(answers)
-    target_count = max(counts.values())
+    # Give every class one slot for every focal answer.  This keeps the total
+    # probe inventory invariant to whether two focal answers happen to collide:
+    # each case has ``cardinality * len(answers)`` total queries.
+    target_count = len(answers)
     deficits = tuple(
         target_count - counts.get(value, 0) for value in range(cardinality)
     )

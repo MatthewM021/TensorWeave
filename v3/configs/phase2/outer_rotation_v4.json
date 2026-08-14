@@ -1,0 +1,391 @@
+{
+  "schema": "tnlm-v3-phase2-outer-rotation-protocol-v4",
+  "protocol_id": "phase2-known-semantics-post-v3-corrective-cell-rotation-v4",
+  "frozen_before_new_environment_fitting_or_outer_probe_evaluation": true,
+  "execution_ready": true,
+  "execution_blocker": null,
+  "claim_eligible": false,
+  "epistemic_scope": "post_v3_open_nonconfirmatory_corrective_replication_with_fresh_independent_environment_draws_inside_known_semantics_not_secret_law_or_representation_discovery",
+  "predecessor_evidence_commitment": {
+    "v3_protocol": {
+      "path": "v3/configs/phase2/outer_rotation_v3.json",
+      "file_sha256": "8689ab0ad06a1268c96690da27a6f8573b1536ca19c3bc18c403fdc07ffe2649"
+    },
+    "v3_implementation_manifest": {
+      "path": "v3_recovery/PHASE2_OUTER_ROTATION_V3_IMPLEMENTATION.sha256",
+      "file_sha256": "6ff8b9e54d5fe7710fe605e2f7615046275f54eb20fd2f75147bbd840e6e7858"
+    },
+    "v3_terminal_preopen": {
+      "path": "v3_recovery/phase2_outer_rotation_v3/terminal-preopen.json",
+      "file_sha256": "0aacf91a3bca23946ab5f9b399da56dc1b786b99abb3f9b27ad5a4b2655bf313",
+      "record_sha256": "fe994db05879ee4dbaaf13245942a5161a464824184d505de0dc985ffccbd0aa",
+      "outer_open_permitted": true
+    },
+    "v3_open_campaign": {
+      "path": "v3_recovery/phase2_outer_rotation_v3/open-campaign.json",
+      "file_sha256": "ae1132f831e9c87ca34452b7960071f3febec5693f2b59bdf95671b3fe78937a",
+      "record_sha256": "b4d16f49fb02ddc661bc6de931a9710f74b6d47b539494f6776c39a1668f9ebe",
+      "campaign_passed": false,
+      "passing_environment_count": 10,
+      "environment_count": 40,
+      "all_realized_probe_answers_correct": true
+    },
+    "v3_evidence_manifest": {
+      "path": "v3_recovery/phase2_outer_rotation_v3/EVIDENCE.sha256",
+      "file_sha256": "51f413facc401dd85c6ec0a0af93b512a405fe9d8c37f09c178d21b5d184296e"
+    },
+    "v3_summary": {
+      "path": "v3_recovery/phase2_outer_rotation_v3/SUMMARY.json",
+      "file_sha256": "eb22adba8c7449bdf4374eecd7584d8254c3c70734b80eceecd8dbabb179efa5"
+    },
+    "v3_formal_result_remains_failed_and_is_not_rewritten": true,
+    "v4_was_designed_after_v3_outer_results_were_opened": true,
+    "v3_outer_results_informed_the_probe_inventory_correction": true,
+    "v3_labels_models_or_scores_used_for_v4_fit_or_selection": false
+  },
+  "corrective_replication_disclosure": {
+    "trigger_observed_after_v3_open": "v3_fixed_96_query_acceptance_assumption_failed_for_30_nonzero_value_cells_even_though_all_3600_realized_actual_queries_and_all_72000_realized_rotated_queries_were_correct",
+    "v3_instrument_issue": "independent_key_commutation_balance_padding_emitted_16_queries_for_value_zero_but_8_for_values_one_two_three",
+    "chosen_fix": "add_nonfocal_output_balance_padding_so_every_cell_emits_16_independent_key_commutation_queries",
+    "semantic_cases_changed": false,
+    "focal_queries_changed": false,
+    "added_queries_are_nonfocal_balance_padding": true,
+    "added_queries_are_new_independent_semantic_evidence": false,
+    "probe_api_and_schema_unchanged": true,
+    "corrective_replication_is_confirmatory": false,
+    "post_hoc_choice_disclosed": true
+  },
+  "supersedes_for_future_execution": {
+    "path": "v3/configs/phase2/outer_rotation_v3.json",
+    "sha256": "8689ab0ad06a1268c96690da27a6f8573b1536ca19c3bc18c403fdc07ffe2649",
+    "status": "v3_evidence_preserved_immutable_v4_only_for_new_forward_execution",
+    "reason": "correct_the_post_open_fixed_query_inventory_assumption_without_reinterpreting_v3"
+  },
+  "base_task_config": {
+    "path": "v3/configs/milestone4/validation_screen_v1.yaml",
+    "sha256": "67e5dac587ceabf0120948cf9fdc077b32df03628bdb0367346c0c32d75f89ab"
+  },
+  "implementation_commitment": {
+    "required_before_any_preopen_environment_fit": true,
+    "manifest_path": "v3_recovery/PHASE2_OUTER_ROTATION_V4_IMPLEMENTATION.sha256",
+    "manifest_sha256_recorded_by_every_artifact": true,
+    "reason_for_external_manifest": "the_runner_reads_the_manifest_so_the_manifest_can_bind_the_runner_without_a_self_hash_cycle",
+    "required_source_globs": [
+      "v3/src/tnlm_v3/*.py"
+    ],
+    "manifest_must_include_every_matching_source_file": true,
+    "required_paths": [
+      "v3/configs/milestone4/validation_screen_v1.yaml",
+      "v3/configs/phase2/outer_rotation_v4.json",
+      "v3/pyproject.toml",
+      "v3/scripts/run_phase2_algebra_power_control.py",
+      "v3/scripts/run_phase2_trace_algebra_experiment.py",
+      "v3/scripts/run_phase2_trace_algebra_multienvironment.py"
+    ]
+  },
+  "task": {
+    "num_surface_keys": 5,
+    "value_cardinality": 4,
+    "max_live_bindings": 3,
+    "cell_order": "lexical_key_then_value",
+    "cell_index": "4_times_key_plus_value",
+    "supported_learned_transition_entries": 20,
+    "supplied_structure": [
+      "addressable_register_interface",
+      "structured_event_parser_and_argument_roles",
+      "four_symbol_value_alphabet_aligned_with_query_labels",
+      "presence_and_invalidation_grammar",
+      "identity_query_gauge",
+      "shared_plus_destination_key_local_transition_table_family"
+    ]
+  },
+  "data": {
+    "generator_splits": ["train", "validation"],
+    "documents_per_split": 24,
+    "document_length": 64,
+    "primary_generated_events_per_environment": 3072,
+    "primary_generated_events_total": 122880,
+    "deterministic_certificate_replay_generation_metered_separately": true,
+    "outer_labels_used_for_fit_or_selection": false,
+    "outer_identifier_known_to_trusted_controller": true,
+    "task_fingerprint_participates_in_generator_seed_derivation": true
+  },
+  "selector": {
+    "residual_penalties": [4, 16],
+    "restart_count": 1,
+    "max_sweeps": 4,
+    "max_pairwise_rounds": 2,
+    "mode": "pseudoheldout_primary",
+    "inner_folds_per_environment": 19,
+    "minimum_pseudo_dependent_queries_per_fold": 16,
+    "trace_initializer": "fixed_point_plurality_from_visible_transitions_and_train_query_targets",
+    "pairwise_search_scope": "initializer_uncertain_or_coordinate_changed_transition_addresses",
+    "selector_derives_optimizer_seed_from_inferred_outer_identifier": false,
+    "fold_optimizer_seed_formula": "environment_optimizer_seed_plus_4_times_pseudo_key_plus_pseudo_value",
+    "environment_optimizer_seed_is_a_precommitted_balanced_schedule_factor": true,
+    "fold_candidate_seen_fit_gate": "zero_training_mistakes_and_zero_local_overrides",
+    "fold_candidate_objective_at_gate": 0,
+    "fold_candidate_global_optimum_then_known_analytically": true,
+    "abort_before_terminal_preopen_aggregate_if_any_candidate_gate_fails": true
+  },
+  "seed_pair_inventory": {
+    "count": 20,
+    "index_range": [0, 19],
+    "train_seed_formula": "40000_plus_seed_pair_index",
+    "validation_seed_formula": "50000_plus_seed_pair_index",
+    "optimizer_seed_formula": "60000_plus_seed_pair_index",
+    "zero_overlap_with_v3_numeric_seed_domains": true,
+    "v3_train_seed_range": [10000, 10019],
+    "v3_validation_seed_range": [20000, 20019],
+    "v3_optimizer_seed_range": [30000, 30019],
+    "numeric_data_seed_reuse_is_not_common_random_numbers": true,
+    "reason": "the_heldout_dependent_task_fingerprint_changes_generator_derived_seeds",
+    "permitted_inference": "balanced_precommitted_assignment_over_independent_environment_draws",
+    "forbidden_inference": "shared_rng_seed_main_effect_or_cell_by_seed_independence"
+  },
+  "crossed_blocks": [
+    {
+      "block_id": "A",
+      "environment_index_offset": 0,
+      "outer_cell_index_range": [0, 19],
+      "seed_pair_index_formula": "outer_cell_index",
+      "complete_single_cell_rotation": true
+    },
+    {
+      "block_id": "B",
+      "environment_index_offset": 20,
+      "outer_cell_index_range": [0, 19],
+      "seed_pair_index_formula": "outer_cell_index_plus_7_mod_20",
+      "complete_single_cell_rotation": true
+    }
+  ],
+  "expanded_design_invariants": {
+    "environment_count": 40,
+    "complete_cell_rotation_blocks": 2,
+    "environments_per_outer_cell": 2,
+    "environments_per_seed_pair_label": 2,
+    "block_shift": 7,
+    "block_shift_coprime_to_cell_count": true,
+    "cell_seed_label_incidence_graph_connected": true,
+    "duplicate_cell_seed_label_combinations": false,
+    "data_realizations_are_independent_not_matched": true,
+    "replicates_per_cell": 2,
+    "gold_standard_full_cell_by_seed_cross_not_claimed": true,
+    "expanded_schedule_sha256": "a429725af7c72f20cb5d8755c664dcdaf552bf60176e05e68579da85e95838ae"
+  },
+  "execution_phases": {
+    "phase_0_precommitted_probe_instrument_freeze": {
+      "occurred_after_v3_open_and_before_any_v4_model_fit": true,
+      "permitted": [
+        "construct_trusted_probe_programs_and_expected_answers",
+        "freeze_suite_scoring_and_balance_hashes",
+        "audit_uniform_query_family_and_pair_inventories"
+      ],
+      "forbidden": [
+        "evaluate_any_v4_fitted_model",
+        "use_any_v4_prediction_to_choose_or_modify_the_instrument"
+      ],
+      "suite_construction_is_not_v4_model_evaluation": true
+    },
+    "phase_1_preopen": {
+      "permitted": [
+        "generate_train_and_validation_corpora",
+        "construct_trusted_fold_attestations",
+        "fit_and_select_candidates",
+        "write_content_bound_preopen_environment_shards"
+      ],
+      "forbidden": [
+        "construct_outer_probe_suite_during_v4_preopen_execution",
+        "read_outer_probe_answers_during_v4_preopen_execution",
+        "evaluate_v4_model_on_outer_or_rotated_probes"
+      ]
+    },
+    "phase_2_terminal_preopen_aggregate": {
+      "required_environment_shards": 40,
+      "required_admissible_fold_candidates": 1520,
+      "requires_every_fold_candidate_gate": true,
+      "requires_every_final_seen_fit_zero_mistakes_and_zero_overrides": true,
+      "content_binds_every_preopen_shard": true
+    },
+    "phase_3_batch_open": {
+      "permitted_only_after_terminal_preopen_aggregate": true,
+      "evaluates_all_40_frozen_models": true,
+      "failed_environment_replacement_forbidden": true,
+      "post_open_optimizer_or_protocol_change_forbidden": true
+    }
+  },
+  "probe_instrument_commitment": {
+    "probe_source_sha256_at_v4_design_freeze": "b4f2b45e53db9fd75fd506d487b68c4cdecbd408ba4246d5b0b68d7136449c80",
+    "probe_suite_schema": "tnlm-v3-balanced-sealed-probes-v1",
+    "balance_policy": "each_case_total_query_count_equals_4_times_case_focal_query_count",
+    "added_queries_are_nonfocal_output_balance_padding": true,
+    "case_count_per_cell": 15,
+    "query_count_per_cell": 96,
+    "focal_query_count_per_cell": 24,
+    "family_order": [
+      "first_entry_bind",
+      "first_entry_update",
+      "first_entry_copy",
+      "update_out",
+      "copy_out_naturality",
+      "repeated_query_identity",
+      "cyclic_composition",
+      "invalidate_rebind",
+      "independent_key_commutation",
+      "distractor_interleaving",
+      "long_composition",
+      "copy_order_noncommutation"
+    ],
+    "family_query_counts_per_cell": [4, 4, 4, 4, 8, 12, 4, 8, 16, 8, 8, 16],
+    "family_output_class_counts_per_cell": [
+      [1, 1, 1, 1],
+      [1, 1, 1, 1],
+      [1, 1, 1, 1],
+      [1, 1, 1, 1],
+      [2, 2, 2, 2],
+      [3, 3, 3, 3],
+      [1, 1, 1, 1],
+      [2, 2, 2, 2],
+      [4, 4, 4, 4],
+      [2, 2, 2, 2],
+      [2, 2, 2, 2],
+      [4, 4, 4, 4]
+    ],
+    "rotated_case_count": 300,
+    "rotated_query_count": 1920,
+    "rotated_focal_query_count": 480,
+    "rotated_pair_count": 20,
+    "rotated_queries_per_pair": 96,
+    "rotated_focal_queries_per_pair": 24,
+    "inner_seen_cell_inventory_queries": 1824,
+    "shortcut_names": [
+      "constant_class_0",
+      "last_visible_argument",
+      "latest_bind_argument_for_query_key",
+      "source_key_bind_echo"
+    ],
+    "suite_hash_inventory_sha256": "1ff5dfc3e0ad4fb515220fdfe58466e8c659636d079921438261002b67fd0591",
+    "suite_hashes_by_outer_cell": [
+      {"outer_cell": [0, 0], "actual_suite_sha256": "b331af5144971d205db3dea06ba7e3b899ab8b42c26dbc95a4885ad0afa72288", "rotated_suite_sha256": "25bc4788dbd24709e77c24a145e3f8fcb6db0b21f115fd27225f1661dfbbb67d"},
+      {"outer_cell": [0, 1], "actual_suite_sha256": "6afaeeae13dcd35300d4532efe68e8f1665c632e53f9d476e744ffc379ddcde4", "rotated_suite_sha256": "52ad887530094edd3f3d5fb74e0da3a772bdded9ef4bebc7d68ffb3a671e95f8"},
+      {"outer_cell": [0, 2], "actual_suite_sha256": "75260811826c39062089efc409a0b293bfa5cceffcccc7f64eb55353253666de", "rotated_suite_sha256": "63c71a2bba1f9af4be66368c02e6cbfb0f5a605a2c8bcf7c2137ff9b2e5318c0"},
+      {"outer_cell": [0, 3], "actual_suite_sha256": "d4747b2ad89e7efb4c2fb747707e6b0eb4378468cb950ed51132ab734edfd7ae", "rotated_suite_sha256": "9acafa694fdea0c51c23b00514ec9a8d347836eadc17c97a071ea8d382961d2f"},
+      {"outer_cell": [1, 0], "actual_suite_sha256": "d0826487eb2b976c4a0f1cebe3921aad916d6ad387bff2ef9ef2ca05209aa79f", "rotated_suite_sha256": "2dc54ae918265fe1d3d59dffe7d4048a69915177208d202559dc4b10c43123a3"},
+      {"outer_cell": [1, 1], "actual_suite_sha256": "0e8ad9c7d57a929424b1726d2eb87caea73a5d8d1bdca72fd5e4f54269978944", "rotated_suite_sha256": "1921596c19f00191d9524de5870cf703d85f5ca90a2c38ca387b9602a00f5bb1"},
+      {"outer_cell": [1, 2], "actual_suite_sha256": "16fc5ceb024d3583c7104b0b523b684a27507e5f626ebb24bef9a8ba9827cd56", "rotated_suite_sha256": "20fe51658738b8da63d4e664bd5afe6e7e64c91601bb40a1d78df88cf5f0653e"},
+      {"outer_cell": [1, 3], "actual_suite_sha256": "12a532da1c81a9bc3a40e2f2a81f979775f8b50a8dbd4900a4b9b12d89867e72", "rotated_suite_sha256": "e75f65e60060910312c411dfb288ece7edca9db2fc99c389fba05cbf98b5f1af"},
+      {"outer_cell": [2, 0], "actual_suite_sha256": "a163db65f21e3134637cd1c4b7ef30fdd41d5590a896658d0571de3b967c5216", "rotated_suite_sha256": "5abc1aa498776af5cadb2a34775d7d9998dec4df9235952f7dfe35f51f3d1d9b"},
+      {"outer_cell": [2, 1], "actual_suite_sha256": "6c9eac451c350d7e4d10ce8d4221aeba19a54e5349840f7ca2f57443da31a4a3", "rotated_suite_sha256": "ad071b813ab57c0272695d61d647c075ab0acddacd0e27dede4243c93eb036dc"},
+      {"outer_cell": [2, 2], "actual_suite_sha256": "ab569607a68ebb9a3b72ae6698f95e81a93a5614d808d266eee7d8f3213f34f0", "rotated_suite_sha256": "713f0ea81451262d37fb1a2f756e62bc8a8c6a4c816764d2b390f87753be0272"},
+      {"outer_cell": [2, 3], "actual_suite_sha256": "3d51506b80443ad38334b5cd44298cf258b9fd6b5d877cacf32ee6e5dbbca946", "rotated_suite_sha256": "a646e92045f4c322c58871c7636883678dc645c68ee0658d8277d68712aecbc2"},
+      {"outer_cell": [3, 0], "actual_suite_sha256": "859189dde9800c0dcf856c464f00e74d8a8fcc436e3b49b706c905d232d37442", "rotated_suite_sha256": "00875fe7e186cadf0736c2b6559477557b793efd4bde911d8282c348518ff20b"},
+      {"outer_cell": [3, 1], "actual_suite_sha256": "33a479cddfcd3c9758dad520364d591549109af86fc55257756619cdfe850a6f", "rotated_suite_sha256": "f1cfa83f3823e1d25e95d3670e0e43d5739d514db3c4ee408df89b743623ff2b"},
+      {"outer_cell": [3, 2], "actual_suite_sha256": "a95d53ed5ccebaf72f4dff1a5b3bb67d5e86301a667b086ab25eab0586327aad", "rotated_suite_sha256": "d747703f784c67b538af859a3167adb06da0328fa479988f21f5cea209c6b16d"},
+      {"outer_cell": [3, 3], "actual_suite_sha256": "d7cfc8b799154ce9952a1e2652fa0fc455a032235232447ca8cb224d48846464", "rotated_suite_sha256": "d052caabb3f77b45967351cdedc74965e637f9ae6e2c3c303d105831865c770a"},
+      {"outer_cell": [4, 0], "actual_suite_sha256": "2617f5b2372b91a809c5113145cc4232053de836793e8bcf786ea1aa39f369af", "rotated_suite_sha256": "5a9f0736168a724fdc8142510083302853a7ef72b9500afea7a6a9e4f838adf6"},
+      {"outer_cell": [4, 1], "actual_suite_sha256": "dbbd8b0996078f7cb2b5bc14d04dca748cad7d58a8b147bd39995f4594e8a78c", "rotated_suite_sha256": "36ee1b03d6a4acf77bbbbac5d2a892484229b86cc644836c12c5b8d1405f2615"},
+      {"outer_cell": [4, 2], "actual_suite_sha256": "04c64c1ef8bb4c041cf4f7854954e2eb5f896c672edd59d3d1dae59d7e7ce773", "rotated_suite_sha256": "152fa663dd5776efb0b645a0fd64c48d154356f45c60487395454fa5318567ad"},
+      {"outer_cell": [4, 3], "actual_suite_sha256": "13b5bbc37939e41cbd62cd9401ddb4b66eb7021659b7dc5087a9a814bd6a2cad", "rotated_suite_sha256": "25ca5e137868f8f23282d009c2b58218bc68f32c0147e8310b896eefbd762251"}
+    ]
+  },
+  "work_budget": {
+    "planned_objective_evaluations_per_fit": 8001,
+    "fit_calls_per_environment": 39,
+    "max_scored_event_work_per_fit": 12300000,
+    "conservative_scored_event_work_per_environment": 479408640,
+    "max_scored_event_work_per_environment": 480000000,
+    "conservative_scored_event_work_total": 19176345600,
+    "max_scored_event_work_total": 19200000000,
+    "max_primary_generated_events_total": 122880,
+    "max_deterministic_replay_generated_events_total": 491520,
+    "max_all_generation_work_total": 614400,
+    "postopen_learned_actual_query_evaluations_per_environment": 96,
+    "postopen_learned_rotated_query_evaluations_per_environment": 1920,
+    "postopen_shortcut_count": 4,
+    "postopen_shortcut_query_evaluations_per_environment": 384,
+    "postopen_model_query_evaluations_per_environment": 2400,
+    "max_primary_postopen_model_query_evaluations_total": 96000,
+    "max_validation_replay_postopen_model_query_evaluations_total": 96000,
+    "max_all_postopen_model_query_evaluations_total": 192000,
+    "replay_generation_is_validation_only_and_never_refit_or_reselection": true
+  },
+  "runtime_reproducibility": {
+    "record_exact_python_version": true,
+    "record_exact_torch_version": true,
+    "record_exact_pyyaml_version": true,
+    "record_platform_and_device": true,
+    "expected_frozen_environment": {
+      "python": "3.12.13",
+      "torch": "2.13.0+cpu",
+      "pyyaml": "6.0.3",
+      "device": "cpu"
+    }
+  },
+  "preopen_acceptance": {
+    "required_passing_environments": 40,
+    "required_admissible_fold_candidates": 1520,
+    "every_candidate_training_mistakes": 0,
+    "every_candidate_local_overrides": 0,
+    "every_final_training_mistakes": 0,
+    "every_final_local_overrides": 0,
+    "all_other_19_cells_observed_in_each_environment": true,
+    "unique_pseudoheldout_folds_per_environment": 19,
+    "minimum_pseudo_dependent_queries_per_fold": 16
+  },
+  "postopen_acceptance": {
+    "exact_supported_transition_entries_per_environment": 20,
+    "actual_cell_cases": [15, 15],
+    "actual_cell_queries": [96, 96],
+    "actual_cell_focal_queries": [24, 24],
+    "exact_probe_families": [12, 12],
+    "exact_path_relations": [3, 3],
+    "rotated_control_cases": [300, 300],
+    "rotated_control_queries": [1920, 1920],
+    "rotated_control_focal_queries": [480, 480],
+    "rotated_control_pairs": [20, 20],
+    "queries_per_rotated_pair": [96, 96],
+    "focal_queries_per_rotated_pair": [24, 24],
+    "family_query_counts_per_cell": [4, 4, 4, 4, 8, 12, 4, 8, 16, 8, 8, 16],
+    "all_shortcut_controls_strictly_below_learned_model": true,
+    "selected_penalty_may_vary": true,
+    "no_pooled_average_rescue": true
+  },
+  "prerequisite_controls": {
+    "observed_transition_address_exception_power_control_required": true,
+    "record_path": "v3_recovery/PHASE2_ALGEBRA_POWER_CONTROL_V2.json",
+    "expected_file_sha256": "31cc623ad890582e21c1c2c414f14fb87ecc149e93b504fe28bbb3913dba00e3",
+    "record_must_validate_before_any_preopen_fit": true,
+    "record_sha256_bound_by_every_preopen_and_campaign_artifact": true,
+    "positive_expected": "penalty_4_realizes_exactly_the_declared_observed_override",
+    "null_expected": "penalty_16_selected_on_tie_with_zero_overrides",
+    "self_pseudoheldout_exception_recovery_claim_forbidden": true
+  },
+  "reporting_requirements": [
+    "report_all_40_environments_and_both_replicates_per_cell",
+    "report_every_fold_candidate_training_mistake_and_override_count",
+    "report_fold_and_aggregate_selection_scores",
+    "report_selected_penalty_distribution",
+    "report_final_realized_transition_tables_and_overrides",
+    "report_actual_cell_separately_from_rotated_cell_coverage",
+    "report_exact_per_family_and_per_pair_probe_inventories",
+    "report_all_shortcut_controls",
+    "bind_v3_predecessor_protocol_manifest_terminal_open_and_evidence_hashes",
+    "bind_v4_protocol_implementation_power_preopen_and_open_artifact_hashes",
+    "describe_numeric_data_seeds_as_independent_draw_labels_not_common_random_numbers",
+    "disclose_v4_probe_fix_was_chosen_after_v3_open",
+    "describe_v4_as_nonconfirmatory_corrective_replication",
+    "do_not_call_cell_rotation_program_conjugacy_or_equivariance",
+    "do_not_call_the_supplied_register_representation_discovered"
+  ],
+  "forbidden_after_any_preopen_fit_begins": [
+    "changing_seed_cell_crossing",
+    "changing_document_count_or_length",
+    "changing_penalty_grid_or_optimizer_budget",
+    "changing_seen_fit_or_probe_acceptance_gates",
+    "changing_corrected_probe_inventory_or_suite_hashes",
+    "dropping_replacing_or_selectively_rerunning_failed_environments",
+    "opening_any_outer_probe_before_the_terminal_preopen_aggregate",
+    "selecting_or_debugging_by_outer_results",
+    "interpreting_validation_when_any_candidate_preopen_gate_fails"
+  ]
+}

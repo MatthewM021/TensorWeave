@@ -158,10 +158,23 @@ def _fake_prerequisites(module, protocol):
     return manifest, runtime, power
 
 
-def test_v3_protocol_expands_exact_crossed_schedule_source_closure_and_runtime() -> None:
+def test_v4_protocol_expands_fresh_crossed_schedule_source_closure_and_runtime() -> None:
     module = _load_script()
     protocol = module.load_frozen_protocol()
+    assert protocol.protocol_sha256 == (
+        "966601e683b647b8f68ed0e99c1deca7a449f977027b5579fd6617522d42ec7b"
+    )
     assert protocol.protocol_sha256 == module.PROTOCOL_SHA256
+    assert protocol.execution_ready
+    assert json.loads(module.default_protocol_path().read_text(encoding="utf-8"))[
+        "execution_blocker"
+    ] is None
+    assert protocol.power_control_expected_file_sha256 == (
+        "31cc623ad890582e21c1c2c414f14fb87ecc149e93b504fe28bbb3913dba00e3"
+    )
+    assert protocol.schedule_sha256 == (
+        "a429725af7c72f20cb5d8755c664dcdaf552bf60176e05e68579da85e95838ae"
+    )
     assert len(protocol.schedule) == 40
     assert protocol.documents_per_split == 24
     assert protocol.document_length == 64
@@ -190,15 +203,127 @@ def test_v3_protocol_expands_exact_crossed_schedule_source_closure_and_runtime()
     assert Counter(row.seed_pair_index for row in protocol.schedule) == {
         index: 2 for index in range(20)
     }
+    assert {row.train_seed for row in protocol.schedule} == set(range(40_000, 40_020))
+    assert {row.validation_seed for row in protocol.schedule} == set(
+        range(50_000, 50_020)
+    )
+    assert {row.optimizer_seed for row in protocol.schedule} == set(
+        range(60_000, 60_020)
+    )
+    assert not (
+        {row.train_seed for row in protocol.schedule}
+        & set(range(10_000, 10_020))
+    )
     source_root = Path(__file__).resolve().parents[1] / "src" / "tnlm_v3"
     expected_sources = {
         path.relative_to(Path(__file__).resolve().parents[2]).as_posix()
         for path in source_root.glob("*.py")
     }
-    assert len(expected_sources) == 27
     assert expected_sources <= set(protocol.implementation_required_paths)
+    assert set(protocol.implementation_required_paths) == expected_sources | {
+        "v3/configs/milestone4/validation_screen_v1.yaml",
+        "v3/configs/phase2/outer_rotation_v4.json",
+        "v3/pyproject.toml",
+        "v3/scripts/run_phase2_algebra_power_control.py",
+        "v3/scripts/run_phase2_trace_algebra_experiment.py",
+        "v3/scripts/run_phase2_trace_algebra_multienvironment.py",
+    }
     assert "v3/pyproject.toml" in protocol.implementation_required_paths
-    assert len(protocol.implementation_required_paths) == 33
+    assert "v3/configs/phase2/outer_rotation_v3.json" not in (
+        protocol.implementation_required_paths
+    )
+    assert protocol.predecessor_evidence_commitment_sha256 == hashlib.sha256(
+        module._canonical_bytes(module._expected_v3_predecessor_commitment())
+    ).hexdigest()
+    assert protocol.probe_source_sha256 == (
+        "b4f2b45e53db9fd75fd506d487b68c4cdecbd408ba4246d5b0b68d7136449c80"
+    )
+
+
+def test_v4_is_forward_only_and_binds_the_immutable_failed_v3_evidence() -> None:
+    module = _load_script()
+    v3_path = (
+        Path(__file__).resolve().parents[1]
+        / "configs"
+        / "phase2"
+        / "outer_rotation_v3.json"
+    )
+    with pytest.raises(ValueError, match="immutable V3 evidence protocol"):
+        module.load_frozen_protocol(v3_path)
+    protocol = module.load_frozen_protocol()
+    record = module._protocol_record(protocol)
+    predecessor = record["v3_predecessor_evidence_commitment"]
+    assert predecessor["v3_open_campaign"]["campaign_passed"] is False
+    assert predecessor["v3_open_campaign"]["passing_environment_count"] == 10
+    assert predecessor["v3_open_campaign"]["all_realized_probe_answers_correct"]
+    assert predecessor["v3_formal_result_remains_failed_and_is_not_rewritten"]
+    assert predecessor["v4_was_designed_after_v3_outer_results_were_opened"]
+    assert not predecessor["v3_labels_models_or_scores_used_for_v4_fit_or_selection"]
+
+
+def test_v4_phase_zero_probe_inventory_is_uniform_and_exactly_hash_bound() -> None:
+    module = _load_script()
+    protocol = module.load_frozen_protocol()
+    from tnlm_v3.algebra_discovery_probes import (
+        ProbeFamily,
+        ProbeQueryRole,
+        build_balanced_probe_suite,
+        cyclic_cell_rotation_inventory,
+    )
+
+    expected_hashes = {
+        cell: (actual_sha, rotated_sha)
+        for cell, actual_sha, rotated_sha in protocol.probe_suite_hashes
+    }
+    assert protocol.probe_family_names == tuple(family.value for family in ProbeFamily)
+    assert protocol.probe_family_query_counts == (
+        4,
+        4,
+        4,
+        4,
+        8,
+        12,
+        4,
+        8,
+        16,
+        8,
+        8,
+        16,
+    )
+    for cell in sorted(expected_hashes):
+        actual = build_balanced_probe_suite(5, 4, (cell,))
+        rotated = build_balanced_probe_suite(
+            5,
+            4,
+            (cell,),
+            cell_rotations=cyclic_cell_rotation_inventory(5, 4, anchor_key=cell[0]),
+        )
+        module._validate_constructed_probe_instrument(
+            protocol,
+            next(row for row in protocol.schedule if row.outer_cell == cell),
+            actual,
+            rotated,
+        )
+        assert (actual.suite_sha256, rotated.suite_sha256) == expected_hashes[cell]
+        assert len(actual.cases) == 15
+        assert sum(len(case.expected_answers) for case in actual.cases) == 96
+        assert sum(
+            sum(role is ProbeQueryRole.FOCAL for role in case.query_roles)
+            for case in actual.cases
+        ) == 24
+        assert all(
+            len(case.expected_answers)
+            == 4 * sum(role is ProbeQueryRole.FOCAL for role in case.query_roles)
+            for case in actual.cases
+        )
+        assert len(rotated.cases) == 300
+        assert sum(len(case.expected_answers) for case in rotated.cases) == 1_920
+        assert rotated.balance.pair_case_counts == tuple(
+            (pair, 15) for pair in sorted(expected_hashes)
+        )
+        assert rotated.balance.pair_focal_query_counts == tuple(
+            (pair, 24) for pair in sorted(expected_hashes)
+        )
 
 
 def test_preflight_freezes_exact_primary_replay_and_optimizer_work() -> None:
@@ -215,6 +340,13 @@ def test_preflight_freezes_exact_primary_replay_and_optimizer_work() -> None:
     assert protocol.max_primary_generated_events_total == 122_880
     assert protocol.max_deterministic_replay_generated_events_total == 491_520
     assert protocol.max_all_generation_work_total == 614_400
+    assert protocol.postopen_model_query_evaluations_per_environment == 2_400
+    assert protocol.max_primary_postopen_model_query_evaluations_total == 96_000
+    assert (
+        protocol.max_validation_replay_postopen_model_query_evaluations_total
+        == 96_000
+    )
+    assert protocol.max_all_postopen_model_query_evaluations_total == 192_000
 
 
 @pytest.mark.parametrize(
@@ -242,19 +374,45 @@ def test_preopen_budget_fails_before_prerequisite_generation_or_fit(
         module.build_preopen_environment_record(0, **{keyword: value})
 
 
-def test_production_power_record_validates_exact_positive_and_null_gates() -> None:
+def test_production_power_v2_validates_exact_positive_and_null_gates() -> None:
     module = _load_script()
     protocol = module.load_frozen_protocol()
-    commitment = module.load_power_control_commitment(protocol)
-    assert commitment.relative_path == "v3_recovery/PHASE2_ALGEBRA_POWER_CONTROL_V1.json"
-    assert commitment.file_sha256 == (
-        "4fa8d54c636ae693fdca7931ebb3e2095488eb8cc74f8d7f49e120e4c6e230a6"
+    assert protocol.power_control_relative_path == (
+        "v3_recovery/PHASE2_ALGEBRA_POWER_CONTROL_V2.json"
     )
+    commitment = module.load_power_control_commitment(protocol)
+    assert commitment.relative_path == protocol.power_control_relative_path
+    assert commitment.file_sha256 == (
+        "31cc623ad890582e21c1c2c414f14fb87ecc149e93b504fe28bbb3913dba00e3"
+    )
+    assert commitment.file_sha256 == protocol.power_control_expected_file_sha256
     assert commitment.record_sha256 == (
-        "831bf991a99ad51b841a916f919df94def448c8f722fd9e1f06769e873c1913f"
+        "74a8d6ee5b519f8e1bc840a6e3838952ff967065ca7b11f642d447c5e9123b12"
     )
     with pytest.raises(ValueError, match="preregistered path"):
         module.load_power_control_commitment(protocol, Path(__file__))
+
+
+def test_production_v4_implementation_manifest_validates_exact_closure() -> None:
+    module = _load_script()
+    protocol = module.load_frozen_protocol()
+    commitment = module.load_implementation_manifest(protocol)
+    manifest_path = module.default_implementation_manifest_path()
+    expected_sha256 = (
+        "de030722267f30922a5f19b6ac65c4c0ce797bc45ded2d31f692df40254b39a0"
+    )
+    assert commitment.relative_path == (
+        "v3_recovery/PHASE2_OUTER_ROTATION_V4_IMPLEMENTATION.sha256"
+    )
+    assert commitment.manifest_sha256 == expected_sha256
+    assert len(commitment.file_sha256s) == 34
+    assert tuple(path for path, _ in commitment.file_sha256s) == (
+        protocol.implementation_required_paths
+    )
+    assert manifest_path.stat().st_size == 3_391
+    assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == expected_sha256
+    with pytest.raises(ValueError, match="preregistered path"):
+        module.load_implementation_manifest(protocol, Path(__file__))
 
 
 def test_runtime_record_is_exact_and_platform_bound() -> None:
@@ -468,9 +626,18 @@ def test_preopen_shard_never_constructs_or_evaluates_any_probe(
     record = module.build_preopen_environment_record(0)
     assert record["schema"] == module.PREOPEN_ENVIRONMENT_SCHEMA
     assert "postfit" not in record
-    assert record["claims"]["outer_probe_suite_constructed"] is False
-    assert record["claims"]["outer_probe_answers_read"] is False
-    assert record["claims"]["outer_or_rotated_probe_evaluation_performed"] is False
+    assert record["claims"][
+        "trusted_probe_instrument_constructed_and_sealed_before_v4_model_fit"
+    ]
+    assert record["claims"][
+        "outer_probe_suite_constructed_during_v4_preopen_execution"
+    ] is False
+    assert record["claims"][
+        "outer_probe_answers_read_during_v4_preopen_execution"
+    ] is False
+    assert record["claims"][
+        "v4_model_outer_or_rotated_probe_evaluation_performed"
+    ] is False
     assert captured["max_pairwise_rounds"] == 2
     assert captured["max_objective_evaluations_per_fit"] == 8_001
     assert record["seen_fit_gate"]["environment_preopen_gate_passed"] is (not unclean)
@@ -508,6 +675,31 @@ def test_replay_budget_fails_before_first_corpus_regeneration(
         module.aggregate_preopen_records(
             records,
             max_validation_replay_generated_events=122_879,
+        )
+
+
+def test_postopen_query_budgets_fail_before_prerequisites_or_first_probe(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_script()
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("postopen work began before query-budget rejection")
+
+    monkeypatch.setattr(module, "_prerequisites", forbidden)
+    monkeypatch.setattr(module, "_build_open_environment_record", forbidden)
+    with pytest.raises(SequenceDiscoveryLimitError, match="before probes"):
+        module.open_campaign(
+            {},
+            (),
+            max_primary_postopen_model_query_evaluations=95_999,
+        )
+    with pytest.raises(SequenceDiscoveryLimitError, match="cumulative budget"):
+        module.validate_campaign_record(
+            {},
+            {},
+            (),
+            max_all_postopen_model_query_evaluations=191_999,
         )
 
 
@@ -601,13 +793,61 @@ def test_batch_open_validates_complete_terminal_before_opening_all_models(
     assert result["opened"] == list(range(40))
 
 
-def _perfect_evaluation(module) -> dict[str, object]:
+def _perfect_evaluation(module, *, rotated: bool = False) -> dict[str, object]:
+    protocol = module.load_frozen_protocol()
+    factor = 20 if rotated else 1
+    query_count = (
+        module.EXPECTED_ROTATED_QUERY_COUNT
+        if rotated
+        else module.EXPECTED_ACTUAL_QUERY_COUNT
+    )
+    focal_count = (
+        module.EXPECTED_ROTATED_FOCAL_QUERY_COUNT
+        if rotated
+        else module.EXPECTED_ACTUAL_FOCAL_QUERY_COUNT
+    )
+    case_counts = (1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2)
+    families = [
+        {
+            "family": name,
+            "correct_count": factor * family_queries,
+            "query_count": factor * family_queries,
+            "focal_correct_count": factor,
+            "focal_query_count": factor,
+            "exact_case_count": factor * family_cases,
+            "case_count": factor * family_cases,
+        }
+        for name, family_queries, family_cases in zip(
+            protocol.probe_family_names,
+            protocol.probe_family_query_counts,
+            case_counts,
+            strict=True,
+        )
+    ]
+    pairs = [
+        {
+            "probe_pair": [key, value],
+            "correct_count": module.EXPECTED_ACTUAL_QUERY_COUNT,
+            "query_count": module.EXPECTED_ACTUAL_QUERY_COUNT,
+            "focal_correct_count": module.EXPECTED_ACTUAL_FOCAL_QUERY_COUNT,
+            "focal_query_count": module.EXPECTED_ACTUAL_FOCAL_QUERY_COUNT,
+            "exact_case_count": module.EXPECTED_ACTUAL_CASE_COUNT,
+            "case_count": module.EXPECTED_ACTUAL_CASE_COUNT,
+        }
+        for key, value in (
+            [(key, value) for key in range(5) for value in range(4)]
+            if rotated
+            else [(0, 0)]
+        )
+    ]
     return {
-        "query_count": module.EXPECTED_ACTUAL_QUERY_COUNT,
-        "correct_count": module.EXPECTED_ACTUAL_QUERY_COUNT,
-        "focal_query_count": module.EXPECTED_ACTUAL_FOCAL_QUERY_COUNT,
-        "focal_correct_count": module.EXPECTED_ACTUAL_FOCAL_QUERY_COUNT,
+        "query_count": query_count,
+        "correct_count": query_count,
+        "focal_query_count": focal_count,
+        "focal_correct_count": focal_count,
         "path_consistency": 1.0,
+        "families": families,
+        "pairs": pairs,
         "path_relations": [
             {
                 "relation": "equal",
@@ -628,25 +868,68 @@ def test_shortcut_and_rotated_controls_are_hard_acceptance_gates() -> None:
         {"final_train_fit_independently_verified": True},
     )
     actual = _perfect_evaluation(module)
-    rotated = {
-        **actual,
-        "query_count": module.EXPECTED_ROTATED_QUERY_COUNT,
-        "correct_count": module.EXPECTED_ROTATED_QUERY_COUNT,
-        "focal_query_count": module.EXPECTED_ROTATED_FOCAL_QUERY_COUNT,
-        "focal_correct_count": module.EXPECTED_ROTATED_FOCAL_QUERY_COUNT,
-    }
+    rotated = _perfect_evaluation(module, rotated=True)
+    actual_suite_sha, rotated_suite_sha = {
+        cell: (actual_sha, rotated_sha)
+        for cell, actual_sha, rotated_sha in protocol.probe_suite_hashes
+    }[(0, 0)]
     postfit = {
         "transition_table": {
             "supported_entry_count": 20,
             "exact_entry_count": 20,
         },
-        "actual_cell_probe": {"case_count": 15, "evaluation": actual},
+        "probe_instrument": {
+            "corrected_after_v3_open": True,
+            "nonconfirmatory_corrective_replication": True,
+            "added_queries_are_nonfocal_balance_padding": True,
+            "family_order": list(protocol.probe_family_names),
+            "family_query_counts_per_cell": list(protocol.probe_family_query_counts),
+            "family_output_class_counts_per_cell": [
+                list(counts) for counts in protocol.probe_family_output_class_counts
+            ],
+            "actual_queries_per_cell": 96,
+            "rotated_queries_per_pair": 96,
+            "rotated_pair_count": 20,
+            "actual_suite_sha256": actual_suite_sha,
+            "rotated_suite_sha256": rotated_suite_sha,
+            "actual_balance_certificate": {
+                "family_class_counts": [
+                    [name, list(counts)]
+                    for name, counts in zip(
+                        protocol.probe_family_names,
+                        protocol.probe_family_output_class_counts,
+                        strict=True,
+                    )
+                ]
+            },
+            "rotated_balance_certificate": {
+                "family_class_counts": [
+                    [name, [20 * count for count in counts]]
+                    for name, counts in zip(
+                        protocol.probe_family_names,
+                        protocol.probe_family_output_class_counts,
+                        strict=True,
+                    )
+                ]
+            },
+        },
+        "actual_cell_probe": {
+            "outer_cell": [0, 0],
+            "case_count": 15,
+            "evaluation": actual,
+        },
         "exact_probe_family_count": 12,
         "shortcut_controls": [
             {
-                "name": "shortcut",
-                "evaluation": {"correct_count": 95, "focal_correct_count": 23},
+                "name": module.EXPECTED_SHORTCUT_NAMES[index],
+                "evaluation": {
+                    "query_count": 96,
+                    "correct_count": 95,
+                    "focal_query_count": 24,
+                    "focal_correct_count": 23,
+                },
             }
+            for index in range(4)
         ],
         "balanced_rotated_cell_control": {
             "case_count": 300,
@@ -657,12 +940,116 @@ def test_shortcut_and_rotated_controls_are_hard_acceptance_gates() -> None:
         protocol, selection, gate, postfit
     )["environment_passed"]
     postfit["shortcut_controls"][0]["evaluation"] = {
+        "query_count": 96,
         "correct_count": 96,
+        "focal_query_count": 24,
         "focal_correct_count": 24,
     }
     rejected = module._environment_acceptance(protocol, selection, gate, postfit)
     assert not rejected["all_shortcut_controls_strictly_worse_overall_and_focal"]
     assert not rejected["environment_passed"]
+
+
+def test_family_pair_balance_and_suite_hash_rows_are_hard_acceptance_gates() -> None:
+    module = _load_script()
+    protocol = module.load_frozen_protocol()
+    selection = _fake_selection(module, protocol, 0)
+    gate = module._fold_seen_fit_report(
+        protocol,
+        selection,
+        {"final_train_fit_independently_verified": True},
+    )
+    # Reuse the production-shaped fixture assembled by the neighbouring test.
+    actual = _perfect_evaluation(module)
+    rotated = _perfect_evaluation(module, rotated=True)
+    actual_sha, rotated_sha = {
+        cell: (first, second)
+        for cell, first, second in protocol.probe_suite_hashes
+    }[(0, 0)]
+    base = {
+        "transition_table": {"supported_entry_count": 20, "exact_entry_count": 20},
+        "probe_instrument": {
+            "corrected_after_v3_open": True,
+            "nonconfirmatory_corrective_replication": True,
+            "added_queries_are_nonfocal_balance_padding": True,
+            "family_order": list(protocol.probe_family_names),
+            "family_query_counts_per_cell": list(protocol.probe_family_query_counts),
+            "family_output_class_counts_per_cell": [
+                list(counts) for counts in protocol.probe_family_output_class_counts
+            ],
+            "actual_queries_per_cell": 96,
+            "rotated_queries_per_pair": 96,
+            "rotated_pair_count": 20,
+            "actual_suite_sha256": actual_sha,
+            "rotated_suite_sha256": rotated_sha,
+            "actual_balance_certificate": {
+                "family_class_counts": [
+                    [name, list(counts)]
+                    for name, counts in zip(
+                        protocol.probe_family_names,
+                        protocol.probe_family_output_class_counts,
+                        strict=True,
+                    )
+                ]
+            },
+            "rotated_balance_certificate": {
+                "family_class_counts": [
+                    [name, [20 * count for count in counts]]
+                    for name, counts in zip(
+                        protocol.probe_family_names,
+                        protocol.probe_family_output_class_counts,
+                        strict=True,
+                    )
+                ]
+            },
+        },
+        "actual_cell_probe": {
+            "outer_cell": [0, 0],
+            "case_count": 15,
+            "evaluation": actual,
+        },
+        "exact_probe_family_count": 12,
+        "shortcut_controls": [
+            {
+                "name": module.EXPECTED_SHORTCUT_NAMES[index],
+                "evaluation": {
+                    "query_count": 96,
+                    "correct_count": 95,
+                    "focal_query_count": 24,
+                    "focal_correct_count": 23,
+                },
+            }
+            for index in range(4)
+        ],
+        "balanced_rotated_cell_control": {
+            "case_count": 300,
+            "evaluation": rotated,
+        },
+    }
+    assert module._environment_acceptance(protocol, selection, gate, base)[
+        "environment_passed"
+    ]
+    family_forgery = json.loads(json.dumps(base))
+    family_forgery["actual_cell_probe"]["evaluation"]["families"][0][
+        "query_count"
+    ] = 3
+    assert not module._environment_acceptance(
+        protocol, selection, gate, family_forgery
+    )["all_12_probe_families_exact"]
+    pair_forgery = json.loads(json.dumps(base))
+    pair_forgery["balanced_rotated_cell_control"]["evaluation"]["pairs"][0][
+        "query_count"
+    ] = 95
+    assert not module._environment_acceptance(
+        protocol, selection, gate, pair_forgery
+    )["actual_and_rotated_pair_inventories_exact"]
+    instrument_forgery = json.loads(json.dumps(base))
+    instrument_forgery["probe_instrument"]["actual_suite_sha256"] = _digest(
+        "forged-suite"
+    )
+    assert not module._environment_acceptance(
+        protocol, selection, gate, instrument_forgery
+    )["corrected_probe_instrument_exact"]
 
 
 def test_source_exposes_only_two_phase_cli_and_scoped_claims() -> None:
@@ -681,15 +1068,28 @@ def test_source_exposes_only_two_phase_cli_and_scoped_claims() -> None:
     assert '"representation_discovery_performed": False' in source
     assert '"secret_law_discovery_performed": False' in source
     assert '"confirmatory_claim_permitted": False' in source
+    assert '"v4_corrective_replication_is_confirmatory": False' in source
+    assert (
+        '"trusted_probe_instrument_constructed_and_sealed_before_v4_model_fit": True'
+        in source
+    )
     assert '"numeric_seed_reuse_is_common_random_number_matching": False' in source
+    assert "rotated_control_1800_of_1800" not in source
+    assert module.default_protocol_path().name == "outer_rotation_v4.json"
+    assert module.default_implementation_manifest_path().name == (
+        "PHASE2_OUTER_ROTATION_V4_IMPLEMENTATION.sha256"
+    )
+    assert module.default_power_control_record_path().name == (
+        "PHASE2_ALGEBRA_POWER_CONTROL_V2.json"
+    )
     assert module.PREOPEN_ENVIRONMENT_SCHEMA != module.OPEN_ENVIRONMENT_SCHEMA
 
 
 @pytest.mark.skipif(
     os.environ.get("TNLM_RUN_SLOW_MULTIENVIRONMENT") != "1",
-    reason="set TNLM_RUN_SLOW_MULTIENVIRONMENT=1 for the frozen 40-environment run",
+    reason="set TNLM_RUN_SLOW_MULTIENVIRONMENT=1 only after V4 source/power/manifest freeze",
 )
-def test_full_v3_two_phase_campaign_opt_in_only(tmp_path: Path) -> None:
+def test_full_v4_two_phase_campaign_opt_in_only(tmp_path: Path) -> None:
     module = _load_script()
     terminal = module.run_all_preopen_with_resume(
         tmp_path / "preopen",
