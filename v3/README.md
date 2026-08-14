@@ -177,13 +177,20 @@ immutable content-addressed attempt transitions with atomic generation checks,
 crash reconciliation, and checksum-bound external artifacts. The isolated
 pilot worker derives its trusted checkpoint contract from the resolved plan,
 while the parent independently verifies the clean tree, paired streams, every
-checkpoint and compact artifact, and the manifest history. A complete local
-seven-lineage pilot passes; it is explicitly non-claiming.
+checkpoint and compact artifact, and the manifest history. A fresh commit-bound
+seven-lineage pilot passed from clean published commit
+`8e5a7001fe543aabfa683fb1f8d7be393e3a0f30`. Its preserved non-claiming bundle
+contains six trained-source results, one derived compact result, 18 canonical
+checkpoints, one compact artifact, and the complete generation-32 immutable
+manifest history. It used one development pair, 12 optimizer steps per source,
+validation lengths 16/32/64, and no test or scaling stream. This verifies
+execution, provenance, checkpoint creation and validation, paired streams, and
+compact-parent lineage only.
 
-This remains implementation-level control infrastructure only. There are no
-published trained baseline checkpoints or commit-bound campaign evidence,
-matched-quality results, TTN or MERA
-scientific results, or speed/RSS wins. The functional cache path deliberately
-performs strict public-state validation and immutable growth; comparative timing
-must first use a predeclared, fair measurement path that accounts for that
-overhead consistently across opponents.
+This remains implementation-level control infrastructure only. Pilot-scale
+trained checkpoints and commit-bound evidence are now published, but there is
+no validation screen, promotion-bound confirmatory campaign, matched-quality
+result, MERA result, scientific result, or speed/RSS win. The functional cache
+path deliberately performs strict public-state validation and immutable growth;
+comparative timing must first use a predeclared, fair measurement path that
+accounts for that overhead consistently across opponents.

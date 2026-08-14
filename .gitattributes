@@ -2,7 +2,10 @@
 *.png binary
 *.zip binary
 *.tnlm3 binary
+*.twcp binary
 v3_recovery/MILESTONE3_EVAL_FIXTURE.json text eol=lf
 v3_recovery/MILESTONE3_EXPORT_AUDIT.json text eol=lf
 v3_recovery/MILESTONE3_REPLAY.json text eol=lf
 v3_recovery/MILESTONE3_EVIDENCE.sha256 text eol=lf
+v3_recovery/MILESTONE4_PILOT_SUMMARY.json text eol=lf
+v3_recovery/MILESTONE4_PILOT_EVIDENCE.sha256 text eol=lf

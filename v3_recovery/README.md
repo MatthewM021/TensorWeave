@@ -15,3 +15,13 @@ compact artifact. `MILESTONE3_EVIDENCE.sha256` binds those four files. The audit
 verifies physical CP-rank export and replay correctness only; it does not claim
 that rank 4 preserves scientific quality or improves wall time, RSS, or
 persistent-state width.
+
+Milestone 4 pilot evidence consists of `MILESTONE4_PILOT_SUMMARY.json` and the
+deterministic `MILESTONE4_PILOT_BUNDLE.zip`, bound by
+`MILESTONE4_PILOT_EVIDENCE.sha256`. The archive preserves the generation-32
+manifest, all 32 immutable transition records, seven results and subprocess
+envelopes, 18 canonical checkpoints, and one compact artifact. Mutable progress
+hints, PID leases, and the manifest lock are intentionally excluded. The pilot
+used one paired seed block and 12 optimizer steps per source; it verifies
+execution and evidence plumbing only, not scientific quality, matched-quality
+compression, runtime, RSS, or generalization.

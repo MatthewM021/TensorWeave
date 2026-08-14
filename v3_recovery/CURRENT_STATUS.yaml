@@ -1,5 +1,5 @@
 project: tensor-network-native-language-model
-updated: 2026-08-13
+updated: 2026-08-14
 status: v3_reconstruction_in_progress
 historical_handoff: V3_RECOVERY_STATUS.yaml
 validated_reconstruction:
@@ -105,7 +105,7 @@ validated_reconstruction:
       - paired multi-seed matched-quality compactness campaign
       - scientific baseline comparison
   milestone_4_causal_reference_controls:
-    status: pilot_runner_source_and_local_execution_verified
+    status: commit_bound_seven_lineage_pilot_verified
     scope:
       - stacked GRU control with context-length-independent persistent state
       - causal Transformer control with explicit per-layer key/value cache
@@ -139,13 +139,50 @@ validated_reconstruction:
     v3_source_tests_skipped: 1
     baseline_contract_tests_passed: 164
     baseline_contract_test_files: 3
-    evidence_scope: deterministic_source_contracts_not_scientific_campaign
+    evidence_scope: deterministic_source_contracts_and_commit_bound_pilot_not_scientific_campaign
+    commit_bound_pilot:
+      status: passed
+      scope: deterministic_milestone4_seven_lineage_non_claiming_pilot_execution
+      claim_eligible: false
+      source_commit: 8e5a7001fe543aabfa683fb1f8d7be393e3a0f30
+      source_tree: 4bfafb878097a01ef63e44f0dc5f6343ec2208c8
+      plan_sha256: 2568d32b090b0060f5376d4c0a194c898ca305c493879c1d7d90f2a06c872faf
+      completed_at_utc: 2026-08-14T00:38:07.819Z
+      manifest_generation: 32
+      manifest_sha256: 1e351125f7132f8fc7b81205d61c00cf2fb32b005a22585b9eb5ff7d0144de6f
+      completed_runs: 7
+      trainable_source_runs: 6
+      derived_compact_runs: 1
+      optimizer_steps_per_source: 12
+      tokens_per_source: 456
+      validation_lengths: [16, 32, 64]
+      checkpoints: 18
+      compact_artifacts: 1
+      checkpoint_creation_and_validation: passed
+      interrupted_resume_exercised_in_this_run: false
+      summary:
+        path: MILESTONE4_PILOT_SUMMARY.json
+        bytes: 4525
+        sha256: dcac6fab6a3f416265992ad9aabf9ecbfe70e9ae102d2b8db7c4e47dbb211237
+      bundle:
+        path: MILESTONE4_PILOT_BUNDLE.zip
+        bytes: 1187845
+        sha256: a1b038e198b551ccd21689eefd735c2236cdeccbc352d891b560edd9a9efb3b1
+        unpacked_authoritative_files: 66
+        unpacked_authoritative_bytes: 1820873
+      checksum_manifest: MILESTONE4_PILOT_EVIDENCE.sha256
+      quality_observation_only:
+        routed_source_queries_correct: 20
+        routed_source_queries_total: 69
+        routed_compact_queries_correct: 20
+        routed_compact_queries_total: 69
+        matched_quality_claim: false
+        scientific_campaign: pending
     remaining:
-      - trained baseline checkpoints and commit-bound run records
-      - published commit-bound pilot execution record
+      - validation-only multi-seed screen and promotion decision
+      - promotion-bound paired multi-seed confirmatory campaign
       - optional identity-initialized MERA ablation
       - fair predeclared cached-runtime measurement path
-      - paired multi-seed matched-quality campaign
 not_yet_reconstructed:
   - trained scientific evaluation of recurrent, cached-transformer, and causal-tree controls
   - optional identity-initialized MERA ablation

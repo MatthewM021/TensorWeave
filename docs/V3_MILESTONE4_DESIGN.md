@@ -136,20 +136,25 @@ requires a curriculum parent at its final optimizer cursor before compact
 derivation. A runner must additionally bind every checkpoint/artifact to the
 completed manifest attempt and clean executable bundle.
 
-The isolated pilot worker and manifest-driven parent runner are implemented.
-A complete local seven-lineage pilot passed with exact paired streams,
-checkpoint resume, compact-parent derivation, and durable manifest transitions.
-This verifies implementation plumbing only; a published commit-bound execution
-record remains pending.
+The isolated pilot worker and manifest-driven parent runner are implemented. A
+fresh commit-bound seven-lineage pilot passed from clean published commit
+`8e5a7001fe543aabfa683fb1f8d7be393e3a0f30`. The preserved non-claiming
+evidence contains six trained-source results, one derived compact result, 18
+canonical checkpoints, one compact artifact, and the complete generation-32
+immutable manifest history. It used one development pair, 12 optimizer steps
+per source, validation lengths 16/32/64, and no test or scaling stream. The run
+created and independently validated resumable checkpoints; interrupted resume
+remains source/test-verified and was not exercised by this fresh execution.
 
 The recurrent, cached-Transformer, and corrected causal-tree source contracts
-are implemented and pass the complete local V3 suite. This establishes source
-behavior only: there is no trained baseline checkpoint, commit-bound campaign
-evidence, matched-quality comparison, MERA result, or scientific result. The
-public cached step path prioritizes strict state validation and immutable
-continuation; a comparative runtime campaign must predeclare a measurement path
-that accounts for validation and cache-growth costs consistently before making
-efficiency claims.
+are implemented and pass the complete V3 suite. Pilot-scale checkpoints and
+commit-bound implementation evidence are now published, but there is no
+validation screen, promotion-bound confirmatory campaign, matched-quality
+comparison, MERA result, scientific result, or speed/RSS win. The public cached
+step path prioritizes strict state validation and immutable continuation; a
+comparative runtime campaign must predeclare a measurement path that accounts
+for validation and cache-growth costs consistently before making efficiency
+claims.
 
 ## Paired campaign boundary
 
