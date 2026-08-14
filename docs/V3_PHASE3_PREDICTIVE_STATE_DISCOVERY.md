@@ -2,9 +2,13 @@
 
 ## Status and purpose
 
-This is a pre-execution research protocol. It specifies the first experiment
-that removes the supplied addressable-register coordinates used in Phase II.
-No result described here has yet been obtained.
+The full arbitrary-suffix operator and factorization campaign remains a
+pre-execution research protocol.  It specifies the first full operator-and-
+factorization experiment that removes the supplied addressable-register
+coordinates used in Phase II.  A
+bounded zero-suffix diagnostic checkpoint has now been completed and is
+reported explicitly below; none of the broader operator, factorization, or
+scaling results has yet been obtained.
 
 The primary question is deliberately narrower than "discover a geometry of
 language":
@@ -712,6 +716,43 @@ operator-Schmidt ranks, and all polynomial/path identities. All negative
 factorization controls must behave as preregistered. If Gate 3 passes and Gate
 6 fails, the conclusion is exact predictive-state discovery without
 compositional-factor discovery.
+
+## Implemented bounded checkpoint
+
+The first executable checkpoint is now implemented in
+`v3/src/tnlm_v3/opaque_predictive_state.py`.  Its claim is deliberately
+narrower than the full protocol above: it learns the finite **zero-suffix
+multi-output absence-diagnostic block**, not arbitrary-suffix transition
+operators, a general PSR, or a tensor factorization.
+
+The controller runs all four `K=2`, `V=2` omissions under two independent
+nonce-keyed opaque relabel blocks.  The learner receives only opaque event,
+query, and answer tokens, fixed-length opaque words, and a content-bound
+candidate pool.  It receives no `K`, `V`, event roles or arguments, semantic
+states, omitted-cell ID, executor, or controller map.  Exhaustive
+learner-input-only attacks leave all eight `(block, cell)` hypotheses
+compatible.  This is an honest-code/API boundary, not cryptographic or
+process isolation against a learner that inspects controller source or the
+call stack.
+
+Every six-row passive block has exact rational rank 4.  Three precommitted
+categorical completions are compatible with the opaque vocabulary, and each
+raises rank to 5.  The postactive learner is outcome-total: all 24 combinations
+of eight environments and three answers rebuild rank 5 and reconstruct all
+nine diagnostic rows exactly.  One response is used per environment.  Four
+paired relabel comparisons satisfy exact nonsingular rational similarities
+under `x_A S = x_B` and `S O_B = O_A`.
+
+The hostile suite passes 45 / 45 tests.  The source SHA-256 is
+`e63eded99f4d2d27261466df3e212253d81078ca3a46e249a4ad1726cdab0d27`;
+the deterministic fixture-report SHA-256 is
+`0c41157bc062264e05fc4772e4b54e8cc40e2f0aebf66fdb74c1fff407449487`.
+Nested digests are contextual content links; authoritative semantic evidence
+comes from reconstructing the complete environment and report.
+
+This checkpoint demonstrates exact passive ambiguity diagnosis and active
+rank restoration in the smallest opaque finite block.  It does not yet meet
+the full operator, factorization, or scaling gates below.
 
 ## Required reporting
 

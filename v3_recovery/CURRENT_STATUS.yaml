@@ -136,11 +136,11 @@ validated_reconstruction:
         source_tree: e59ca383e984177ea337c1a2037bfbe48687cdda
         ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31720252790
         ci_status: passed
-    v3_source_tests_collected: 858
-    v3_default_tests_passed: 854
+    v3_source_tests_collected: 928
+    v3_default_tests_passed: 924
     v3_default_tests_skipped: 4
     v3_opt_in_phase2_slow_tests_passed: 2
-    v3_effective_tests_passed: 856
+    v3_effective_tests_passed: 926
     v3_effective_tests_skipped: 2
     v3_source_tests_scope: current_local_source_suite_not_screen_or_scientific_campaign_evidence
     repository_verifier:
@@ -217,7 +217,7 @@ validated_reconstruction:
       - optional identity-initialized MERA ablation
       - fair predeclared cached-runtime measurement path
   phase_1_2_compositional_algebra_research:
-    status: multienvironment_v3_formally_failed_on_probe_inventory_gate_with_exact_behavior
+    status: multienvironment_v4_corrective_replication_formally_passed_with_exact_behavior
     claim_eligible: false
     scope: coefficient_recovery_inside_a_supplied_addressable_register_transducer
     exact_semantic_analysis:
@@ -264,6 +264,9 @@ validated_reconstruction:
       file: PHASE2_ALGEBRA_POWER_CONTROL_V1.json
       file_sha256: 4fa8d54c636ae693fdca7931ebb3e2095488eb8cc74f8d7f49e120e4c6e230a6
       record_sha256: 831bf991a99ad51b841a916f919df94def448c8f722fd9e1f06769e873c1913f
+      source_refrozen_v2_file: PHASE2_ALGEBRA_POWER_CONTROL_V2.json
+      source_refrozen_v2_file_sha256: 31cc623ad890582e21c1c2c414f14fb87ecc149e93b504fe28bbb3913dba00e3
+      source_refrozen_v2_record_sha256: 74a8d6ee5b519f8e1bc840a6e3838952ff967065ca7b11f642d447c5e9123b12
     outer_rotation_v3:
       status: completed_formal_failure_due_to_noninvariant_fixed_query_count_gate
       environments: 40
@@ -299,10 +302,77 @@ validated_reconstruction:
       terminal_record_sha256: fe994db05879ee4dbaaf13245942a5161a464824184d505de0dc985ffccbd0aa
       open_record_sha256: b4d16f49fb02ddc661bc6de931a9710f74b6d47b539494f6776c39a1668f9ebe
       evidence_directory: phase2_outer_rotation_v3
+    outer_rotation_v4:
+      status: completed_formal_pass_post_v3_nonconfirmatory_corrective_replication
+      source_commit: b8613f3f73099aa02542d814319e2017e3e6aa56
+      environments: 40
+      complete_cell_blocks: 2
+      fold_candidates: 1520
+      documents_per_split: 24
+      document_length: 64
+      protocol_sha256: 966601e683b647b8f68ed0e99c1deca7a449f977027b5579fd6617522d42ec7b
+      implementation_manifest: PHASE2_OUTER_ROTATION_V4_IMPLEMENTATION.sha256
+      implementation_manifest_sha256: de030722267f30922a5f19b6ac65c4c0ce797bc45ded2d31f692df40254b39a0
+      v3_formal_result_reclassified: false
+      correction: cell_invariant_nonfocal_output_balance_padding
+      semantic_case_inventory_changed_from_v3: false
+      focal_query_inventory_changed_from_v3: false
+      added_queries_are_new_independent_semantic_evidence: false
+      two_phase_batch_open: true
+      terminal_preopen_passed: true
+      admissible_fold_candidates: 1520
+      final_models_with_zero_train_mistakes_and_zero_overrides: 40
+      final_seen_queries_correct: 18858
+      final_seen_queries_total: 18858
+      selected_penalty_16: 40
+      fold_primary_score_ties: 760
+      aggregate_primary_score_ties: 40
+      penalty_selection_interpretation: deterministic_stronger_penalty_tiebreak_not_validation_preference
+      formal_campaign_passed: true
+      formal_passing_environments: 40
+      formal_required_passing_environments: 40
+      actual_cell_queries_correct: 3840
+      actual_cell_queries_total: 3840
+      actual_cell_focal_queries_correct: 960
+      actual_cell_focal_queries_total: 960
+      rotated_cell_queries_correct: 76800
+      rotated_cell_queries_total: 76800
+      rotated_cell_focal_queries_correct: 19200
+      rotated_cell_focal_queries_total: 19200
+      supported_transition_entries_exact: 800
+      supported_transition_entries_total: 800
+      terminal_file_sha256: 2fe74115f1affd71f139763a93a062f3e8715b11a6f25938f7e37fb58407ec5c
+      terminal_record_sha256: 2395abe4bfb114fa7ec45a2b0b4bab79e6c4f5f952b5ab76eb6b50e5e5327d71
+      open_file_sha256: f839966f4b7e45c041a3d337904c77d918f081ebd6df89fc74129c742de8db30
+      open_record_sha256: 44bfe874674848ee8fc4d0126aa64ac5c558ce3a73b911ba479e5e2daf7d8b22
+      summary_record_sha256: b9cfac53c1be69eeb245c30a2b851c21aceb076555a19de6ee5b6d08e3bc07ce
+      evidence_directory: phase2_outer_rotation_v4
+      claim_scope: coefficient_recovery_inside_supplied_addressable_register_representation
+      confirmatory: false
+    phase_3_opaque_zero_suffix_miniature:
+      status: locally_verified_bounded_checkpoint
+      scope: finite_zero_suffix_multioutput_absence_diagnostic_block_only
+      environments: 8
+      passive_exact_rank: 4
+      postactive_exact_rank: 5
+      compatible_completion_outcomes_checked: 24
+      diagnostic_rows_reconstructed: 9
+      membership_responses_per_environment: 1
+      exact_rational_similarity_certificates: 4
+      learner_input_coordinate_hypotheses_remaining: 8
+      focused_tests_passed: 45
+      deterministic_report_sha256: 0c41157bc062264e05fc4772e4b54e8cc40e2f0aebf66fdb74c1fff407449487
+      source_sha256: e63eded99f4d2d27261466df3e212253d81078ca3a46e249a4ad1726cdab0d27
+      test_sha256: e908bc374c0b5fd797e864d89fc6d3336326c004d6e1d6b8552a4c6602693d8c
+      honest_code_api_boundary: true
+      cryptographic_or_process_isolation: false
+      arbitrary_suffix_operator_discovery: false
+      full_psr_discovery: false
+      tensor_factor_discovery: false
     limitations:
-      - retrospective_protocol_rehearsal
-      - three_seeds_only
-      - penalty_selection_not_stable
+      - post_v3_corrective_replication_is_nonconfirmatory
+      - two_replicates_per_cell
+      - penalty_strength_not_empirically_identified
       - register_representation_and_query_gauge_supplied
       - trusted_controller_used_oracle_occupancy_and_dependency_metadata
       - not_representation_discovery
@@ -311,9 +381,9 @@ validated_reconstruction:
       - not_natural_language_evidence
     remaining:
       - preserve_v3_as_failed_without_post_hoc_gate_reclassification
-      - freeze_and_test_a_forward_only_cell_invariant_probe_inventory
+      - preserve_v4_as_a_post_v3_nonconfirmatory_corrective_pass
       - freeze_a_genuinely_prospective_externally_held_environment
-      - broaden_to_latent_predictive_state_and_operator_discovery
+      - extend_the_bounded_opaque_zero_suffix_block_to_arbitrary_suffix_operator_discovery
 not_yet_reconstructed:
   - trained scientific evaluation of recurrent, cached-transformer, and causal-tree controls
   - optional identity-initialized MERA ablation

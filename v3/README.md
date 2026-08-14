@@ -198,7 +198,7 @@ the three paired results, applies the predeclared source and compact-quality
 gates, and writes a checksum-bound promotion record with a decision of
 `complete_promote` or `complete_do_not_promote`.
 
-The current local V3 suite collects 858 tests.  Its default run passes 854 with
+The current local V3 suite collects 928 tests.  Its default run passes 924 with
 four skips; the two opt-in Phase-II discovery regressions pass separately.
 The remaining skips are the CUDA-only check and the deliberately unopened
 40-environment Phase-II campaign regression.  This is local source
@@ -248,9 +248,24 @@ value-0 cells; the other cells generated 88 balanced queries and answered all
 in `../v3_recovery/phase2_outer_rotation_v3/`.  This outcome is not relabeled
 post hoc.
 
-The proposed Phase III follow-on removes the supplied register coordinates
-from the estimator and tests exact predictive-state discovery from opaque
-event/query symbols, including an actively acquired missing Hankel direction,
-similarity-gauge invariance, and a fail-closed factorization certificate.  Its
-preregistered design is in
+The forward-only V4 corrective replication preserves that failure and changes
+only nonfocal output-balance padding.  In two fresh complete 20-cell blocks it
+passed 40 / 40 environments, with 3,840 / 3,840 actual-cell queries, 960 /
+960 focal queries, and 76,800 / 76,800 rotated-control queries.  All 40 final
+models recovered the same exact 20-entry table with zero TRAIN mistakes and
+zero local overrides.  All folds tied penalties 4 and 16; the frozen tie-break
+selected 16, so this is not evidence of empirical penalty preference.  The
+post-V3 corrective result is nonconfirmatory and remains limited to coefficient
+recovery in the supplied representation.  Evidence is in
+`../v3_recovery/phase2_outer_rotation_v4/`.
+
+The first bounded Phase III checkpoint is also executable.  Its learner sees
+only opaque diagnostic tokens and answers under an honest-code API boundary.
+Across four omissions and two nonce-keyed relabel blocks, passive exact rank is
+4; an answer-free query/completion set is committed, then one released
+categorical response raises it to 5 and reconstructs all nine finite
+zero-suffix diagnostic rows.  All 24 compatible completion
+outcomes pass, and paired realizations are related by exact rational similarity
+maps.  This is not yet arbitrary-suffix operator discovery, a full PSR, or
+tensor-factor discovery.  The broader preregistered design remains in
 `../docs/V3_PHASE3_PREDICTIVE_STATE_DISCOVERY.md`.

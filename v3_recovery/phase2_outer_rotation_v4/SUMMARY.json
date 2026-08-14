@@ -1,0 +1,204 @@
+{
+  "schema": "tnlm-v3-phase2-outer-rotation-v4-audit-v1",
+  "scope": "post_v3_nonconfirmatory_corrective_replication_and_behavioral_audit",
+  "source_commit": "b8613f3f73099aa02542d814319e2017e3e6aa56",
+  "protocol": {
+    "id": "phase2-known-semantics-post-v3-corrective-cell-rotation-v4",
+    "sha256": "966601e683b647b8f68ed0e99c1deca7a449f977027b5579fd6617522d42ec7b",
+    "implementation_manifest_sha256": "de030722267f30922a5f19b6ac65c4c0ce797bc45ded2d31f692df40254b39a0",
+    "runner_sha256": "ebb0be3dac06c8420c08668ba1fcee31d14b273cc2fa0e502908b263a2111598",
+    "power_control_file_sha256": "31cc623ad890582e21c1c2c414f14fb87ecc149e93b504fe28bbb3913dba00e3",
+    "power_control_record_sha256": "74a8d6ee5b519f8e1bc840a6e3838952ff967065ca7b11f642d447c5e9123b12"
+  },
+  "predecessor": {
+    "v3_formal_campaign_passed": false,
+    "v3_passing_environment_count": 10,
+    "v3_required_environment_count": 40,
+    "v3_actual_queries_correct": 3600,
+    "v3_actual_queries_total": 3600,
+    "v3_formal_result_reclassified": false,
+    "v4_designed_after_v3_outer_results_were_opened": true
+  },
+  "integrity": {
+    "preopen_record_count": 40,
+    "all_40_preopen_canonical_hashes_valid": true,
+    "all_40_open_canonical_hashes_valid": true,
+    "terminal_preopen_file_sha256": "2fe74115f1affd71f139763a93a062f3e8715b11a6f25938f7e37fb58407ec5c",
+    "terminal_preopen_record_sha256": "2395abe4bfb114fa7ec45a2b0b4bab79e6c4f5f952b5ab76eb6b50e5e5327d71",
+    "open_campaign_file_sha256": "f839966f4b7e45c041a3d337904c77d918f081ebd6df89fc74129c742de8db30",
+    "open_campaign_record_sha256": "44bfe874674848ee8fc4d0126aa64ac5c558ce3a73b911ba479e5e2daf7d8b22",
+    "evidence_manifest_sha256": "9eaf7a1b23bf66c79dc08ed65ea34c059406796d42cb2e25adaa5f99c68d9345",
+    "independent_campaign_replay_passed": true,
+    "fold_candidate_models_serialized": false,
+    "fold_candidate_training_and_pseudoquery_gate_fields_are_trusted_runner_certificates": true,
+    "fold_candidate_training_and_pseudoquery_gate_fields_independently_replayed": false,
+    "final_model_direct_train_fit_independently_replayed": true,
+    "postopen_model_query_evaluations_used": 192000,
+    "postopen_model_query_evaluation_cap": 192000,
+    "another_full_v4_campaign_replay_permitted": false
+  },
+  "preopen": {
+    "environment_count": 40,
+    "complete_cell_rotation_blocks": 2,
+    "fold_count": 760,
+    "candidate_fit_count": 1520,
+    "candidate_fits_zero_training_mistakes_and_zero_overrides": 1520,
+    "final_models_zero_training_mistakes_and_zero_overrides": 40,
+    "final_seen_query_correct_count": 18858,
+    "final_seen_query_count": 18858,
+    "outer_open_permitted": true
+  },
+  "selection": {
+    "selected_penalty_counts": {
+      "4": 0,
+      "16": 40
+    },
+    "fold_primary_score_ties": 760,
+    "aggregate_primary_score_ties": 40,
+    "penalty_4": {
+      "pseudo_query_mistakes": 183,
+      "pseudo_query_count": 55560,
+      "all_validation_query_mistakes": 369,
+      "all_validation_query_count": 177177,
+      "aggregate_realized_overrides": 0
+    },
+    "penalty_16": {
+      "pseudo_query_mistakes": 183,
+      "pseudo_query_count": 55560,
+      "all_validation_query_mistakes": 369,
+      "all_validation_query_count": 177177,
+      "aggregate_realized_overrides": 0
+    },
+    "folds_with_nonzero_pseudo_mistakes": 18,
+    "folds_with_nonzero_all_validation_mistakes": 20,
+    "interpretation": "Every fold and every environment aggregate tied. The preregistered stronger-penalty deterministic tie-break selected 16; validation did not distinguish the penalties."
+  },
+  "learned_model": {
+    "unique_corpora": 40,
+    "unique_provenance_bound_model_fingerprints": 40,
+    "unique_coefficient_tables": 1,
+    "unique_override_tables": 1,
+    "final_local_override_count": 0,
+    "supported_transition_entries_exact": 800,
+    "supported_transition_entries_total": 800,
+    "bind": [0, 1, 2, 3],
+    "update_transform_0": [1, 2, 3, 0],
+    "update_transform_1": [2, 3, 0, 1],
+    "update_transform_2": [3, 0, 1, 2],
+    "copy": [0, 1, 2, 3],
+    "update_transform_3_identity_was_generator_supported_or_learned": false
+  },
+  "formal_outcome": {
+    "campaign_passed": true,
+    "passing_environment_count": 40,
+    "required_passing_environment_count": 40,
+    "failed_environment_count": 0,
+    "no_pooled_average_rescue": true
+  },
+  "behavioral_outcome": {
+    "actual_cell_case_count": 600,
+    "actual_cell_correct_count": 3840,
+    "actual_cell_query_count": 3840,
+    "actual_cell_focal_correct_count": 960,
+    "actual_cell_focal_query_count": 960,
+    "balanced_rotated_control_case_count": 12000,
+    "balanced_rotated_control_correct_count": 76800,
+    "balanced_rotated_control_query_count": 76800,
+    "balanced_rotated_control_focal_correct_count": 19200,
+    "balanced_rotated_control_focal_query_count": 19200,
+    "probe_families_exact": 480,
+    "probe_families_total": 480,
+    "actual_path_relations_satisfied": 120,
+    "actual_path_relations_total": 120,
+    "shortcut_controls_strictly_worse": 160,
+    "shortcut_controls_total": 160,
+    "behavioral_prediction_failure_count": 0,
+    "total_output_classes_balanced_within_every_family": true,
+    "focal_output_classes_claimed_balanced": false
+  },
+  "shortcut_outcome": {
+    "constant_class_0": {
+      "correct_count": 960,
+      "query_count": 3840,
+      "focal_correct_count": 360,
+      "focal_query_count": 960
+    },
+    "last_visible_argument": {
+      "correct_count": 3340,
+      "query_count": 3840,
+      "focal_correct_count": 460,
+      "focal_query_count": 960
+    },
+    "latest_bind_argument_for_query_key": {
+      "correct_count": 3430,
+      "query_count": 3840,
+      "focal_correct_count": 550,
+      "focal_query_count": 960
+    },
+    "source_key_bind_echo": {
+      "correct_count": 3520,
+      "query_count": 3840,
+      "focal_correct_count": 640,
+      "focal_query_count": 960
+    }
+  },
+  "by_outer_value": [
+    {
+      "value": 0,
+      "environment_count": 10,
+      "formal_pass_count": 10,
+      "actual_correct_count": 960,
+      "actual_query_count": 960,
+      "focal_correct_count": 240,
+      "focal_query_count": 240
+    },
+    {
+      "value": 1,
+      "environment_count": 10,
+      "formal_pass_count": 10,
+      "actual_correct_count": 960,
+      "actual_query_count": 960,
+      "focal_correct_count": 240,
+      "focal_query_count": 240
+    },
+    {
+      "value": 2,
+      "environment_count": 10,
+      "formal_pass_count": 10,
+      "actual_correct_count": 960,
+      "actual_query_count": 960,
+      "focal_correct_count": 240,
+      "focal_query_count": 240
+    },
+    {
+      "value": 3,
+      "environment_count": 10,
+      "formal_pass_count": 10,
+      "actual_correct_count": 960,
+      "actual_query_count": 960,
+      "focal_correct_count": 240,
+      "focal_query_count": 240
+    }
+  ],
+  "corrective_instrument": {
+    "kind": "forward_only_cell_invariant_nonfocal_balance_padding",
+    "actual_queries_per_cell": 96,
+    "focal_queries_per_cell": 24,
+    "rotated_queries_per_cell_suite": 1920,
+    "rotated_focal_queries_per_cell_suite": 480,
+    "semantic_case_inventory_changed_from_v3": false,
+    "focal_query_inventory_changed_from_v3": false,
+    "added_queries_are_nonfocal_balance_padding": true,
+    "added_queries_are_new_independent_semantic_evidence": false
+  },
+  "claim_scope": {
+    "formal_v4_campaign_passed": true,
+    "coefficient_recovery_inside_supplied_addressable_register_representation": true,
+    "representation_discovery": false,
+    "secret_law_discovery": false,
+    "confirmatory_claim": false,
+    "post_v3_corrective_replication": true,
+    "artifact_is_independently_authenticated_execution_certificate": false
+  },
+  "record_sha256": "b9cfac53c1be69eeb245c30a2b851c21aceb076555a19de6ee5b6d08e3bc07ce"
+}

@@ -40,7 +40,8 @@ The paired observed-exception/null power control is preserved as
 `PHASE2_ALGEBRA_POWER_CONTROL_V1.json`.  It validates the selector's ability
 to realize one directly observed transition-address exception and to prefer
 the shared solution on the matched null condition; it makes no unseen-
-exception claim.  `PHASE2_OUTER_ROTATION_V3_IMPLEMENTATION.sha256` freezes the
+exception claim.  `PHASE2_ALGEBRA_POWER_CONTROL_V2.json` is the exact
+source-refrozen prerequisite for V4.  `PHASE2_OUTER_ROTATION_V3_IMPLEMENTATION.sha256` freezes the
 complete 33-file implementation/runtime closure for the subsequent two-phase
 40-environment execution.  The manifest and prerequisite record must validate
 before any new environment is generated or fit.
@@ -54,3 +55,17 @@ every cell, while the valid balanced suite contains 88 queries at values
 were correct.  `SUMMARY.json` records the distinction between the immutable
 formal failure and the exact behavioral result; `EVIDENCE.sha256` binds all 40
 preopen shards plus the terminal and opened records.
+
+The forward-only corrective replication is preserved under
+`phase2_outer_rotation_v4/`.  Its protocol was frozen only after the V3 result
+was opened and changes only nonfocal balance padding; it does not reclassify
+V3.  `PHASE2_OUTER_ROTATION_V4_IMPLEMENTATION.sha256` freezes the 34-file
+implementation closure.  All 1,520 candidate gates and all 40 final-fit gates
+passed before one atomic batch open.  V4 formally passed 40 / 40 environments:
+3,840 / 3,840 actual queries, 960 / 960 focal queries, and 76,800 / 76,800
+rotated-control queries were correct.  `SUMMARY.json` records the result and
+its nonconfirmatory supplied-representation scope; `EVIDENCE.sha256` binds the
+40 shards, terminal aggregate, and opened campaign.
+Candidate-fit cleanliness remains a typed, hash-bound trusted-runner
+certificate because candidate models are not serialized; the 40 final models'
+direct-TRAIN fits are independently replayed.
