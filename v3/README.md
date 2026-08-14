@@ -239,6 +239,15 @@ records remain retrospective and non-claiming;
 see `../docs/V3_PHASE2_LEARNING_THE_ALGEBRA.md` and
 `../v3_recovery/PHASE2_TRACE_ALGEBRA_PILOT_SUMMARY.json`.
 
+The subsequent frozen 40-environment execution passed every preopen fit gate
+and produced exact behavior: 3,600 / 3,600 actual-cell queries and 72,000 /
+72,000 rotated-control queries.  Its formal campaign result is still failed
+(10 / 40), because a fixed 96-query acceptance check was valid only for
+value-0 cells; the other cells generated 88 balanced queries and answered all
+88 correctly.  The immutable failed record and separate behavioral audit are
+in `../v3_recovery/phase2_outer_rotation_v3/`.  This outcome is not relabeled
+post hoc.
+
 The proposed Phase III follow-on removes the supplied register coordinates
 from the estimator and tests exact predictive-state discovery from opaque
 event/query symbols, including an actively acquired missing Hankel direction,

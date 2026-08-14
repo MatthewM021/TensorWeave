@@ -44,3 +44,13 @@ exception claim.  `PHASE2_OUTER_ROTATION_V3_IMPLEMENTATION.sha256` freezes the
 complete 33-file implementation/runtime closure for the subsequent two-phase
 40-environment execution.  The manifest and prerequisite record must validate
 before any new environment is generated or fit.
+
+The completed execution is preserved under `phase2_outer_rotation_v3/`.
+`terminal-preopen.json` passed all 1,520 candidate and 40 final-fit gates and
+authorized one atomic batch open.  `open-campaign.json` is formally failed at
+10 / 40 environments because the frozen runner required 96 actual queries at
+every cell, while the valid balanced suite contains 88 queries at values
+1--3.  All 3,600 realized actual queries and all 72,000 rotated-control queries
+were correct.  `SUMMARY.json` records the distinction between the immutable
+formal failure and the exact behavioral result; `EVIDENCE.sha256` binds all 40
+preopen shards plus the terminal and opened records.

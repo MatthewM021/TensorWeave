@@ -1,0 +1,149 @@
+{
+  "schema": "tnlm-v3-phase2-outer-rotation-v3-audit-v1",
+  "scope": "formal_protocol_outcome_and_postopen_behavioral_audit",
+  "source_commit": "a9e601d9e5e71967bd7de4819e678c14f3e7ddf8",
+  "protocol": {
+    "id": "phase2-known-semantics-crossed-complete-cell-rotation-v3",
+    "sha256": "8689ab0ad06a1268c96690da27a6f8573b1536ca19c3bc18c403fdc07ffe2649",
+    "implementation_manifest_sha256": "6ff8b9e54d5fe7710fe605e2f7615046275f54eb20fd2f75147bbd840e6e7858",
+    "runner_sha256": "b5a1409b33e96e97d0073bdea1bd4e2b664d3e54280ed9190774e32fbc8f2e76",
+    "power_control_record_sha256": "831bf991a99ad51b841a916f919df94def448c8f722fd9e1f06769e873c1913f"
+  },
+  "integrity": {
+    "preopen_record_count": 40,
+    "all_40_preopen_canonical_hashes_valid": true,
+    "all_40_open_canonical_hashes_valid": true,
+    "terminal_preopen_file_sha256": "0aacf91a3bca23946ab5f9b399da56dc1b786b99abb3f9b27ad5a4b2655bf313",
+    "terminal_preopen_record_sha256": "fe994db05879ee4dbaaf13245942a5161a464824184d505de0dc985ffccbd0aa",
+    "open_campaign_file_sha256": "ae1132f831e9c87ca34452b7960071f3febec5693f2b59bdf95671b3fe78937a",
+    "open_campaign_record_sha256": "b4d16f49fb02ddc661bc6de931a9710f74b6d47b539494f6776c39a1668f9ebe",
+    "evidence_manifest_sha256": "51f413facc401dd85c6ec0a0af93b512a405fe9d8c37f09c178d21b5d184296e"
+  },
+  "preopen": {
+    "environment_count": 40,
+    "complete_cell_rotation_blocks": 2,
+    "fold_count": 760,
+    "candidate_fit_count": 1520,
+    "candidate_fits_zero_training_mistakes_and_zero_overrides": 1520,
+    "final_models_zero_training_mistakes_and_zero_overrides": 40,
+    "final_seen_query_correct_count": 18800,
+    "final_seen_query_count": 18800,
+    "outer_open_permitted": true
+  },
+  "selection": {
+    "selected_penalty_counts": {
+      "4": 0,
+      "16": 40
+    },
+    "fold_primary_score_ties": 760,
+    "aggregate_primary_score_ties": 40,
+    "penalty_4": {
+      "pseudo_query_mistakes": 372,
+      "pseudo_query_count": 53700,
+      "all_validation_query_mistakes": 858,
+      "all_validation_query_count": 176019,
+      "aggregate_realized_overrides": 0
+    },
+    "penalty_16": {
+      "pseudo_query_mistakes": 372,
+      "pseudo_query_count": 53700,
+      "all_validation_query_mistakes": 858,
+      "all_validation_query_count": 176019,
+      "aggregate_realized_overrides": 0
+    },
+    "interpretation": "All folds and all environment aggregates tied. The preregistered description-length and stronger-penalty tie-break selected 16; cross-validation did not distinguish the penalties."
+  },
+  "formal_outcome": {
+    "campaign_passed": false,
+    "passing_environment_count": 10,
+    "required_passing_environment_count": 40,
+    "failed_environment_count": 30,
+    "only_failed_gate": "actual_cell_96_of_96_queries_correct",
+    "failed_cells": "all two replicates of the 15 cells whose value is 1, 2, or 3",
+    "retroactive_gate_change_permitted": false
+  },
+  "behavioral_outcome": {
+    "actual_cell_correct_count": 3600,
+    "actual_cell_query_count": 3600,
+    "actual_cell_focal_correct_count": 960,
+    "actual_cell_focal_query_count": 960,
+    "balanced_rotated_control_correct_count": 72000,
+    "balanced_rotated_control_query_count": 72000,
+    "balanced_rotated_control_focal_correct_count": 19200,
+    "balanced_rotated_control_focal_query_count": 19200,
+    "supported_transition_entries_exact": 800,
+    "supported_transition_entries_total": 800,
+    "probe_families_exact": 480,
+    "probe_families_total": 480,
+    "path_relations_satisfied": 120,
+    "path_relations_total": 120,
+    "shortcut_controls_strictly_worse": 160,
+    "shortcut_controls_total": 160,
+    "behavioral_prediction_failure_count": 0
+  },
+  "by_outer_value": [
+    {
+      "value": 0,
+      "environment_count": 10,
+      "formal_pass_count": 10,
+      "actual_correct_count": 960,
+      "actual_query_count": 960,
+      "focal_correct_count": 240,
+      "focal_query_count": 240
+    },
+    {
+      "value": 1,
+      "environment_count": 10,
+      "formal_pass_count": 0,
+      "actual_correct_count": 880,
+      "actual_query_count": 880,
+      "focal_correct_count": 240,
+      "focal_query_count": 240
+    },
+    {
+      "value": 2,
+      "environment_count": 10,
+      "formal_pass_count": 0,
+      "actual_correct_count": 880,
+      "actual_query_count": 880,
+      "focal_correct_count": 240,
+      "focal_query_count": 240
+    },
+    {
+      "value": 3,
+      "environment_count": 10,
+      "formal_pass_count": 0,
+      "actual_correct_count": 880,
+      "actual_query_count": 880,
+      "focal_correct_count": 240,
+      "focal_query_count": 240
+    }
+  ],
+  "root_cause": {
+    "kind": "noninvariant_fixed_probe_inventory_gate",
+    "frozen_gate": "query_count == correct_count == 96",
+    "actual_inventory": {
+      "outer_value_0": 96,
+      "outer_values_1_2_3": 88
+    },
+    "mechanism": "Per-case output balancing pads to the largest focal-class multiplicity. In independent-key commutation the two focal answers coincide for value 0 but differ for values 1, 2, and 3, creating eight extra nonfocal balance-control queries only for value 0.",
+    "suite_validity": "Every cell still has 15 cases, 24 focal queries, balanced output classes, all 12 exact families, and all 3 satisfied path relations.",
+    "model_failure": false,
+    "protocol_instrumentation_failure": true
+  },
+  "claim_scope": {
+    "formal_v3_campaign_passed": false,
+    "exact_behavioral_extrapolation_observed_in_all_40_environments": true,
+    "coefficient_recovery_inside_supplied_addressable_register_representation": true,
+    "representation_discovery": false,
+    "secret_law_discovery": false,
+    "confirmatory_claim": false,
+    "artifact_is_independently_authenticated_execution_certificate": false
+  },
+  "forward_only_action": {
+    "preserve_v3_as_failed": true,
+    "preferred_v4_change": "Pad each case to the focal-query count per output class, giving exactly 96 queries at every cell; parameterize tests over all 20 cells before freezing any new campaign.",
+    "reuse_v3_open_result_as_v4_pass": false
+  },
+  "record_sha256": "5d0d96f2b71b013015b3053bcabb97268738f507518317a46468186066ad0280"
+}

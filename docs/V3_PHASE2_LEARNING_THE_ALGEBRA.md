@@ -333,8 +333,36 @@ if every preopen gate passes may the runner open all 40 models as one batch;
 there is no failed-cell replacement or pooled-average rescue.  The frozen
 protocol is `v3/configs/phase2/outer_rotation_v3.json`.  Its exact
 implementation/runtime manifest is external to avoid a self-hash cycle and is
-validated before generation or fitting.  At this point the protocol is ready
-for execution but has no result yet.
+validated before generation or fitting.
+
+### V3 multi-environment result: formal failure, exact behavior
+
+The frozen campaign was executed from source commit `a9e601d`.  All 40
+preopen environments passed: 1,520 / 1,520 fold candidates had zero TRAIN
+mistakes and zero overrides, every final model replayed with zero mistakes and
+zero overrides, and the terminal aggregate permitted the single batch open.
+All 760 pseudoheldout folds tied the two penalties on their primary score; the
+preregistered description-length/stronger-penalty tie-break therefore selected
+penalty 16 in all 40 environments.  This is not evidence that cross-validation
+preferred one penalty.
+
+The opened behavior was exact.  The models answered 3,600 / 3,600 actual-cell
+queries and 960 / 960 focal queries, plus 72,000 / 72,000 balanced rotated-cell
+queries and 19,200 / 19,200 rotated focal queries.  Every environment learned
+all 20 supported transition entries exactly, passed all 12 probe families and
+all three path relations, and beat every shortcut on both overall and focal
+accuracy.
+
+Nevertheless, the formal frozen result is **failure: 10 / 40 environments**.
+The runner preregistered a literal 96 / 96 actual-query gate using the original
+value-0 pilot.  Per-case output balancing creates 96 queries for value 0 but
+only 88 for values 1--3: in the independent-key commutation family the two
+focal answers coincide at value 0 and require eight additional nonfocal
+balance controls.  Thus all 30 nonzero-value environments scored 88 / 88 but
+failed only the fixed-count gate.  This is a probe-inventory instrumentation
+error, not a prediction error, but the gate cannot be changed after opening.
+The content-bound records are preserved under
+`v3_recovery/phase2_outer_rotation_v3/`; the formal V3 outcome remains failed.
 
 ## The leakage firewall
 
@@ -592,13 +620,13 @@ capacity supplies that identification by itself.
 
 The exact learner, nullity witnesses, excitation curves, 19 rotated
 pseudoheldout folds, shared-plus-local selector, balanced behavioral probes,
-and observed-exception power control are now executable and verified.  The
-next sequence is:
+observed-exception power control, and frozen 40-environment V3 execution are
+now complete.  The next sequence is:
 
-1. commit the exact V3 protocol, implementation manifest, runtime, and power
-   prerequisite before any new environment is fit;
-2. execute all 40 preopen environments, form the terminal aggregate, and open
-   the outer probes only if every candidate and final-fit gate passes;
+1. preserve the failed V3 protocol and its exact behavioral audit without a
+   post-hoc pass reclassification;
+2. version a forward-only probe fix that makes the total balanced query
+   inventory cell-invariant, and parameterize its tests over all 20 cells;
 3. freeze a genuinely label-held prospective environment outside this already
    inspected task family;
 4. remove the supplied addressable-register coordinates and learn a minimal
