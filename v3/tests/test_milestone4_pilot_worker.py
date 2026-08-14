@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import hashlib
 import importlib.util
 import json
+import math
 import os
 from pathlib import Path
 import sys
@@ -11,7 +12,13 @@ import types
 
 import pytest
 import torch
+import yaml
 
+from tnlm_v3.benchmark import (
+    document_local_route_consistency,
+    per_document_route_recovery,
+    summarize_router_load,
+)
 from tnlm_v3.campaign_checkpoint import (
     campaign_checkpoint_contract,
     deserialize_campaign_checkpoint,
@@ -20,6 +27,7 @@ from tnlm_v3.compact_artifact import (
     deserialize_compact_binding_model,
     serialize_compact_binding_model,
 )
+from tnlm_v3.routing import NULL_ROUTE
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -86,6 +94,174 @@ def _provenance() -> dict[str, str]:
         "worker_sha256": "7" * 64,
         "package_tree_sha256": "8" * 64,
     }
+
+
+def _real_screen_config(worker, tmp_path: Path):  # type: ignore[no-untyped-def]
+    document = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))
+    assert type(document) is dict
+    document["campaign_id"] = "m4-screen-test"
+    document["stage"] = "screen"
+    document["description"] = "Validation-only screen worker acceptance fixture."
+    document["pairs"].extend(
+        [
+            {
+                "pair_id": "development-pair-2",
+                "model_seed": 2101,
+                "train_seed": 2201,
+                "validation_seed": 2301,
+                "statistics_seed": 2401,
+            },
+            {
+                "pair_id": "development-pair-3",
+                "model_seed": 3101,
+                "train_seed": 3201,
+                "validation_seed": 3301,
+                "statistics_seed": 3401,
+            },
+        ]
+    )
+    document["statistics"] = {
+        "paired_unit": "pair_id",
+        "confidence_level": 0.95,
+        "method": "paired_exact_empirical_bootstrap_n3_v1",
+        "resamples": 27,
+    }
+    document["screen_gates"] = {
+        "chance": 0.25,
+        "oracle_mean_min": 0.80,
+        "reference_mean_min": 0.70,
+        "reference_pair_min": 0.60,
+        "reference_heldout_mean_min": 0.60,
+        "reference_longest_length_mean_min": 0.60,
+        "chance_corrected_oracle_recovery_min": 0.80,
+        "oracle_max_drop_vs_reference": 0.02,
+        "candidate_pair_max_drop": 0.10,
+        "require_positive_query_partitions": True,
+        "require_no_route_collapse": True,
+    }
+    document["selection"] = {
+        "candidates_by_stratum": {
+            "routed_latent": ["routed-latent"],
+            "routed_compact_rank": ["routed-compact"],
+            "gru": ["gru-control"],
+            "cached_transformer": ["transformer-control"],
+            "causal_ttn": ["ttn-control"],
+        },
+        "primary_metric": "macro_length_query_accuracy",
+        "direction": "maximize",
+        "standard_tie_break": [
+            "smaller_parameter_count",
+            "lexical_candidate_id",
+        ],
+        "compact_tie_break": [
+            "smaller_parameter_count",
+            "smaller_target_cp_rank",
+            "higher_primary_metric",
+            "lexical_candidate_id",
+        ],
+    }
+    path = tmp_path / "screen.yaml"
+    path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    return worker.load_milestone4_campaign_config(path)
+
+
+def _assert_routing_schema(routing: object) -> None:
+    assert type(routing) is dict
+    assert set(routing) == {
+        "route_recovery",
+        "route_consistency",
+        "router_load",
+    }
+    recovery = routing["route_recovery"]
+    assert type(recovery) is dict
+    assert set(recovery) == {
+        "correct",
+        "local_event_count",
+        "accuracy",
+        "macro_accuracy",
+        "document_count",
+    }
+    for name in ("correct", "local_event_count", "document_count"):
+        assert type(recovery[name]) is int and recovery[name] >= 0
+    for name in ("accuracy", "macro_accuracy"):
+        assert type(recovery[name]) is float and math.isfinite(recovery[name])
+
+    consistency = routing["route_consistency"]
+    assert type(consistency) is dict
+    assert set(consistency) == {
+        "consistent_events",
+        "local_event_count",
+        "consistency",
+        "group_count",
+        "fully_consistent_groups",
+    }
+    for name in (
+        "consistent_events",
+        "local_event_count",
+        "group_count",
+        "fully_consistent_groups",
+    ):
+        assert type(consistency[name]) is int and consistency[name] >= 0
+    assert type(consistency["consistency"]) is float
+    assert math.isfinite(consistency["consistency"])
+
+    load = routing["router_load"]
+    assert type(load) is dict
+    assert set(load) == {
+        "branch_counts",
+        "branch_fractions",
+        "local_event_count",
+        "global_event_count",
+        "null_event_count",
+        "valid_event_count",
+        "global_event_fraction",
+        "null_event_fraction",
+        "active_branches",
+        "collapsed",
+        "document_count",
+        "collapsed_document_count",
+        "collapsed_document_fraction",
+        "mean_active_branches_per_document",
+        "max_load_fraction",
+        "load_entropy",
+        "normalized_load_entropy",
+        "mean_assignment_entropy",
+        "normalized_mean_assignment_entropy",
+        "assignment_entropy_count",
+    }
+    assert type(load["branch_counts"]) is list
+    assert all(type(value) is int and value >= 0 for value in load["branch_counts"])
+    assert type(load["branch_fractions"]) is list
+    assert all(
+        type(value) is float and math.isfinite(value)
+        for value in load["branch_fractions"]
+    )
+    for name in (
+        "local_event_count",
+        "global_event_count",
+        "null_event_count",
+        "valid_event_count",
+        "active_branches",
+        "document_count",
+        "collapsed_document_count",
+        "assignment_entropy_count",
+    ):
+        assert type(load[name]) is int and load[name] >= 0
+    assert type(load["collapsed"]) is bool
+    for name in (
+        "global_event_fraction",
+        "null_event_fraction",
+        "collapsed_document_fraction",
+        "mean_active_branches_per_document",
+        "max_load_fraction",
+        "load_entropy",
+        "normalized_load_entropy",
+        "mean_assignment_entropy",
+        "normalized_mean_assignment_entropy",
+    ):
+        assert type(load[name]) is float and math.isfinite(load[name])
+    assert "documents" not in recovery
+    assert "groups" not in consistency
 
 
 @dataclass(frozen=True)
@@ -228,6 +404,28 @@ def test_strict_json_rejects_duplicates_nonfinite_and_noncanonical(worker) -> No
     ):
         with pytest.raises(worker.PilotWorkerError):
             worker._strict_json(raw, "fixture")
+
+
+def test_worker_scope_accepts_real_pilot_and_screen_without_claim_streams(
+    worker,
+    campaign: CampaignFixture,
+    tmp_path: Path,
+) -> None:  # type: ignore[no-untyped-def]
+    worker._validate_worker_scope(campaign.config)
+    screen = _real_screen_config(worker, tmp_path)
+    assert screen.stage is worker.CampaignStage.SCREEN
+    assert screen.claim_eligible is False
+    assert screen.data.test is None
+    assert screen.data.scaling is None
+    worker._validate_worker_scope(screen)
+
+    unsafe = types.SimpleNamespace(
+        stage=worker.CampaignStage.SCREEN,
+        claim_eligible=False,
+        data=types.SimpleNamespace(test=object(), scaling=None),
+    )
+    with pytest.raises(worker.PilotWorkerError, match="without test/scaling"):
+        worker._validate_worker_scope(unsafe)
 
 
 def test_sha_prefix_and_checkpoint_schedule_are_exact(
@@ -439,6 +637,7 @@ def test_fresh_source_full_run_has_frozen_schema_and_no_test_stream(
             "query",
             "seen_query",
             "heldout_query",
+            "routing",
             "structural",
         }
         for name in ("query", "seen_query", "heldout_query"):
@@ -452,8 +651,92 @@ def test_fresh_source_full_run_has_frozen_schema_and_no_test_stream(
         assert structural["fingerprint_sha256"] == hashlib.sha256(
             worker._canonical(structural["values"])
         ).hexdigest()
+        _assert_routing_schema(item["routing"])
     assert campaign.config.data.test is None
     assert campaign.config.data.scaling is None
+
+
+def test_baseline_validation_keeps_routing_explicitly_null(
+    worker, campaign: CampaignFixture
+) -> None:  # type: ignore[no-untyped-def]
+    baseline = next(item for item in campaign.plan if item.model_id == "gru-control")
+    context = worker.CampaignRunContext(config=campaign.config, run=baseline)
+    torch.manual_seed(baseline.model_seed)
+    model = worker.build_campaign_source_model(context)
+    validation = worker._evaluate(model, context)
+    assert validation
+    assert all(item["routing"] is None for item in validation)
+
+
+def test_routing_serializer_rejects_nonplain_and_nonfinite_aggregates(
+    worker, campaign: CampaignFixture
+) -> None:  # type: ignore[no-untyped-def]
+    torch.manual_seed(campaign.source.model_seed)
+    model = worker.build_campaign_source_model(campaign.source_context)
+    length = campaign.source.data.validation.lengths[0]
+    batch = worker.generate_campaign_evaluation_batch(
+        campaign.source_context, stream="validation", length=length
+    )
+    _, summary = worker.evaluate_binding_model(model, batch)
+
+    nonplain = replace(
+        summary,
+        route_recovery=replace(summary.route_recovery, accuracy=1),
+    )
+    with pytest.raises(worker.PilotWorkerError, match="finite float"):
+        worker._routing_entry(nonplain)
+
+    nonfinite = replace(
+        summary,
+        router_load=replace(summary.router_load, load_entropy=float("nan")),
+    )
+    with pytest.raises(worker.PilotWorkerError, match="finite float"):
+        worker._routing_entry(nonfinite)
+
+    nonplain_vector = replace(
+        summary,
+        router_load=replace(
+            summary.router_load,
+            branch_counts=list(summary.router_load.branch_counts),
+        ),
+    )
+    with pytest.raises(worker.PilotWorkerError, match="must be a tuple"):
+        worker._routing_entry(nonplain_vector)
+
+
+@pytest.mark.parametrize("route_value", [NULL_ROUTE, 3])
+def test_routing_serializer_preserves_complete_no_local_route_evidence(
+    worker,
+    route_value: int,
+) -> None:  # type: ignore[no-untyped-def]
+    branches = 3
+    routes = torch.full((2, 4), route_value, dtype=torch.int64)
+    true_routes = torch.zeros_like(routes)
+    valid = torch.ones_like(routes, dtype=torch.bool)
+    documents = torch.arange(2, dtype=torch.int64).unsqueeze(1).expand_as(routes)
+    fields = torch.zeros_like(routes)
+    summary = types.SimpleNamespace(
+        route_recovery=per_document_route_recovery(
+            routes, true_routes, documents, valid, branches
+        ),
+        route_consistency=document_local_route_consistency(
+            routes, documents, fields, fields, valid, branches
+        ),
+        router_load=summarize_router_load(
+            routes, valid, branches, document_ids=documents
+        ),
+    )
+    assert type(summary.router_load.load_entropy) is int
+
+    routing = worker._routing_entry(summary)
+
+    load = routing["router_load"]
+    assert load["local_event_count"] == 0
+    assert load["valid_event_count"] == 8
+    assert load["load_entropy"] == 0.0
+    assert type(load["load_entropy"]) is float
+    assert load["collapsed"] is False
+    assert load["collapsed_document_count"] == 0
 
 
 def test_resume_replays_exact_full_record_and_checkpoint_bytes(
@@ -567,6 +850,8 @@ def test_derived_compact_binds_parent_and_round_trips_canonically(
     assert manifest.exported_model_fingerprint == compact["exported_model_fingerprint"]  # type: ignore[index]
     assert manifest.selection_fingerprint == selection.fingerprint()
     assert serialize_compact_binding_model(model, manifest, selection) == raw
+    for item in metrics["validation_by_length"]:  # type: ignore[union-attr]
+        _assert_routing_schema(item["routing"])
 
 
 def test_compact_rejects_tampered_parent_result_hash_and_model_binding(
@@ -742,7 +1027,7 @@ def test_execute_refuses_confirmatory_or_test_capable_config(
         parent_checkpoint=None,
         parent_checkpoint_sha256=None,
     )
-    with pytest.raises(worker.PilotWorkerError, match="non-claiming pilot"):
+    with pytest.raises(worker.PilotWorkerError, match="non-claiming pilot or screen"):
         worker._execute(arguments)
 
 

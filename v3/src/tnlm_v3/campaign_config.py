@@ -7,9 +7,10 @@ campaign, manifest, executable bundle, selected models, and seed freshness.
 Those checks require external artifacts and therefore do not belong to this
 pure configuration parser.
 
-Screen selection is exhaustive: it includes every trainable model except the
-routed-oracle reference stratum, plus every derived compact-rank candidate.
-Additional models are allowed, but they follow that same inclusion policy.
+Screen selection is exhaustive and stratum-explicit.  The curriculum reference
+is mandatory and implicit, the oracle is a diagnostic rather than a selection
+candidate, and every latent, compact-rank, GRU, cached-Transformer, and causal
+TTN candidate belongs to exactly one locked stratum.
 """
 
 from __future__ import annotations
@@ -35,6 +36,20 @@ _HEX64 = re.compile(r"[0-9a-f]{64}\Z")
 _FAMILIES = {"routed", "gru", "cached_transformer", "causal_ttn"}
 _ROLES = {"trainable_source", "derived_compact"}
 _ROUTING = {"oracle", "curriculum", "latent"}
+_SCREEN_STRATA = {
+    "routed_latent",
+    "routed_compact_rank",
+    "gru",
+    "cached_transformer",
+    "causal_ttn",
+}
+_STANDARD_TIE_BREAK = ("smaller_parameter_count", "lexical_candidate_id")
+_COMPACT_TIE_BREAK = (
+    "smaller_parameter_count",
+    "smaller_target_cp_rank",
+    "higher_primary_metric",
+    "lexical_candidate_id",
+)
 _MODEL_KEYS = {
     "model_id",
     "family",
@@ -409,41 +424,90 @@ class CampaignTrainingSpec:
 
 
 @dataclass(frozen=True)
-class CampaignSelectionSpec:
-    candidates_by_family: tuple[tuple[str, tuple[str, ...]], ...]
-    primary_metric: str
-    direction: str
-    tie_break: tuple[str, ...]
+class CampaignScreenGatesSpec:
+    chance: float
+    oracle_mean_min: float
+    reference_mean_min: float
+    reference_pair_min: float
+    reference_heldout_mean_min: float
+    reference_longest_length_mean_min: float
+    chance_corrected_oracle_recovery_min: float
+    oracle_max_drop_vs_reference: float
+    candidate_pair_max_drop: float
+    require_positive_query_partitions: bool
+    require_no_route_collapse: bool
 
     def __post_init__(self) -> None:
-        if type(self.candidates_by_family) is not tuple:
-            raise TypeError("candidates_by_family must be an immutable tuple")
-        families: list[str] = []
-        for index, item in enumerate(self.candidates_by_family):
+        locked = {
+            "chance": 0.25,
+            "oracle_mean_min": 0.80,
+            "reference_mean_min": 0.70,
+            "reference_pair_min": 0.60,
+            "reference_heldout_mean_min": 0.60,
+            "reference_longest_length_mean_min": 0.60,
+            "chance_corrected_oracle_recovery_min": 0.80,
+            "oracle_max_drop_vs_reference": 0.02,
+            "candidate_pair_max_drop": 0.10,
+        }
+        for name, expected in locked.items():
+            value = _finite_real(getattr(self, name), name)
+            if value > 1.0:
+                raise ValueError(f"{name} must lie in [0,1]")
+            if value != expected:
+                raise ValueError(f"{name} must be exactly {expected}")
+            object.__setattr__(self, name, value)
+        _literal_true(
+            self.require_positive_query_partitions,
+            "require_positive_query_partitions",
+        )
+        _literal_true(self.require_no_route_collapse, "require_no_route_collapse")
+
+
+@dataclass(frozen=True)
+class CampaignSelectionSpec:
+    candidates_by_stratum: tuple[tuple[str, tuple[str, ...]], ...]
+    primary_metric: str
+    direction: str
+    standard_tie_break: tuple[str, ...]
+    compact_tie_break: tuple[str, ...]
+    screen_gates: tuple[tuple[str, object], ...]
+
+    def __post_init__(self) -> None:
+        if type(self.candidates_by_stratum) is not tuple:
+            raise TypeError("candidates_by_stratum must be an immutable tuple")
+        strata: list[str] = []
+        for index, item in enumerate(self.candidates_by_stratum):
             if type(item) is not tuple or len(item) != 2 or type(item[0]) is not str:
                 raise TypeError(
-                    f"candidates_by_family[{index}] must be an exact (str, tuple) pair"
+                    f"candidates_by_stratum[{index}] must be an exact (str, tuple) pair"
                 )
-            family, candidates = item
-            if family not in _FAMILIES:
-                raise ValueError("selection contains an unsupported family")
+            stratum, candidates = item
+            if stratum not in _SCREEN_STRATA:
+                raise ValueError("selection contains an unsupported stratum")
             if type(candidates) is not tuple or any(
                 type(candidate) is not str for candidate in candidates
             ):
                 raise TypeError("selection candidates must be a tuple of strings")
             if not candidates:
-                raise ValueError("selection family/candidates cannot be empty")
+                raise ValueError("selection stratum/candidates cannot be empty")
             if candidates != tuple(sorted(set(candidates))):
                 raise ValueError("selection candidates must be sorted and unique")
-            families.append(family)
-        if families != sorted(set(families)):
-            raise ValueError("selection families must be sorted and unique")
+            strata.append(stratum)
+        if strata != sorted(_SCREEN_STRATA):
+            raise ValueError("selection must contain every locked stratum exactly once")
         if self.primary_metric != "macro_length_query_accuracy":
             raise ValueError("selection primary_metric is unsupported")
         if self.direction != "maximize":
             raise ValueError("selection direction must be maximize")
-        if self.tie_break != ("smaller_parameter_count", "lexical_candidate_id"):
-            raise ValueError("selection tie_break does not match the locked order")
+        if self.standard_tie_break != _STANDARD_TIE_BREAK:
+            raise ValueError("selection standard_tie_break does not match the locked order")
+        if self.compact_tie_break != _COMPACT_TIE_BREAK:
+            raise ValueError("selection compact_tie_break does not match the locked order")
+        _validate_immutable_mapping(self.screen_gates, "screen_gates")
+        values = _thaw(self.screen_gates)
+        if not isinstance(values, dict):
+            raise TypeError("screen_gates must decode to a mapping")
+        CampaignScreenGatesSpec(**values)
 
 
 @dataclass(frozen=True)
@@ -482,9 +546,13 @@ class CampaignStatisticsSpec:
         if level != 0.95:
             raise ValueError("confidence_level must be exactly 0.95")
         object.__setattr__(self, "confidence_level", level)
-        if self.method != "paired_percentile_bootstrap_v1":
+        if self.method == "paired_percentile_bootstrap_v1":
+            _plain_int(self.resamples, "resamples", minimum=1000)
+        elif self.method == "paired_exact_empirical_bootstrap_n3_v1":
+            if _plain_int(self.resamples, "resamples", minimum=1) != 27:
+                raise ValueError("exact three-pair bootstrap requires resamples=27")
+        else:
             raise ValueError("unsupported statistics method")
-        _plain_int(self.resamples, "resamples", minimum=1000)
 
 
 @dataclass(frozen=True)
@@ -513,7 +581,7 @@ class CampaignPromotionSpec:
     record_path: str
     record_sha256: str
     screen_manifest_sha256: str
-    executable_bundle_sha256: str
+    screen_executable_bundle_sha256: str
 
     def __post_init__(self) -> None:
         _identifier(self.screen_campaign_id, "screen_campaign_id")
@@ -530,7 +598,10 @@ class CampaignPromotionSpec:
             raise ValueError("record_path must be a normalized relative POSIX path")
         _sha(self.record_sha256, "record_sha256")
         _sha(self.screen_manifest_sha256, "screen_manifest_sha256")
-        _sha(self.executable_bundle_sha256, "executable_bundle_sha256")
+        _sha(
+            self.screen_executable_bundle_sha256,
+            "screen_executable_bundle_sha256",
+        )
 
 
 @dataclass(frozen=True)
@@ -551,6 +622,17 @@ class Milestone4CampaignConfig:
     runtime: CampaignRuntimeSpec
     selection: CampaignSelectionSpec | None = None
     promotion: CampaignPromotionSpec | None = None
+
+    @property
+    def screen_gates(self) -> CampaignScreenGatesSpec | None:
+        """Return the screen-only gates stored in the immutable selection contract."""
+
+        if self.selection is None:
+            return None
+        values = _thaw(self.selection.screen_gates)
+        if not isinstance(values, dict):
+            raise TypeError("screen_gates must decode to a mapping")
+        return CampaignScreenGatesSpec(**values)
 
     def __post_init__(self) -> None:
         if isinstance(self.schema_version, bool) or self.schema_version != 1:
@@ -605,14 +687,34 @@ class Milestone4CampaignConfig:
         if self.stage is CampaignStage.PILOT:
             if self.selection is not None or self.promotion is not None:
                 raise ValueError("pilot forbids selection and promotion")
+            if self.statistics.method != "paired_percentile_bootstrap_v1":
+                raise ValueError("pilot requires paired_percentile_bootstrap_v1")
         elif self.stage is CampaignStage.SCREEN:
             if self.selection is None or self.promotion is not None:
                 raise ValueError("screen requires selection and forbids promotion")
+            if len(self.pairs) != 3:
+                raise ValueError("screen requires exactly three pairs")
+            if (
+                self.statistics.method
+                != "paired_exact_empirical_bootstrap_n3_v1"
+                or self.statistics.resamples != 27
+            ):
+                raise ValueError(
+                    "screen requires paired_exact_empirical_bootstrap_n3_v1 "
+                    "with resamples=27"
+                )
+            gates = self.screen_gates
+            if gates is None:
+                raise ValueError("screen requires screen_gates")
+            if gates.chance != 1.0 / self.task.value_cardinality:
+                raise ValueError("screen chance must equal reciprocal value cardinality")
         else:
             if self.selection is not None or self.promotion is None:
                 raise ValueError("confirmatory requires promotion and forbids selection")
             if len(self.pairs) < 3:
                 raise ValueError("confirmatory requires at least three pairs")
+            if self.statistics.method != "paired_percentile_bootstrap_v1":
+                raise ValueError("confirmatory requires paired_percentile_bootstrap_v1")
         for pair in self.pairs:
             if (pair.test_seed is not None) is not (
                 self.stage is CampaignStage.CONFIRMATORY
@@ -743,28 +845,75 @@ class Milestone4CampaignConfig:
             )
         if self.selection is None:
             return
+        by_stratum = dict(self.selection.candidates_by_stratum)
         seen: set[str] = set()
-        for family, candidates in self.selection.candidates_by_family:
-            if family not in _FAMILIES or not candidates:
-                raise ValueError("selection family/candidates are invalid")
+        for stratum, candidates in self.selection.candidates_by_stratum:
             if len(set(candidates)) != len(candidates):
                 raise ValueError("selection candidates must be unique")
             for model_id in candidates:
                 if model_id in seen or model_id not in model_by_id:
                     raise ValueError("selection candidate is duplicate or unknown")
-                if model_by_id[model_id].family != family:
-                    raise ValueError("selection candidate family mismatch")
                 seen.add(model_id)
-        required_candidates = {
+        expected_by_stratum = {
+            "routed_latent": {
+                model.model_id
+                for model in self.models
+                if model.family == "routed"
+                and model.role == "trainable_source"
+                and model.routing_mode == "latent"
+            },
+            "routed_compact_rank": {
+                model.model_id
+                for model in self.models
+                if model.role == "derived_compact"
+            },
+            "gru": {
+                model.model_id
+                for model in self.models
+                if model.family == "gru" and model.role == "trainable_source"
+            },
+            "cached_transformer": {
+                model.model_id
+                for model in self.models
+                if model.family == "cached_transformer"
+                and model.role == "trainable_source"
+            },
+            "causal_ttn": {
+                model.model_id
+                for model in self.models
+                if model.family == "causal_ttn"
+                and model.role == "trainable_source"
+            },
+        }
+        for stratum, expected in expected_by_stratum.items():
+            if set(by_stratum[stratum]) != expected:
+                raise ValueError(
+                    f"screen selection stratum {stratum!r} must contain its exact "
+                    "candidate set"
+                )
+        required_candidates = set().union(*expected_by_stratum.values())
+        if seen != required_candidates:
+            raise ValueError("screen selection candidate coverage is incomplete")
+        references = {
             model.model_id
             for model in self.models
-            if model.role == "derived_compact"
-            or not (model.family == "routed" and model.routing_mode == "oracle")
+            if model.family == "routed"
+            and model.role == "trainable_source"
+            and model.routing_mode == "curriculum"
         }
-        if seen != required_candidates:
+        if references != {self.quality.primary_reference_model_id}:
+            raise ValueError("screen requires exactly one implicit curriculum reference")
+        oracles = {
+            model.model_id
+            for model in self.models
+            if model.family == "routed"
+            and model.role == "trainable_source"
+            and model.routing_mode == "oracle"
+        }
+        if len(oracles) != 1 or seen.intersection(oracles | references):
             raise ValueError(
-                "screen selection must contain exactly every non-oracle source "
-                "and every compact candidate"
+                "screen oracle must be diagnostic and reference/oracle must be omitted "
+                "from selection strata"
             )
 
     def canonical_json(self) -> str:
@@ -964,13 +1113,6 @@ def resolve_campaign_plan(
     _sha(executable_bundle_sha256, "executable_bundle_sha256")
     semantic_config_sha256 = config.fingerprint()
     _sha(semantic_config_sha256, "semantic_config_sha256")
-    if (
-        config.promotion is not None
-        and config.promotion.executable_bundle_sha256
-        != executable_bundle_sha256
-    ):
-        raise ValueError("promoted executable bundle does not match resolved bundle")
-
     runs: list[ResolvedCampaignRun] = []
     run_by_model_pair: dict[tuple[str, str], str] = {}
     ordered_models = sorted(
@@ -1315,23 +1457,50 @@ def _make_evaluation(value: object, name: str) -> EvaluationDataSpec:
     )
 
 
-def _make_selection(value: object) -> CampaignSelectionSpec:
+def _make_selection(
+    value: object,
+    screen_gates: CampaignScreenGatesSpec,
+) -> CampaignSelectionSpec:
     mapping = _mapping(value, "selection")
-    _exact(mapping, {"candidates_by_family", "primary_metric", "direction", "tie_break"}, "selection")
-    candidates = _mapping(mapping["candidates_by_family"], "candidates_by_family")
+    _exact(
+        mapping,
+        {
+            "candidates_by_stratum",
+            "primary_metric",
+            "direction",
+            "standard_tie_break",
+            "compact_tie_break",
+        },
+        "selection",
+    )
+    candidates = _mapping(
+        mapping["candidates_by_stratum"], "candidates_by_stratum"
+    )
     normalized: list[tuple[str, tuple[str, ...]]] = []
-    for family in sorted(candidates):
+    for stratum in sorted(candidates):
         normalized.append(
             (
-                family,
-                tuple(sorted(_sequence(candidates[family], f"candidates.{family}"))),
+                stratum,
+                tuple(
+                    sorted(
+                        _sequence(
+                            candidates[stratum], f"candidates.{stratum}"
+                        )
+                    )
+                ),
             )
         )
     return CampaignSelectionSpec(
-        candidates_by_family=tuple(normalized),
+        candidates_by_stratum=tuple(normalized),
         primary_metric=mapping["primary_metric"],
         direction=mapping["direction"],
-        tie_break=tuple(_sequence(mapping["tie_break"], "tie_break")),
+        standard_tie_break=tuple(
+            _sequence(mapping["standard_tie_break"], "standard_tie_break")
+        ),
+        compact_tie_break=tuple(
+            _sequence(mapping["compact_tie_break"], "compact_tie_break")
+        ),
+        screen_gates=_immutable_mapping(asdict(screen_gates)),
     )
 
 
@@ -1346,7 +1515,7 @@ def load_milestone4_campaign_config(path: str | Path) -> Milestone4CampaignConfi
         raise ValueError("stage must be pilot, screen, or confirmatory") from error
     expected = set(_COMMON_ROOT_KEYS)
     if stage is CampaignStage.SCREEN:
-        expected.add("selection")
+        expected |= {"selection", "screen_gates"}
     elif stage is CampaignStage.CONFIRMATORY:
         expected.add("promotion")
     _exact(document, expected, "configuration")
@@ -1391,9 +1560,18 @@ def load_milestone4_campaign_config(path: str | Path) -> Milestone4CampaignConfi
         _exact(mapping, set(cls.__dataclass_fields__), name)
         return cls(**dict(mapping))
 
+    screen_gates: CampaignScreenGatesSpec | None = None
+    if stage is CampaignStage.SCREEN:
+        screen_gate_values = _mapping(document["screen_gates"], "screen_gates")
+        _exact(
+            screen_gate_values,
+            set(CampaignScreenGatesSpec.__dataclass_fields__),
+            "screen_gates",
+        )
+        screen_gates = CampaignScreenGatesSpec(**dict(screen_gate_values))
     selection = (
-        _make_selection(document["selection"])
-        if stage is CampaignStage.SCREEN
+        _make_selection(document["selection"], screen_gates)
+        if screen_gates is not None
         else None
     )
     promotion = (
@@ -1428,6 +1606,7 @@ __all__ = [
     "CampaignPromotionSpec",
     "CampaignQualitySpec",
     "CampaignRuntimeSpec",
+    "CampaignScreenGatesSpec",
     "CampaignSelectionSpec",
     "CampaignStage",
     "CampaignStatisticsSpec",

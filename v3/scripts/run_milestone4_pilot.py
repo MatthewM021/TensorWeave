@@ -12,7 +12,9 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+from fractions import Fraction
 import hashlib
+from itertools import product
 import json
 import math
 import os
@@ -69,6 +71,7 @@ from tnlm_v3.campaign_manifest import (
     InProgressAttemptError,
     ReconciliationRequiredError,
     campaign_manifest_path,
+    campaign_manifest_sha256,
     complete_campaign_attempt,
     fail_campaign_attempt,
     heartbeat_campaign_attempt,
@@ -149,6 +152,10 @@ class PilotRunSummary:
     stream_prefix_sha256: str | None
     initial_model_fingerprint: str | None
     final_model_fingerprint: str
+    validation_metrics: tuple[ValidationLengthSummary, ...] = ()
+    parameter_count: int | None = None
+    checkpoints: tuple[ArtifactReference, ...] = ()
+    compact_lineage_json: str | None = None
 
 
 @dataclass(frozen=True)
@@ -164,6 +171,23 @@ class PilotCampaignSummary:
     executable_bundle_sha256: str
     runs: tuple[PilotRunSummary, ...]
     claim_eligible: bool = False
+    promotion: ArtifactReference | None = None
+    promotion_decision: str | None = None
+
+
+@dataclass(frozen=True)
+class ValidationLengthSummary:
+    """Trusted, immutable validation facts retained for campaign aggregation."""
+
+    length: int
+    query_correct: int
+    query_count: int
+    seen_correct: int
+    seen_count: int
+    heldout_correct: int
+    heldout_count: int
+    structural_values: tuple[tuple[str, int], ...]
+    routing_json: str | None
 
 
 @dataclass(frozen=True)
@@ -201,6 +225,9 @@ class _WorkerResult:
     completed_step: int
     initial_model_fingerprint: str | None
     final_model_fingerprint: str
+    validation_metrics: tuple[ValidationLengthSummary, ...]
+    parameter_count: int
+    compact_lineage_json: str | None
 
 
 @dataclass(frozen=True)
@@ -926,10 +953,12 @@ def _load_authority(
     if hashlib.sha256(raw_before).hexdigest() != provenance.raw_config_sha256:
         raise PilotRunnerError("configuration changed after provenance binding")
     config = load_milestone4_campaign_config(provenance.config_path)
-    if config.stage is not CampaignStage.PILOT or config.claim_eligible:
-        raise PilotRunnerError("the pilot runner accepts only non-claiming pilot configs")
+    if config.stage not in {CampaignStage.PILOT, CampaignStage.SCREEN} or config.claim_eligible:
+        raise PilotRunnerError(
+            "the runner accepts only non-claiming pilot or screen configs"
+        )
     if config.data.test is not None or config.data.scaling is not None:
-        raise PilotRunnerError("pilot configuration must not expose test or scaling data")
+        raise PilotRunnerError("pilot/screen configuration must not expose test or scaling data")
     plan = resolve_campaign_plan(
         config,
         provenance.code_commit,
@@ -937,13 +966,51 @@ def _load_authority(
         provenance.raw_config_sha256,
         provenance.executable_bundle_sha256,
     )
-    if (
-        len(plan) != 7
-        or sum(run.role == "trainable_source" for run in plan) != 6
-        or sum(run.role == "derived_compact" for run in plan) != 1
-        or len(config.pairs) != 1
-    ):
-        raise PilotRunnerError("pilot requires exactly six sources and one compact child")
+    source_count = sum(run.role == "trainable_source" for run in plan)
+    compact_count = sum(run.role == "derived_compact" for run in plan)
+    if config.stage is CampaignStage.PILOT:
+        if len(plan) != 7 or source_count != 6 or compact_count != 1 or len(config.pairs) != 1:
+            raise PilotRunnerError("pilot requires exactly six sources and one compact child")
+    else:
+        if (
+            len(config.pairs) != 3
+            or compact_count < 3
+            or source_count < 18
+            or len(plan) != len(config.models) * 3
+        ):
+            raise PilotRunnerError(
+                "screen requires exactly three complete pairs and at least one compact lineage"
+            )
+        expected_pair_models = {model.model_id for model in config.models}
+        for pair in config.pairs:
+            observed = {run.model_id for run in plan if run.pair_id == pair.pair_id}
+            if observed != expected_pair_models:
+                raise PilotRunnerError("screen plan does not contain the exact model matrix per pair")
+        references = tuple(
+            model
+            for model in config.models
+            if model.model_id == config.quality.primary_reference_model_id
+            and model.family == "routed"
+            and model.role == "trainable_source"
+            and model.routing_mode == "curriculum"
+        )
+        oracles = tuple(
+            model
+            for model in config.models
+            if model.family == "routed"
+            and model.role == "trainable_source"
+            and model.routing_mode == "oracle"
+        )
+        if len(references) != 1 or len(oracles) != 1:
+            raise PilotRunnerError(
+                "screen routing authority requires one curriculum reference and one oracle"
+            )
+        if any(
+            model.role == "derived_compact"
+            and model.parent_model_id != references[0].model_id
+            for model in config.models
+        ):
+            raise PilotRunnerError("every screen compact must descend from the routed reference")
     plan_sha = campaign_plan_sha256(config, plan)
     authority = CampaignAuthority(
         config=config,
@@ -1338,6 +1405,218 @@ def _artifact_from_value(
     return reference
 
 
+def _ratio_matches(value: object, numerator: int, denominator: int, name: str) -> float:
+    observed = _finite_number(value, name, minimum=0.0, maximum=1.0)
+    expected = numerator / denominator if denominator else 0.0
+    if observed != expected:
+        raise PilotRunnerError(f"{name} disagrees with its exact counts")
+    return observed
+
+
+def _validate_routing_metrics(
+    value: object,
+    *,
+    run: ResolvedCampaignRun,
+    config: Milestone4CampaignConfig,
+    episodes: int,
+) -> str | None:
+    """Validate the worker's bounded routing summary and retain canonical bytes."""
+
+    if run.family != "routed":
+        if value is not None:
+            raise PilotRunnerError("baseline validation routing metrics must be null")
+        return None
+    if not isinstance(value, dict):
+        raise PilotRunnerError("routed validation requires routing metrics")
+    _exact(value, {"route_recovery", "route_consistency", "router_load"}, "routing")
+
+    recovery = value["route_recovery"]
+    if not isinstance(recovery, dict):
+        raise PilotRunnerError("route_recovery must be an object")
+    _exact(
+        recovery,
+        {"correct", "local_event_count", "accuracy", "macro_accuracy", "document_count"},
+        "route_recovery",
+    )
+    recovered = _plain_int(recovery["correct"], "route_recovery.correct")
+    recovery_count = _plain_int(
+        recovery["local_event_count"], "route_recovery.local_event_count"
+    )
+    if recovered > recovery_count:
+        raise PilotRunnerError("route_recovery.correct exceeds its denominator")
+    _ratio_matches(recovery["accuracy"], recovered, recovery_count, "route_recovery.accuracy")
+    _finite_number(
+        recovery["macro_accuracy"],
+        "route_recovery.macro_accuracy",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    recovery_documents = _plain_int(
+        recovery["document_count"], "route_recovery.document_count"
+    )
+    if recovery_documents > episodes:
+        raise PilotRunnerError("route_recovery.document_count exceeds validation episodes")
+
+    consistency = value["route_consistency"]
+    if not isinstance(consistency, dict):
+        raise PilotRunnerError("route_consistency must be an object")
+    _exact(
+        consistency,
+        {
+            "consistent_events",
+            "local_event_count",
+            "consistency",
+            "group_count",
+            "fully_consistent_groups",
+        },
+        "route_consistency",
+    )
+    consistent = _plain_int(
+        consistency["consistent_events"], "route_consistency.consistent_events"
+    )
+    consistency_count = _plain_int(
+        consistency["local_event_count"], "route_consistency.local_event_count"
+    )
+    groups = _plain_int(consistency["group_count"], "route_consistency.group_count")
+    full_groups = _plain_int(
+        consistency["fully_consistent_groups"],
+        "route_consistency.fully_consistent_groups",
+    )
+    if consistent > consistency_count or full_groups > groups:
+        raise PilotRunnerError("route_consistency counts are impossible")
+    _ratio_matches(
+        consistency["consistency"],
+        consistent,
+        consistency_count,
+        "route_consistency.consistency",
+    )
+
+    load = value["router_load"]
+    if not isinstance(load, dict):
+        raise PilotRunnerError("router_load must be an object")
+    load_keys = {
+        "branch_counts",
+        "branch_fractions",
+        "local_event_count",
+        "global_event_count",
+        "null_event_count",
+        "valid_event_count",
+        "global_event_fraction",
+        "null_event_fraction",
+        "active_branches",
+        "collapsed",
+        "document_count",
+        "collapsed_document_count",
+        "collapsed_document_fraction",
+        "mean_active_branches_per_document",
+        "max_load_fraction",
+        "load_entropy",
+        "normalized_load_entropy",
+        "mean_assignment_entropy",
+        "normalized_mean_assignment_entropy",
+        "assignment_entropy_count",
+    }
+    _exact(load, load_keys, "router_load")
+    raw_counts = load["branch_counts"]
+    raw_fractions = load["branch_fractions"]
+    branches = config.task.branches
+    if (
+        not isinstance(raw_counts, list)
+        or not isinstance(raw_fractions, list)
+        or len(raw_counts) != branches
+        or len(raw_fractions) != branches
+    ):
+        raise PilotRunnerError("router_load branch vectors have the wrong width")
+    counts = tuple(
+        _plain_int(item, f"router_load.branch_counts[{index}]")
+        for index, item in enumerate(raw_counts)
+    )
+    local_count = _plain_int(load["local_event_count"], "router_load.local_event_count")
+    global_count = _plain_int(load["global_event_count"], "router_load.global_event_count")
+    null_count = _plain_int(load["null_event_count"], "router_load.null_event_count")
+    valid_count = _plain_int(load["valid_event_count"], "router_load.valid_event_count")
+    if sum(counts) != local_count or local_count + global_count + null_count != valid_count:
+        raise PilotRunnerError("router_load event counts do not partition valid events")
+    fractions = tuple(
+        _ratio_matches(item, count, local_count, f"router_load.branch_fractions[{index}]")
+        for index, (item, count) in enumerate(zip(raw_fractions, counts, strict=True))
+    )
+    _ratio_matches(
+        load["global_event_fraction"], global_count, valid_count, "router_load.global_event_fraction"
+    )
+    _ratio_matches(
+        load["null_event_fraction"], null_count, valid_count, "router_load.null_event_fraction"
+    )
+    active = _plain_int(load["active_branches"], "router_load.active_branches")
+    if active != sum(count > 0 for count in counts):
+        raise PilotRunnerError("router_load.active_branches disagrees with branch counts")
+    collapsed = load["collapsed"]
+    if type(collapsed) is not bool or collapsed is not bool(local_count and branches > 1 and active <= 1):
+        raise PilotRunnerError("router_load.collapsed disagrees with branch counts")
+    documents = _plain_int(load["document_count"], "router_load.document_count")
+    collapsed_documents = _plain_int(
+        load["collapsed_document_count"], "router_load.collapsed_document_count"
+    )
+    if documents != episodes or collapsed_documents > documents:
+        raise PilotRunnerError("router_load document counts are invalid")
+    _ratio_matches(
+        load["collapsed_document_fraction"],
+        collapsed_documents,
+        documents,
+        "router_load.collapsed_document_fraction",
+    )
+    mean_active = _finite_number(
+        load["mean_active_branches_per_document"],
+        "router_load.mean_active_branches_per_document",
+        minimum=0.0,
+        maximum=float(branches),
+    )
+    if documents == 0 and mean_active != 0.0:
+        raise PilotRunnerError("empty router_load documents require zero mean active branches")
+    maximum_load = _finite_number(
+        load["max_load_fraction"], "router_load.max_load_fraction", minimum=0.0, maximum=1.0
+    )
+    if maximum_load != max(fractions, default=0.0):
+        raise PilotRunnerError("router_load.max_load_fraction disagrees with branch loads")
+    normalizer = math.log(branches) if branches > 1 else 0.0
+    load_entropy = _finite_number(
+        load["load_entropy"], "router_load.load_entropy", minimum=0.0, maximum=normalizer
+    )
+    normalized_load = _finite_number(
+        load["normalized_load_entropy"],
+        "router_load.normalized_load_entropy",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    expected_entropy = -sum(item * math.log(item) for item in fractions if item > 0)
+    if not math.isclose(load_entropy, expected_entropy, rel_tol=0.0, abs_tol=1.0e-12):
+        raise PilotRunnerError("router_load.load_entropy disagrees with branch fractions")
+    expected_normalized = load_entropy / normalizer if normalizer else 0.0
+    if not math.isclose(normalized_load, expected_normalized, rel_tol=0.0, abs_tol=1.0e-12):
+        raise PilotRunnerError("router_load.normalized_load_entropy is invalid")
+    assignment_entropy = _finite_number(
+        load["mean_assignment_entropy"],
+        "router_load.mean_assignment_entropy",
+        minimum=0.0,
+        maximum=normalizer,
+    )
+    normalized_assignment = _finite_number(
+        load["normalized_mean_assignment_entropy"],
+        "router_load.normalized_mean_assignment_entropy",
+        minimum=0.0,
+        maximum=1.0,
+    )
+    expected_assignment = assignment_entropy / normalizer if normalizer else 0.0
+    if not math.isclose(normalized_assignment, expected_assignment, rel_tol=0.0, abs_tol=1.0e-12):
+        raise PilotRunnerError("router_load.normalized_mean_assignment_entropy is invalid")
+    assignment_count = _plain_int(
+        load["assignment_entropy_count"], "router_load.assignment_entropy_count"
+    )
+    if assignment_count != local_count:
+        raise PilotRunnerError("router_load.assignment_entropy_count differs from local events")
+    return _canonical_bytes(value).decode("ascii")
+
+
 def _validate_worker_result(
     path: Path,
     *,
@@ -1539,12 +1818,14 @@ def _validate_worker_result(
         raise PilotRunnerError("validation_by_length must be an array")
     expected_lengths = tuple(run.data.validation.lengths)
     validation_hashes: list[tuple[int, str]] = []
+    validation_metrics: list[ValidationLengthSummary] = []
+    parameter_counts: list[int] = []
     for index, value in enumerate(validation_values):
         if not isinstance(value, dict):
             raise PilotRunnerError("validation entry must be an object")
         required = {
             "length", "batch_sha256", "episodes", "query", "seen_query",
-            "heldout_query", "structural",
+            "heldout_query", "routing", "structural",
         }
         _exact(value, required, f"validation[{index}]")
         length = _plain_int(value["length"], "validation length", minimum=1)
@@ -1553,6 +1834,7 @@ def _validate_worker_result(
         if expected_counts is None or episodes != expected_counts[0]:
             raise PilotRunnerError("validation episode count differs from config")
         observed_counts: list[int] = []
+        observed_correct: list[int] = []
         for metric_name, expected_count in zip(
             ("query", "seen_query", "heldout_query"),
             expected_counts[1:],
@@ -1584,8 +1866,12 @@ def _validate_worker_result(
                     cross_entropy, f"{metric_name}.cross_entropy", minimum=0
                 )
             observed_counts.append(count)
+            observed_correct.append(correct)
         if observed_counts[0] != observed_counts[1] + observed_counts[2]:
             raise PilotRunnerError("validation query strata do not partition queries")
+        routing_json = _validate_routing_metrics(
+            value["routing"], run=run, config=authority.config, episodes=episodes
+        )
         structural = value["structural"]
         if not isinstance(structural, dict):
             raise PilotRunnerError("validation structural metrics must be an object")
@@ -1597,6 +1883,12 @@ def _validate_worker_result(
             raise PilotRunnerError("validation structural keys must be nonempty strings")
         for key, item in values.items():
             _plain_int(item, f"structural.{key}")
+        if "parameter_count" not in values:
+            raise PilotRunnerError("validation structural metrics omit parameter_count")
+        parameter_count = _plain_int(
+            values["parameter_count"], "structural.parameter_count", minimum=1
+        )
+        parameter_counts.append(parameter_count)
         structural_fingerprint = _sha(
             structural["fingerprint_sha256"], "structural fingerprint"
         )
@@ -1604,10 +1896,25 @@ def _validate_worker_result(
             raise PilotRunnerError("validation structural fingerprint is invalid")
         batch_hash = _sha(value["batch_sha256"], "validation batch_sha256")
         validation_hashes.append((length, batch_hash))
+        validation_metrics.append(
+            ValidationLengthSummary(
+                length=length,
+                query_correct=observed_correct[0],
+                query_count=observed_counts[0],
+                seen_correct=observed_correct[1],
+                seen_count=observed_counts[1],
+                heldout_correct=observed_correct[2],
+                heldout_count=observed_counts[2],
+                structural_values=tuple(sorted(values.items())),
+                routing_json=routing_json,
+            )
+        )
     if tuple(length for length, _ in validation_hashes) != expected_lengths:
         raise PilotRunnerError("validation lengths do not exactly match the config")
     if tuple(validation_hashes) != expected_streams.validation_hashes:
         raise PilotRunnerError("validation batch hashes differ from trusted generation")
+    if len(set(parameter_counts)) != 1:
+        raise PilotRunnerError("parameter_count changed across validation lengths")
     _exact(
         stream,
         {
@@ -1811,6 +2118,13 @@ def _validate_worker_result(
         completed_step=completed_step,
         initial_model_fingerprint=initial_model_fingerprint,
         final_model_fingerprint=final_model_fingerprint,
+        validation_metrics=tuple(validation_metrics),
+        parameter_count=parameter_counts[0],
+        compact_lineage_json=(
+            _canonical_bytes(compact_metrics).decode("ascii")
+            if isinstance(compact_metrics, dict)
+            else None
+        ),
     )
 
 
@@ -2135,6 +2449,10 @@ def _completed_summary(
         stream_prefix_sha256=validated.stream_prefix_sha256,
         initial_model_fingerprint=validated.initial_model_fingerprint,
         final_model_fingerprint=validated.final_model_fingerprint,
+        validation_metrics=validated.validation_metrics,
+        parameter_count=validated.parameter_count,
+        checkpoints=validated.checkpoints,
+        compact_lineage_json=validated.compact_lineage_json,
     )
 
 
@@ -2476,6 +2794,576 @@ def _execute_one(
         stream_prefix_sha256=validated.stream_prefix_sha256,
         initial_model_fingerprint=validated.initial_model_fingerprint,
         final_model_fingerprint=validated.final_model_fingerprint,
+        validation_metrics=validated.validation_metrics,
+        parameter_count=validated.parameter_count,
+        checkpoints=validated.checkpoints,
+        compact_lineage_json=validated.compact_lineage_json,
+    )
+
+
+def _fraction_json(value: Fraction) -> list[int]:
+    return [value.numerator, value.denominator]
+
+
+def _descriptive_statistics(values: Sequence[Fraction]) -> dict[str, object]:
+    if not values:
+        raise PilotRunnerError("cannot aggregate an empty paired metric")
+    ordered = tuple(values)
+    mean = sum(ordered, Fraction(0, 1)) / len(ordered)
+    sorted_values = sorted(ordered)
+    middle = len(sorted_values) // 2
+    median = (
+        sorted_values[middle]
+        if len(sorted_values) % 2
+        else (sorted_values[middle - 1] + sorted_values[middle]) / 2
+    )
+    if len(ordered) == 1:
+        sample_sd = 0.0
+    else:
+        variance = sum((item - mean) ** 2 for item in ordered) / (len(ordered) - 1)
+        sample_sd = math.sqrt(float(variance))
+    return {
+        "pair_values": [_fraction_json(item) for item in ordered],
+        "mean": _fraction_json(mean),
+        "sample_sd": sample_sd,
+        "standard_error": sample_sd / math.sqrt(len(ordered)),
+        "minimum": _fraction_json(sorted_values[0]),
+        "maximum": _fraction_json(sorted_values[-1]),
+        "median": _fraction_json(median),
+    }
+
+
+def _paired_delta_statistics(values: Sequence[Fraction]) -> dict[str, object]:
+    if len(values) != 3:
+        raise PilotRunnerError("SCREEN paired statistics require exactly three deltas")
+    result = _descriptive_statistics(values)
+    empirical = tuple(
+        sum((values[index] for index in indices), Fraction(0, 1)) / 3
+        for indices in product(range(3), repeat=3)
+    )
+    if len(empirical) != 27:
+        raise PilotRunnerError("SCREEN exact bootstrap did not produce 27 resamples")
+    percentile_rank = 2
+    result.update(
+        {
+            "raw_delta_vector": [_fraction_json(item) for item in values],
+            "ordered_resample_indices": [list(indices) for indices in product(range(3), repeat=3)],
+            "ordered_empirical_resample_means": [
+                _fraction_json(item) for item in empirical
+            ],
+            "fifth_percentile_nearest_rank": percentile_rank,
+            "fifth_percentile": _fraction_json(sorted(empirical)[percentile_rank - 1]),
+            "sign_test_minimum_p": [1, 8],
+        }
+    )
+    return result
+
+
+def _metric_fraction(metric: ValidationLengthSummary, partition: str) -> Fraction:
+    if partition == "query":
+        correct, count = metric.query_correct, metric.query_count
+    elif partition == "seen_query":
+        correct, count = metric.seen_correct, metric.seen_count
+    elif partition == "heldout_query":
+        correct, count = metric.heldout_correct, metric.heldout_count
+    else:  # pragma: no cover - internal programming error
+        raise PilotRunnerError(f"unsupported validation partition {partition!r}")
+    return Fraction(correct, count) if count else Fraction(0, 1)
+
+
+def _macro_over_lengths(summary: PilotRunSummary, partition: str) -> Fraction:
+    if not summary.validation_metrics:
+        raise PilotRunnerError("run summary has no trusted validation metrics")
+    return sum(
+        (_metric_fraction(metric, partition) for metric in summary.validation_metrics),
+        Fraction(0, 1),
+    ) / len(summary.validation_metrics)
+
+
+def _artifact_json(reference: ArtifactReference | None) -> dict[str, object] | None:
+    if reference is None:
+        return None
+    return {
+        "path": reference.path,
+        "sha256": reference.sha256,
+        "size_bytes": reference.size_bytes,
+    }
+
+
+def _validation_metric_json(metric: ValidationLengthSummary) -> dict[str, object]:
+    routing = None if metric.routing_json is None else json.loads(metric.routing_json)
+    return {
+        "length": metric.length,
+        "query": {
+            "correct": metric.query_correct,
+            "count": metric.query_count,
+            "accuracy": _fraction_json(_metric_fraction(metric, "query")),
+        },
+        "seen_query": {
+            "correct": metric.seen_correct,
+            "count": metric.seen_count,
+            "accuracy": _fraction_json(_metric_fraction(metric, "seen_query")),
+        },
+        "heldout_query": {
+            "correct": metric.heldout_correct,
+            "count": metric.heldout_count,
+            "accuracy": _fraction_json(_metric_fraction(metric, "heldout_query")),
+        },
+        "structural": dict(metric.structural_values),
+        "routing": routing,
+    }
+
+
+def _screen_model_aggregates(
+    config: Milestone4CampaignConfig,
+    summaries: Mapping[str, PilotRunSummary],
+    plan: Sequence[ResolvedCampaignRun],
+) -> tuple[dict[str, dict[str, object]], dict[str, tuple[Fraction, ...]]]:
+    pair_ids = tuple(pair.pair_id for pair in config.pairs)
+    by_model_pair = {
+        (run.model_id, run.pair_id): summaries[run.run_id]
+        for run in plan
+    }
+    reference_id = config.quality.primary_reference_model_id
+    aggregate_documents: dict[str, dict[str, object]] = {}
+    query_vectors: dict[str, tuple[Fraction, ...]] = {}
+    for model in config.models:
+        model_summaries = tuple(by_model_pair[(model.model_id, pair_id)] for pair_id in pair_ids)
+        parameter_counts = {summary.parameter_count for summary in model_summaries}
+        if None in parameter_counts or len(parameter_counts) != 1:
+            raise PilotRunnerError(
+                f"parameter_count is not invariant across pairs for {model.model_id}"
+            )
+        partitions: dict[str, object] = {}
+        for partition in ("query", "seen_query", "heldout_query"):
+            values = tuple(_macro_over_lengths(summary, partition) for summary in model_summaries)
+            reference_values = tuple(
+                _macro_over_lengths(by_model_pair[(reference_id, pair_id)], partition)
+                for pair_id in pair_ids
+            )
+            deltas = tuple(
+                value - reference
+                for value, reference in zip(values, reference_values, strict=True)
+            )
+            partitions[partition] = {
+                "macro_over_length_by_pair": [
+                    {"pair_id": pair_id, "value": _fraction_json(value)}
+                    for pair_id, value in zip(pair_ids, values, strict=True)
+                ],
+                "mean_over_pairs": _fraction_json(
+                    sum(values, Fraction(0, 1)) / len(values)
+                ),
+                "descriptive_statistics": _descriptive_statistics(values),
+                "delta_vs_routed_source": _paired_delta_statistics(deltas),
+            }
+            if partition == "query":
+                query_vectors[model.model_id] = values
+        aggregate_documents[model.model_id] = {
+            "parameter_count": next(iter(parameter_counts)),
+            "partitions": partitions,
+        }
+    return aggregate_documents, query_vectors
+
+
+def _mean_fraction(values: Sequence[Fraction]) -> Fraction:
+    if not values:
+        raise PilotRunnerError("cannot take the mean of an empty sequence")
+    return sum(values, Fraction(0, 1)) / len(values)
+
+
+def _screen_promotion_document(
+    *,
+    config: Milestone4CampaignConfig,
+    plan: Sequence[ResolvedCampaignRun],
+    authority: CampaignAuthority,
+    provenance: PilotProvenance,
+    manifest: CampaignManifest,
+    summaries: Mapping[str, PilotRunSummary],
+) -> tuple[dict[str, object], str]:
+    if config.stage is not CampaignStage.SCREEN or config.selection is None:
+        raise PilotRunnerError("promotion aggregation requires a SCREEN configuration")
+    gates = config.screen_gates
+    if gates is None:
+        raise PilotRunnerError("SCREEN configuration has no validated screen gates")
+    aggregate, query_vectors = _screen_model_aggregates(config, summaries, plan)
+    pair_ids = tuple(pair.pair_id for pair in config.pairs)
+    reference_id = config.quality.primary_reference_model_id
+    oracle_models = tuple(
+        model.model_id
+        for model in config.models
+        if model.family == "routed"
+        and model.role == "trainable_source"
+        and model.routing_mode == "oracle"
+    )
+    if len(oracle_models) != 1:
+        raise PilotRunnerError("SCREEN requires exactly one oracle diagnostic")
+    oracle_id = oracle_models[0]
+    reference_query = query_vectors[reference_id]
+    oracle_query = query_vectors[oracle_id]
+
+    by_model_pair = {
+        (run.model_id, run.pair_id): summaries[run.run_id]
+        for run in plan
+    }
+    reference_heldout = tuple(
+        _macro_over_lengths(by_model_pair[(reference_id, pair_id)], "heldout_query")
+        for pair_id in pair_ids
+    )
+    reference_longest = tuple(
+        _metric_fraction(by_model_pair[(reference_id, pair_id)].validation_metrics[-1], "query")
+        for pair_id in pair_ids
+    )
+    oracle_recovery_values: list[float] = []
+    for pair_id in pair_ids:
+        run_summary = by_model_pair[(oracle_id, pair_id)]
+        per_length: list[float] = []
+        for metric in run_summary.validation_metrics:
+            if metric.routing_json is None:
+                raise PilotRunnerError("oracle validation lacks routing diagnostics")
+            routing = json.loads(metric.routing_json)
+            per_length.append(float(routing["route_recovery"]["macro_accuracy"]))
+        oracle_recovery_values.append(sum(per_length) / len(per_length))
+    oracle_recovery = sum(oracle_recovery_values) / len(oracle_recovery_values)
+    corrected_recovery = (oracle_recovery - gates.chance) / (1.0 - gates.chance)
+
+    positive_partitions = all(
+        metric.query_count > 0 and metric.seen_count > 0 and metric.heldout_count > 0
+        for summary in summaries.values()
+        for metric in summary.validation_metrics
+    )
+    def route_evidence_passes(model_id: str) -> bool:
+        for pair_id in pair_ids:
+            summary = by_model_pair[(model_id, pair_id)]
+            for metric in summary.validation_metrics:
+                if metric.routing_json is None:
+                    return False
+                load = json.loads(metric.routing_json)["router_load"]
+                if (
+                    load["collapsed"]
+                    or load["collapsed_document_count"]
+                    or load["local_event_count"] == 0
+                    or load["active_branches"] <= 1
+                ):
+                    return False
+        return True
+
+    route_evidence_by_model = {
+        model.model_id: route_evidence_passes(model.model_id)
+        for model in config.models
+        if model.family == "routed"
+    }
+    route_collapse_free = (
+        route_evidence_by_model[reference_id]
+        and route_evidence_by_model[oracle_id]
+    )
+
+    reference_mean = _mean_fraction(reference_query)
+    oracle_mean = _mean_fraction(oracle_query)
+    gate_results: list[dict[str, object]] = []
+
+    def gate_result(name: str, passed: bool, observed: object, rule: str) -> None:
+        gate_results.append(
+            {"gate": name, "passed": bool(passed), "observed": observed, "rule": rule}
+        )
+
+    gate_result(
+        "oracle_mean_min",
+        float(oracle_mean) >= gates.oracle_mean_min,
+        _fraction_json(oracle_mean),
+        f">={gates.oracle_mean_min}",
+    )
+    gate_result(
+        "reference_mean_min",
+        float(reference_mean) >= gates.reference_mean_min,
+        _fraction_json(reference_mean),
+        f">={gates.reference_mean_min}",
+    )
+    gate_result(
+        "reference_pair_min",
+        min(map(float, reference_query)) >= gates.reference_pair_min,
+        [_fraction_json(item) for item in reference_query],
+        f"each_pair>={gates.reference_pair_min}",
+    )
+    gate_result(
+        "reference_heldout_mean_min",
+        float(_mean_fraction(reference_heldout)) >= gates.reference_heldout_mean_min,
+        _fraction_json(_mean_fraction(reference_heldout)),
+        f">={gates.reference_heldout_mean_min}",
+    )
+    gate_result(
+        "reference_longest_length_mean_min",
+        float(_mean_fraction(reference_longest)) >= gates.reference_longest_length_mean_min,
+        _fraction_json(_mean_fraction(reference_longest)),
+        f">={gates.reference_longest_length_mean_min}",
+    )
+    gate_result(
+        "chance_corrected_oracle_recovery_min",
+        corrected_recovery >= gates.chance_corrected_oracle_recovery_min,
+        corrected_recovery,
+        f">={gates.chance_corrected_oracle_recovery_min};chance={gates.chance}",
+    )
+    oracle_drop = reference_mean - oracle_mean
+    gate_result(
+        "oracle_max_drop_vs_reference",
+        float(oracle_drop) <= gates.oracle_max_drop_vs_reference,
+        _fraction_json(oracle_drop),
+        f"<={gates.oracle_max_drop_vs_reference}",
+    )
+    gate_result(
+        "require_positive_query_partitions",
+        positive_partitions,
+        positive_partitions,
+        "all_query_seen_heldout_counts_positive",
+    )
+    gate_result(
+        "require_no_route_collapse",
+        route_collapse_free,
+        route_collapse_free,
+        "oracle_and_reference_have_local_multibranch_routes_without_collapsed_documents",
+    )
+
+    model_by_id = {model.model_id: model for model in config.models}
+    selected_standard: list[dict[str, object]] = []
+    standard_candidates: list[dict[str, object]] = []
+    compact_qualifiers: list[dict[str, object]] = []
+    for stratum, candidate_ids in config.selection.candidates_by_stratum:
+        if stratum == "routed_compact_rank":
+            for model_id in candidate_ids:
+                deltas = tuple(
+                    candidate - reference
+                    for candidate, reference in zip(
+                        query_vectors[model_id], reference_query, strict=True
+                    )
+                )
+                mean_delta = _mean_fraction(deltas)
+                mean_pass = float(mean_delta) >= -config.quality.max_absolute_drop
+                pair_pass = min(map(float, deltas)) >= -gates.candidate_pair_max_drop
+                route_pass = route_evidence_by_model[model_id]
+                model = model_by_id[model_id]
+                export = model.export_values
+                if export is None:
+                    raise PilotRunnerError("compact selection candidate has no export contract")
+                compact_qualifiers.append(
+                    {
+                        "model_id": model_id,
+                        "qualified": mean_pass and pair_pass and route_pass,
+                        "mean_margin_passed": mean_pass,
+                        "pair_margin_passed": pair_pass,
+                        "route_evidence_passed": route_pass,
+                        "mean_delta": _fraction_json(mean_delta),
+                        "raw_delta_vector": [_fraction_json(item) for item in deltas],
+                        "parameter_count": aggregate[model_id]["parameter_count"],
+                        "target_cp_rank": export["target_cp_rank"],
+                        "score": _fraction_json(_mean_fraction(query_vectors[model_id])),
+                    }
+                )
+            continue
+        eligible: list[str] = []
+        for model_id in candidate_ids:
+            route_pass = (
+                route_evidence_by_model[model_id]
+                if stratum == "routed_latent"
+                else True
+            )
+            standard_candidates.append(
+                {
+                    "stratum": stratum,
+                    "model_id": model_id,
+                    "qualified": True,
+                    "route_evidence_passed": route_pass,
+                    "score": _fraction_json(_mean_fraction(query_vectors[model_id])),
+                    "parameter_count": aggregate[model_id]["parameter_count"],
+                }
+            )
+            eligible.append(model_id)
+        winner = min(
+            eligible,
+            key=lambda model_id: (
+                -float(_mean_fraction(query_vectors[model_id])),
+                int(aggregate[model_id]["parameter_count"]),
+                model_id,
+            ),
+        )
+        selected_standard.append(
+            {
+                "stratum": stratum,
+                "model_id": winner,
+                "score": _fraction_json(_mean_fraction(query_vectors[winner])),
+                "parameter_count": aggregate[winner]["parameter_count"],
+            }
+        )
+    compact_qualifiers.sort(
+        key=lambda item: (
+            not bool(item["qualified"]),
+            int(item["parameter_count"]),
+            int(item["target_cp_rank"]),
+            -float(Fraction(*item["score"])),  # type: ignore[arg-type]
+            str(item["model_id"]),
+        )
+    )
+    qualified_compacts = [item for item in compact_qualifiers if item["qualified"]]
+    compact_winner = qualified_compacts[0] if qualified_compacts else None
+    gate_result(
+        "compact_mean_and_pair_margins",
+        bool(qualified_compacts),
+        compact_qualifiers,
+        (
+            f"mean_delta>=-{config.quality.max_absolute_drop};"
+            f"each_pair_delta>=-{gates.candidate_pair_max_drop};"
+            "route_evidence_passed;at_least_one"
+        ),
+    )
+    expected_standard_strata = sum(
+        stratum != "routed_compact_rank"
+        for stratum, _ in config.selection.candidates_by_stratum
+    )
+    standard_selection_complete = len(selected_standard) == expected_standard_strata
+    all_gates_passed = all(bool(item["passed"]) for item in gate_results)
+    decision = "complete_promote" if all_gates_passed else "complete_do_not_promote"
+    selected_ids = [reference_id]
+    selected_ids.extend(item["model_id"] for item in selected_standard)
+    if compact_winner is not None:
+        selected_ids.append(compact_winner["model_id"])
+
+    run_documents: list[dict[str, object]] = []
+    for run in sorted(plan, key=lambda item: (item.model_id, item.pair_id, item.run_id)):
+        summary = summaries[run.run_id]
+        run_documents.append(
+            {
+                "run_id": run.run_id,
+                "run_sha256": _run_sha256(run),
+                "model_id": run.model_id,
+                "pair_id": run.pair_id,
+                "family": run.family,
+                "role": run.role,
+                "routing_mode": run.routing_mode,
+                "parent_model_id": run.parent_model_id,
+                "parent_run_id": run.parent_run_id,
+                "attempt_number": summary.attempt_number,
+                "parameter_count": summary.parameter_count,
+                "validation_batch_hashes": [
+                    {"length": length, "sha256": digest}
+                    for length, digest in summary.validation_batch_hashes
+                ],
+                "validation_by_length": [
+                    _validation_metric_json(metric) for metric in summary.validation_metrics
+                ],
+                "artifacts": {
+                    "result": _artifact_json(summary.result),
+                    "subprocess": _artifact_json(summary.output),
+                    "checkpoints": [
+                        _artifact_json(reference) for reference in summary.checkpoints
+                    ],
+                    "final_checkpoint": _artifact_json(summary.final_checkpoint),
+                    "compact_artifact": _artifact_json(summary.compact_artifact),
+                },
+                "fingerprints": {
+                    "initial_model": summary.initial_model_fingerprint,
+                    "final_model": summary.final_model_fingerprint,
+                    "training_stream_prefix": summary.stream_prefix_sha256,
+                },
+                "compact_lineage": (
+                    None
+                    if summary.compact_lineage_json is None
+                    else json.loads(summary.compact_lineage_json)
+                ),
+            }
+        )
+
+    document = {
+        "schema_version": 1,
+        "record_type": "milestone4_screen_promotion_v1",
+        "campaign_id": config.campaign_id,
+        "stage": "screen",
+        "decision": decision,
+        "claim_eligible": False,
+        "scope": {
+            "test_data_used": False,
+            "scaling_data_used": False,
+            "statement": (
+                "Non-claiming SCREEN selection evidence only; no test or scaling "
+                "evaluation was exposed or used."
+            ),
+        },
+        "authority": {
+            "plan_sha256": authority.plan_sha256,
+            "manifest_path": f"campaigns/{config.campaign_id}/manifest.json",
+            "manifest_generation": manifest.generation,
+            "manifest_sha256": campaign_manifest_sha256(manifest),
+            "raw_config_sha256": provenance.raw_config_sha256,
+            "semantic_config_sha256": config.fingerprint(),
+            "code_commit": provenance.code_commit,
+            "code_tree": provenance.code_tree,
+            "parent_runner_sha256": provenance.parent_runner_sha256,
+            "worker_sha256": provenance.worker_sha256,
+            "package_tree_sha256": provenance.package_tree_sha256,
+            "executable_bundle_sha256": provenance.executable_bundle_sha256,
+        },
+        "pairs": [
+            {
+                "pair_id": pair.pair_id,
+                "model_seed": pair.model_seed,
+                "train_seed": pair.train_seed,
+                "validation_seed": pair.validation_seed,
+                "statistics_seed": pair.statistics_seed,
+            }
+            for pair in config.pairs
+        ],
+        "statistics": {
+            "paired_unit": config.statistics.paired_unit,
+            "method": config.statistics.method,
+            "resamples": config.statistics.resamples,
+            "confidence_level": config.statistics.confidence_level,
+            "macro_order": "macro_over_validation_lengths_then_mean_over_three_pairs",
+            "fifth_percentile_nearest_rank": 2,
+            "sign_test_minimum_p": [1, 8],
+        },
+        "gates": {
+            "specification": {
+                name: getattr(gates, name)
+                for name in gates.__dataclass_fields__
+            },
+            "results": gate_results,
+            "all_passed": all_gates_passed,
+        },
+        "selection": {
+            "primary_metric": config.selection.primary_metric,
+            "reference": {"model_id": reference_id, "retained": True},
+            "oracle_diagnostic": {"model_id": oracle_id, "promoted": False},
+            "standard_tie_break": list(config.selection.standard_tie_break),
+            "compact_tie_break": list(config.selection.compact_tie_break),
+            "standard_winners": selected_standard,
+            "standard_candidates": standard_candidates,
+            "standard_stratum_selection_complete": {
+                "passed": standard_selection_complete,
+                "selected": len(selected_standard),
+                "required": expected_standard_strata,
+                "diagnostic_only": True,
+            },
+            "compact_qualifiers": compact_qualifiers,
+            "compact_winner": compact_winner,
+            "selected_model_ids": selected_ids,
+            "promoted_model_ids": selected_ids if decision == "complete_promote" else [],
+        },
+        "model_aggregates": aggregate,
+        "runs": run_documents,
+    }
+    return document, decision
+
+
+def _write_screen_promotion(
+    *,
+    output_root: Path,
+    repo_root: Path,
+    config: Milestone4CampaignConfig,
+    document: Mapping[str, Any],
+) -> ArtifactReference:
+    relative = f"artifacts/screen/{config.campaign_id}/promotion.json"
+    directory = _ensure_private_directory(output_root, str(PurePosixPath(relative).parent))
+    path = directory / "promotion.json"
+    _atomic_immutable_json(path, document)
+    return make_artifact_reference(
+        relative, external_root=output_root, checkout_root=repo_root
     )
 
 
@@ -2488,7 +3376,7 @@ def run_milestone4_pilot(
     expected_commit: str | None = None,
     worker_timeout_seconds: float = _WORKER_TIMEOUT_SECONDS,
 ) -> PilotCampaignSummary:
-    """Execute or resume the exact seven-run, non-claiming pilot campaign."""
+    """Execute or resume a non-claiming Milestone-4 PILOT or SCREEN campaign."""
 
     provenance = collect_pilot_provenance(
         repo_root,
@@ -2541,31 +3429,69 @@ def run_milestone4_pilot(
         external_root=output,
         checkout_root=provenance.repo_root,
     )
-    if len(summaries) != 7 or any(
+    if len(summaries) != len(plan) or any(
         not state.attempts or state.attempts[-1].status != "completed"
         for state in final.runs
     ):
-        raise PilotRunnerError("pilot success requires all seven completed runs")
-    source_summaries = tuple(summaries[run.run_id] for run in sources)
-    expected_validation = source_summaries[0].validation_batch_hashes
-    expected_training_hashes = source_summaries[0].training_batch_hashes
-    expected_training_tokens = source_summaries[0].training_token_counts
-    expected_stream_prefix = source_summaries[0].stream_prefix_sha256
-    if any(
-        summary.validation_batch_hashes != expected_validation
-        or summary.training_batch_hashes != expected_training_hashes
-        or summary.training_token_counts != expected_training_tokens
-        or summary.stream_prefix_sha256 != expected_stream_prefix
-        for summary in source_summaries
-    ):
-        raise PilotRunnerError("paired source data streams are not identical")
-    if any(
-        summary.validation_batch_hashes != expected_validation
-        for summary in summaries.values()
-    ):
-        raise PilotRunnerError("validation batch hashes differ across pilot lineages")
+        raise PilotRunnerError("campaign success requires every planned run to complete")
+    for pair in config.pairs:
+        pair_sources = tuple(
+            summaries[run.run_id]
+            for run in sources
+            if run.pair_id == pair.pair_id
+        )
+        if not pair_sources:
+            raise PilotRunnerError("campaign pair has no source runs")
+        expected_validation = pair_sources[0].validation_batch_hashes
+        expected_training_hashes = pair_sources[0].training_batch_hashes
+        expected_training_tokens = pair_sources[0].training_token_counts
+        expected_stream_prefix = pair_sources[0].stream_prefix_sha256
+        if any(
+            summary.validation_batch_hashes != expected_validation
+            or summary.training_batch_hashes != expected_training_hashes
+            or summary.training_token_counts != expected_training_tokens
+            or summary.stream_prefix_sha256 != expected_stream_prefix
+            for summary in pair_sources
+        ):
+            raise PilotRunnerError("paired source data streams are not identical")
+        pair_summaries = tuple(
+            summaries[run.run_id] for run in plan if run.pair_id == pair.pair_id
+        )
+        if any(
+            summary.validation_batch_hashes != expected_validation
+            for summary in pair_summaries
+        ):
+            raise PilotRunnerError("validation batch hashes differ within a paired lineage")
     _verify_provenance_unchanged(provenance)
     ordered = tuple(summaries[run.run_id] for run in (*sources, *derived))
+    promotion: ArtifactReference | None = None
+    promotion_decision: str | None = None
+    if config.stage is CampaignStage.SCREEN:
+        promotion_document, promotion_decision = _screen_promotion_document(
+            config=config,
+            plan=plan,
+            authority=authority,
+            provenance=provenance,
+            manifest=final,
+            summaries=summaries,
+        )
+        promotion = _write_screen_promotion(
+            output_root=output,
+            repo_root=provenance.repo_root,
+            config=config,
+            document=promotion_document,
+        )
+        reloaded = load_campaign_manifest(
+            authority,
+            external_root=output,
+            checkout_root=provenance.repo_root,
+        )
+        if (
+            reloaded.generation != final.generation
+            or campaign_manifest_sha256(reloaded) != campaign_manifest_sha256(final)
+        ):
+            raise PilotRunnerError("campaign manifest changed while promotion was published")
+        _verify_provenance_unchanged(provenance)
     return PilotCampaignSummary(
         campaign_id=config.campaign_id,
         plan_sha256=authority.plan_sha256,
@@ -2578,6 +3504,8 @@ def run_milestone4_pilot(
         executable_bundle_sha256=provenance.executable_bundle_sha256,
         runs=ordered,
         claim_eligible=False,
+        promotion=promotion,
+        promotion_decision=promotion_decision,
     )
 
 
@@ -2606,13 +3534,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     except Exception as error:
         print(f"pilot failed: {type(error).__name__}: {error}", file=sys.stderr)
         return 1
-    print(_canonical_bytes({
+    output_document: dict[str, object] = {
         "campaign_id": summary.campaign_id,
         "plan_sha256": summary.plan_sha256,
         "manifest_generation": summary.manifest_generation,
         "completed_runs": len(summary.runs),
         "claim_eligible": False,
-    }).decode("ascii"))
+    }
+    if summary.promotion is not None:
+        output_document["promotion"] = _artifact_json(summary.promotion)
+        output_document["promotion_decision"] = summary.promotion_decision
+    print(_canonical_bytes(output_document).decode("ascii"))
     return 0
 
 

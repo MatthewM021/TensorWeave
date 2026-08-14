@@ -105,7 +105,7 @@ validated_reconstruction:
       - paired multi-seed matched-quality compactness campaign
       - scientific baseline comparison
   milestone_4_causal_reference_controls:
-    status: commit_bound_seven_lineage_pilot_verified
+    status: commit_bound_pilot_verified_validation_screen_source_ready
     scope:
       - stacked GRU control with context-length-independent persistent state
       - causal Transformer control with explicit per-layer key/value cache
@@ -123,6 +123,8 @@ validated_reconstruction:
       - immutable crash-reconciling attempt records and atomic manifest index
       - isolated seven-lineage pilot worker with exact checkpoint resume and compact derivation
       - commit-bound parent runner with provenance, artifact, and manifest verification
+      - validation-only three-pair screen worker with bounded routing summaries
+      - exact paired aggregation, frozen selection gates, and immutable promotion record
     published_checkpoints:
       recurrent_and_cached_transformer:
         source_commit: 832e6de01e2b7d8b6c9e0ab9c1eae4b9a68db9f8
@@ -134,9 +136,14 @@ validated_reconstruction:
         source_tree: e59ca383e984177ea337c1a2037bfbe48687cdda
         ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31720252790
         ci_status: passed
-    v3_source_tests_collected: 702
-    v3_source_tests_passed: 701
+    v3_source_tests_collected: 728
+    v3_source_tests_passed: 727
     v3_source_tests_skipped: 1
+    v3_source_tests_scope: current_local_source_suite_not_screen_execution_evidence
+    repository_verifier:
+      status: passed
+      protected_v2_files: 193
+      protected_v2_bytes: 6759670
     baseline_contract_tests_passed: 164
     baseline_contract_test_files: 3
     evidence_scope: deterministic_source_contracts_and_commit_bound_pilot_not_scientific_campaign
@@ -178,8 +185,31 @@ validated_reconstruction:
         routed_compact_queries_total: 69
         matched_quality_claim: false
         scientific_campaign: pending
+    validation_screen_source:
+      status: locally_verified_execution_pending
+      config: v3/configs/milestone4/validation_screen_v1.yaml
+      claim_eligible: false
+      seed_pairs: 3
+      planned_runs: 24
+      independently_trained_source_runs: 18
+      derived_compact_runs: 6
+      optimizer_steps_per_source: 512
+      train_token_budget_per_source: 28672
+      train_lengths: [10, 12, 16, 18]
+      validation_lengths: [16, 32, 64, 128, 256]
+      validation_episodes_per_length: 64
+      compact_target_cp_ranks: [2, 4]
+      statistics_method: paired_exact_empirical_bootstrap_n3_v1
+      exact_ordered_resamples: 27
+      routing_diagnostics: recovery_consistency_and_load_collapse
+      allowed_screen_decisions: [complete_promote, complete_do_not_promote]
+      test_stream_exposed: false
+      scaling_stream_exposed: false
+      runtime_or_rss_evidence: false
+      promotion_decision: pending
+      execution_evidence: pending
     remaining:
-      - validation-only multi-seed screen and promotion decision
+      - execute the validation-only three-pair screen and record its promotion decision
       - promotion-bound paired multi-seed confirmatory campaign
       - optional identity-initialized MERA ablation
       - fair predeclared cached-runtime measurement path

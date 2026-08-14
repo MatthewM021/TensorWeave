@@ -4,6 +4,8 @@ import hashlib
 import importlib.util
 import json
 import os
+from dataclasses import replace
+from fractions import Fraction
 from pathlib import Path
 import subprocess
 import sys
@@ -334,3 +336,409 @@ def test_main_reports_failure_without_success_claim(runner, capsys) -> None:  # 
         runner.main([])
     captured = capsys.readouterr()
     assert "completed_runs" not in captured.out
+
+
+def test_exact_three_pair_statistics_are_exhaustive_and_ranked(runner) -> None:  # type: ignore[no-untyped-def]
+    values = (Fraction(1, 10), Fraction(0, 1), Fraction(-1, 10))
+    result = runner._paired_delta_statistics(values)
+    assert result["raw_delta_vector"] == [[1, 10], [0, 1], [-1, 10]]
+    assert len(result["ordered_resample_indices"]) == 27
+    assert len(result["ordered_empirical_resample_means"]) == 27
+    assert result["ordered_resample_indices"][0] == [0, 0, 0]
+    assert result["ordered_resample_indices"][-1] == [2, 2, 2]
+    assert result["ordered_empirical_resample_means"][0] == [1, 10]
+    assert result["ordered_empirical_resample_means"][-1] == [-1, 10]
+    assert result["fifth_percentile_nearest_rank"] == 2
+    assert result["fifth_percentile"] == [-1, 15]
+    assert result["sign_test_minimum_p"] == [1, 8]
+    assert result["mean"] == [0, 1]
+    assert result["median"] == [0, 1]
+    assert result["sample_sd"] == pytest.approx(0.1)
+    assert result["standard_error"] == pytest.approx(0.1 / (3**0.5))
+
+
+def test_parent_strictly_validates_routing_summary_schema_and_identities(runner) -> None:  # type: ignore[no-untyped-def]
+    entropy = -(2 / 3) * __import__("math").log(2 / 3) - (1 / 3) * __import__("math").log(1 / 3)
+    routing = {
+        "route_recovery": {
+            "correct": 2,
+            "local_event_count": 3,
+            "accuracy": 2 / 3,
+            "macro_accuracy": 0.75,
+            "document_count": 2,
+        },
+        "route_consistency": {
+            "consistent_events": 3,
+            "local_event_count": 3,
+            "consistency": 1.0,
+            "group_count": 2,
+            "fully_consistent_groups": 2,
+        },
+        "router_load": {
+            "branch_counts": [2, 1, 0],
+            "branch_fractions": [2 / 3, 1 / 3, 0.0],
+            "local_event_count": 3,
+            "global_event_count": 1,
+            "null_event_count": 1,
+            "valid_event_count": 5,
+            "global_event_fraction": 0.2,
+            "null_event_fraction": 0.2,
+            "active_branches": 2,
+            "collapsed": False,
+            "document_count": 2,
+            "collapsed_document_count": 0,
+            "collapsed_document_fraction": 0.0,
+            "mean_active_branches_per_document": 1.5,
+            "max_load_fraction": 2 / 3,
+            "load_entropy": entropy,
+            "normalized_load_entropy": entropy / __import__("math").log(3),
+            "mean_assignment_entropy": 0.5,
+            "normalized_mean_assignment_entropy": 0.5 / __import__("math").log(3),
+            "assignment_entropy_count": 3,
+        },
+    }
+    encoded = runner._validate_routing_metrics(
+        routing,
+        run=SimpleNamespace(family="routed"),
+        config=SimpleNamespace(task=SimpleNamespace(branches=3)),
+        episodes=2,
+    )
+    assert json.loads(encoded) == routing
+    tampered = json.loads(json.dumps(routing))
+    tampered["router_load"]["branch_fractions"][0] = 0.5
+    with pytest.raises(runner.PilotRunnerError, match="exact counts"):
+        runner._validate_routing_metrics(
+            tampered,
+            run=SimpleNamespace(family="routed"),
+            config=SimpleNamespace(task=SimpleNamespace(branches=3)),
+            episodes=2,
+        )
+    with pytest.raises(runner.PilotRunnerError, match="must be null"):
+        runner._validate_routing_metrics(
+            routing,
+            run=SimpleNamespace(family="gru"),
+            config=SimpleNamespace(task=SimpleNamespace(branches=3)),
+            episodes=2,
+        )
+
+
+def test_screen_promotion_selection_gates_and_parameter_invariance(
+    runner, monkeypatch  # type: ignore[no-untyped-def]
+) -> None:
+    config = runner.load_milestone4_campaign_config(
+        ROOT / "v3" / "configs" / "milestone4" / "validation_screen_v1.yaml"
+    )
+    plan = runner.resolve_campaign_plan(
+        config,
+        "1" * 40,
+        "2" * 40,
+        "3" * 64,
+        "4" * 64,
+    )
+    scores = {
+        "routed-source": 80,
+        "routed-oracle": 82,
+        "routed-latent": 76,
+        "routed-compact-r2": 75,
+        "routed-compact-r4": 79,
+        "gru-control": 75,
+        "transformer-control": 75,
+        "ttn-control": 75,
+    }
+    parameters = {
+        "routed-source": 200,
+        "routed-oracle": 200,
+        "routed-latent": 200,
+        "routed-compact-r2": 50,
+        "routed-compact-r4": 60,
+        "gru-control": 175,
+        "transformer-control": 180,
+        "ttn-control": 170,
+    }
+
+    def metric(run, length: int):  # type: ignore[no-untyped-def]
+        correct = scores[run.model_id]
+        seen_correct = round(correct * 0.6)
+        routing_json = None
+        if run.family == "routed":
+            routing_json = json.dumps(
+                {
+                    "route_recovery": {"macro_accuracy": 0.9},
+                    "router_load": {
+                        "collapsed": False,
+                        "collapsed_document_count": 0,
+                        "local_event_count": 20,
+                        "active_branches": 3,
+                    },
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            )
+        return runner.ValidationLengthSummary(
+            length=length,
+            query_correct=correct,
+            query_count=100,
+            seen_correct=seen_correct,
+            seen_count=60,
+            heldout_correct=correct - seen_correct,
+            heldout_count=40,
+            structural_values=(("parameter_count", parameters[run.model_id]),),
+            routing_json=routing_json,
+        )
+
+    summaries = {}
+    for run in plan:
+        prefix = f"artifacts/{run.run_id}/attempt-000001"
+        result = runner.ArtifactReference(f"{prefix}/result.json", "a" * 64, 10)
+        output = runner.ArtifactReference(f"{prefix}/subprocess.json", "b" * 64, 10)
+        checkpoint = (
+            runner.ArtifactReference(f"{prefix}/checkpoint-step-00000512.twcp", "c" * 64, 10)
+            if run.role == "trainable_source"
+            else None
+        )
+        compact = (
+            runner.ArtifactReference(f"{prefix}/compact-model.tnlm3", "d" * 64, 10)
+            if run.role == "derived_compact"
+            else None
+        )
+        summaries[run.run_id] = runner.PilotRunSummary(
+            run_id=run.run_id,
+            model_id=run.model_id,
+            pair_id=run.pair_id,
+            role=run.role,
+            attempt_number=1,
+            resumed=False,
+            result=result,
+            output=output,
+            final_checkpoint=checkpoint,
+            compact_artifact=compact,
+            validation_batch_hashes=tuple(
+                (length, hashlib.sha256(f"{run.pair_id}:{length}".encode()).hexdigest())
+                for length in config.data.validation.lengths
+            ),
+            training_batch_hashes=(),
+            training_token_counts=(),
+            stream_prefix_sha256=("e" * 64 if checkpoint else None),
+            initial_model_fingerprint=("f" * 64 if checkpoint else None),
+            final_model_fingerprint="0" * 64,
+            validation_metrics=tuple(
+                metric(run, length) for length in config.data.validation.lengths
+            ),
+            parameter_count=parameters[run.model_id],
+            checkpoints=(() if checkpoint is None else (checkpoint,)),
+            compact_lineage_json=("{}" if compact is not None else None),
+        )
+
+    monkeypatch.setattr(runner, "campaign_manifest_sha256", lambda _: "9" * 64)
+    document, decision = runner._screen_promotion_document(
+        config=config,
+        plan=plan,
+        authority=SimpleNamespace(plan_sha256="5" * 64),
+        provenance=SimpleNamespace(
+            raw_config_sha256="3" * 64,
+            code_commit="1" * 40,
+            code_tree="2" * 40,
+            parent_runner_sha256="6" * 64,
+            worker_sha256="7" * 64,
+            package_tree_sha256="8" * 64,
+            executable_bundle_sha256="4" * 64,
+        ),
+        manifest=SimpleNamespace(generation=73),
+        summaries=summaries,
+    )
+    assert decision == "complete_promote"
+    assert document["selection"]["reference"] == {
+        "model_id": "routed-source",
+        "retained": True,
+    }
+    assert document["selection"]["oracle_diagnostic"]["promoted"] is False
+    assert document["selection"]["compact_winner"]["model_id"] == "routed-compact-r2"
+    assert "routed-oracle" not in document["selection"]["promoted_model_ids"]
+    assert len(
+        document["model_aggregates"]["routed-compact-r2"]["partitions"]["query"]
+        ["delta_vs_routed_source"]["ordered_empirical_resample_means"]
+    ) == 27
+    assert len(canonical(document)) <= runner._MAX_OUTPUT_BYTES
+
+    compact_run = next(
+        run
+        for run in plan
+        if run.model_id == "routed-compact-r2"
+        and run.pair_id == config.pairs[0].pair_id
+    )
+    compact_summary = summaries[compact_run.run_id]
+    compact_first = compact_summary.validation_metrics[0]
+    compact_zero_local = json.loads(compact_first.routing_json)
+    compact_zero_local["router_load"]["local_event_count"] = 0
+    compact_zero_local["router_load"]["active_branches"] = 0
+    summaries[compact_run.run_id] = replace(
+        compact_summary,
+        validation_metrics=(
+            replace(
+                compact_first,
+                routing_json=json.dumps(
+                    compact_zero_local, sort_keys=True, separators=(",", ":")
+                ),
+            ),
+            *compact_summary.validation_metrics[1:],
+        ),
+    )
+    candidate_document, candidate_decision = runner._screen_promotion_document(
+        config=config,
+        plan=plan,
+        authority=SimpleNamespace(plan_sha256="5" * 64),
+        provenance=SimpleNamespace(
+            raw_config_sha256="3" * 64,
+            code_commit="1" * 40,
+            code_tree="2" * 40,
+            parent_runner_sha256="6" * 64,
+            worker_sha256="7" * 64,
+            package_tree_sha256="8" * 64,
+            executable_bundle_sha256="4" * 64,
+        ),
+        manifest=SimpleNamespace(generation=73),
+        summaries=summaries,
+    )
+    assert candidate_decision == "complete_promote"
+    assert candidate_document["selection"]["compact_winner"]["model_id"] == (
+        "routed-compact-r4"
+    )
+    global_collapse_gate = next(
+        item
+        for item in candidate_document["gates"]["results"]
+        if item["gate"] == "require_no_route_collapse"
+    )
+    assert global_collapse_gate["passed"] is True
+    rejected_compact = next(
+        item
+        for item in candidate_document["selection"]["compact_qualifiers"]
+        if item["model_id"] == "routed-compact-r2"
+    )
+    assert rejected_compact["route_evidence_passed"] is False
+    summaries[compact_run.run_id] = compact_summary
+
+    latent_run = next(
+        run
+        for run in plan
+        if run.model_id == "routed-latent"
+        and run.pair_id == config.pairs[0].pair_id
+    )
+    latent_summary = summaries[latent_run.run_id]
+    latent_first = latent_summary.validation_metrics[0]
+    latent_zero_local = json.loads(latent_first.routing_json)
+    latent_zero_local["router_load"]["local_event_count"] = 0
+    latent_zero_local["router_load"]["active_branches"] = 0
+    summaries[latent_run.run_id] = replace(
+        latent_summary,
+        validation_metrics=(
+            replace(
+                latent_first,
+                routing_json=json.dumps(
+                    latent_zero_local, sort_keys=True, separators=(",", ":")
+                ),
+            ),
+            *latent_summary.validation_metrics[1:],
+        ),
+    )
+    latent_document, latent_decision = runner._screen_promotion_document(
+        config=config,
+        plan=plan,
+        authority=SimpleNamespace(plan_sha256="5" * 64),
+        provenance=SimpleNamespace(
+            raw_config_sha256="3" * 64,
+            code_commit="1" * 40,
+            code_tree="2" * 40,
+            parent_runner_sha256="6" * 64,
+            worker_sha256="7" * 64,
+            package_tree_sha256="8" * 64,
+            executable_bundle_sha256="4" * 64,
+        ),
+        manifest=SimpleNamespace(generation=73),
+        summaries=summaries,
+    )
+    assert latent_decision == "complete_promote"
+    latent_winner = next(
+        item
+        for item in latent_document["selection"]["standard_winners"]
+        if item["stratum"] == "routed_latent"
+    )
+    assert latent_winner["model_id"] == "routed-latent"
+    assert "routed-latent" in latent_document["selection"]["promoted_model_ids"]
+    assert latent_document["selection"]["standard_stratum_selection_complete"] == {
+        "passed": True,
+        "selected": 4,
+        "required": 4,
+        "diagnostic_only": True,
+    }
+    latent_candidate = next(
+        item
+        for item in latent_document["selection"]["standard_candidates"]
+        if item["model_id"] == "routed-latent"
+    )
+    assert latent_candidate["qualified"] is True
+    assert latent_candidate["route_evidence_passed"] is False
+    latent_global_gate = next(
+        item
+        for item in latent_document["gates"]["results"]
+        if item["gate"] == "require_no_route_collapse"
+    )
+    assert latent_global_gate["passed"] is True
+    summaries[latent_run.run_id] = latent_summary
+
+    oracle_run = next(
+        run
+        for run in plan
+        if run.model_id == "routed-oracle" and run.pair_id == config.pairs[0].pair_id
+    )
+    oracle_summary = summaries[oracle_run.run_id]
+    first_metric = oracle_summary.validation_metrics[0]
+    zero_local = json.loads(first_metric.routing_json)
+    zero_local["router_load"]["local_event_count"] = 0
+    zero_local["router_load"]["active_branches"] = 0
+    summaries[oracle_run.run_id] = replace(
+        oracle_summary,
+        validation_metrics=(
+            replace(
+                first_metric,
+                routing_json=json.dumps(
+                    zero_local, sort_keys=True, separators=(",", ":")
+                ),
+            ),
+            *oracle_summary.validation_metrics[1:],
+        ),
+    )
+    rejected_document, rejected_decision = runner._screen_promotion_document(
+        config=config,
+        plan=plan,
+        authority=SimpleNamespace(plan_sha256="5" * 64),
+        provenance=SimpleNamespace(
+            raw_config_sha256="3" * 64,
+            code_commit="1" * 40,
+            code_tree="2" * 40,
+            parent_runner_sha256="6" * 64,
+            worker_sha256="7" * 64,
+            package_tree_sha256="8" * 64,
+            executable_bundle_sha256="4" * 64,
+        ),
+        manifest=SimpleNamespace(generation=73),
+        summaries=summaries,
+    )
+    assert rejected_decision == "complete_do_not_promote"
+    collapse_gate = next(
+        item
+        for item in rejected_document["gates"]["results"]
+        if item["gate"] == "require_no_route_collapse"
+    )
+    assert collapse_gate["passed"] is False
+    summaries[oracle_run.run_id] = oracle_summary
+
+    changed_run = next(
+        run
+        for run in plan
+        if run.model_id == "routed-source" and run.pair_id == config.pairs[-1].pair_id
+    )
+    summaries[changed_run.run_id] = replace(
+        summaries[changed_run.run_id], parameter_count=201
+    )
+    with pytest.raises(runner.PilotRunnerError, match="not invariant"):
+        runner._screen_model_aggregates(config, summaries, plan)

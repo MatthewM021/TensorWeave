@@ -187,10 +187,25 @@ validation lengths 16/32/64, and no test or scaling stream. This verifies
 execution, provenance, checkpoint creation and validation, paired streams, and
 compact-parent lineage only.
 
-This remains implementation-level control infrastructure only. Pilot-scale
-trained checkpoints and commit-bound evidence are now published, but there is
-no validation screen, promotion-bound confirmatory campaign, matched-quality
-result, MERA result, scientific result, or speed/RSS win. The functional cache
-path deliberately performs strict public-state validation and immutable growth;
-comparative timing must first use a predeclared, fair measurement path that
-accounts for that overhead consistently across opponents.
+The validation-only three-pair screen source is now implemented and frozen in
+`configs/milestone4/validation_screen_v1.yaml`. Its plan contains 24 results:
+18 independently trained sources across the six source conditions and six
+rank-2/rank-4 compact children derived from their exact curriculum parents.
+Each source receives 512 optimizer steps over mixed lengths 10/12/16/18, then
+64 validation episodes at each of lengths 16/32/64/128/256. The runner now
+validates routed recovery, consistency, and load/collapse summaries, aggregates
+the three paired results, applies the predeclared source and compact-quality
+gates, and writes a checksum-bound promotion record with a decision of
+`complete_promote` or `complete_do_not_promote`.
+
+The current local V3 suite passes 727 tests with one skip, including the new
+screen source contract. This is local source verification, not screen evidence.
+The screen remains non-claiming: it exposes no test or scaling stream, and its
+schema-mandatory runtime declaration does not produce runtime or RSS evidence.
+No screen run or promotion decision has yet been produced. Pilot-scale trained
+checkpoints and commit-bound pilot evidence are published, but there is no
+promotion-bound confirmatory campaign, matched-quality result, MERA result,
+scientific result, or speed/RSS win. The functional cache path deliberately
+performs strict public-state validation and immutable growth; comparative timing
+must first use a predeclared, fair measurement path that accounts for that
+overhead consistently across opponents.

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-"""Execute one commit-bound, non-claiming Milestone-4 pilot run.
+"""Execute one commit-bound, non-claiming Milestone-4 pilot or screen run.
 
 The parent owns the campaign manifest.  This worker owns only one immutable
 attempt directory and emits a strict result plus model artifacts.  It never
-opens confirmatory test/scaling streams and never interprets the pilot as
-scientific evidence.
+opens confirmatory test/scaling streams and never interprets a pilot or screen
+as scientific evidence.
 """
 
 import argparse
@@ -88,6 +88,20 @@ def _sha(value: object, name: str, *, forty: bool = False) -> str:
 def _plain_int(value: object, name: str, *, minimum: int = 0) -> int:
     if type(value) is not int or value < minimum:
         raise PilotWorkerError(f"{name} must be an integer >= {minimum}")
+    return value
+
+
+def _plain_float(
+    value: object,
+    name: str,
+    *,
+    minimum: float = 0.0,
+    maximum: float | None = None,
+) -> float:
+    if type(value) is not float or not math.isfinite(value) or value < minimum:
+        raise PilotWorkerError(f"{name} must be a finite float >= {minimum}")
+    if maximum is not None and value > maximum:
+        raise PilotWorkerError(f"{name} must be <= {maximum}")
     return value
 
 
@@ -495,6 +509,162 @@ def _structural(model: torch.nn.Module, batch: BindingBatch, output: object, sum
     return {"fingerprint_sha256": fingerprint, "values": values}
 
 
+def _summary_field(summary: object, field: str, name: str) -> object:
+    try:
+        return getattr(summary, field)
+    except AttributeError as error:
+        raise PilotWorkerError(f"{name} is missing") from error
+
+
+def _summary_int(summary: object, field: str, prefix: str) -> int:
+    return _plain_int(_summary_field(summary, field, f"{prefix}.{field}"), f"{prefix}.{field}")
+
+
+def _summary_float(
+    summary: object,
+    field: str,
+    prefix: str,
+    *,
+    maximum: float | None = None,
+) -> float:
+    return _plain_float(
+        _summary_field(summary, field, f"{prefix}.{field}"),
+        f"{prefix}.{field}",
+        maximum=maximum,
+    )
+
+
+def _routing_entry(summary: object) -> dict[str, object]:
+    recovery = _summary_field(summary, "route_recovery", "route_recovery")
+    consistency = _summary_field(summary, "route_consistency", "route_consistency")
+    load = _summary_field(summary, "router_load", "router_load")
+
+    raw_counts = _summary_field(load, "branch_counts", "router_load.branch_counts")
+    if type(raw_counts) is not tuple:
+        raise PilotWorkerError("router_load.branch_counts must be a tuple")
+    branch_counts = [
+        _plain_int(value, f"router_load.branch_counts[{index}]")
+        for index, value in enumerate(raw_counts)
+    ]
+    raw_fractions = _summary_field(
+        load, "branch_fractions", "router_load.branch_fractions"
+    )
+    if type(raw_fractions) is not tuple:
+        raise PilotWorkerError("router_load.branch_fractions must be a tuple")
+    branch_fractions = [
+        _plain_float(
+            value,
+            f"router_load.branch_fractions[{index}]",
+            maximum=1.0,
+        )
+        for index, value in enumerate(raw_fractions)
+    ]
+    if len(branch_counts) != len(branch_fractions):
+        raise PilotWorkerError("router_load branch vectors disagree")
+    collapsed = _summary_field(load, "collapsed", "router_load.collapsed")
+    if type(collapsed) is not bool:
+        raise PilotWorkerError("router_load.collapsed must be a boolean")
+    raw_load_entropy = _summary_field(load, "load_entropy", "router_load.load_entropy")
+    # ``summarize_router_load`` computes ``-sum(...)``. Python's empty sum is
+    # the integer zero, so an all-global/all-null evaluation legitimately has
+    # an exact ``0`` even though this serialized field is defined as a float.
+    # Normalize that one producer edge case so the completed evidence reaches
+    # the parent's no-route-collapse gate instead of failing serialization.
+    if type(raw_load_entropy) is int and raw_load_entropy == 0:
+        load_entropy = 0.0
+    else:
+        load_entropy = _plain_float(raw_load_entropy, "router_load.load_entropy")
+
+    return {
+        "route_recovery": {
+            "correct": _summary_int(recovery, "correct", "route_recovery"),
+            "local_event_count": _summary_int(
+                recovery, "local_event_count", "route_recovery"
+            ),
+            "accuracy": _summary_float(
+                recovery, "accuracy", "route_recovery", maximum=1.0
+            ),
+            "macro_accuracy": _summary_float(
+                recovery, "macro_accuracy", "route_recovery", maximum=1.0
+            ),
+            "document_count": _summary_int(
+                recovery, "document_count", "route_recovery"
+            ),
+        },
+        "route_consistency": {
+            "consistent_events": _summary_int(
+                consistency, "consistent_events", "route_consistency"
+            ),
+            "local_event_count": _summary_int(
+                consistency, "local_event_count", "route_consistency"
+            ),
+            "consistency": _summary_float(
+                consistency, "consistency", "route_consistency", maximum=1.0
+            ),
+            "group_count": _summary_int(
+                consistency, "group_count", "route_consistency"
+            ),
+            "fully_consistent_groups": _summary_int(
+                consistency, "fully_consistent_groups", "route_consistency"
+            ),
+        },
+        "router_load": {
+            "branch_counts": branch_counts,
+            "branch_fractions": branch_fractions,
+            "local_event_count": _summary_int(
+                load, "local_event_count", "router_load"
+            ),
+            "global_event_count": _summary_int(
+                load, "global_event_count", "router_load"
+            ),
+            "null_event_count": _summary_int(
+                load, "null_event_count", "router_load"
+            ),
+            "valid_event_count": _summary_int(
+                load, "valid_event_count", "router_load"
+            ),
+            "global_event_fraction": _summary_float(
+                load, "global_event_fraction", "router_load", maximum=1.0
+            ),
+            "null_event_fraction": _summary_float(
+                load, "null_event_fraction", "router_load", maximum=1.0
+            ),
+            "active_branches": _summary_int(
+                load, "active_branches", "router_load"
+            ),
+            "collapsed": collapsed,
+            "document_count": _summary_int(
+                load, "document_count", "router_load"
+            ),
+            "collapsed_document_count": _summary_int(
+                load, "collapsed_document_count", "router_load"
+            ),
+            "collapsed_document_fraction": _summary_float(
+                load, "collapsed_document_fraction", "router_load", maximum=1.0
+            ),
+            "mean_active_branches_per_document": _summary_float(
+                load, "mean_active_branches_per_document", "router_load"
+            ),
+            "max_load_fraction": _summary_float(
+                load, "max_load_fraction", "router_load", maximum=1.0
+            ),
+            "load_entropy": load_entropy,
+            "normalized_load_entropy": _summary_float(
+                load, "normalized_load_entropy", "router_load"
+            ),
+            "mean_assignment_entropy": _summary_float(
+                load, "mean_assignment_entropy", "router_load"
+            ),
+            "normalized_mean_assignment_entropy": _summary_float(
+                load, "normalized_mean_assignment_entropy", "router_load"
+            ),
+            "assignment_entropy_count": _summary_int(
+                load, "assignment_entropy_count", "router_load"
+            ),
+        },
+    }
+
+
 def _evaluate(model: torch.nn.Module, context: CampaignRunContext) -> list[dict[str, object]]:
     result: list[dict[str, object]] = []
     for length in context.run.data.validation.lengths:
@@ -506,11 +676,13 @@ def _evaluate(model: torch.nn.Module, context: CampaignRunContext) -> list[dict[
             query_accuracy = summary.query
             seen_accuracy = summary.seen_query
             heldout_accuracy = summary.heldout_query
+            routing = _routing_entry(summary)
         else:
             output, summary = evaluate_baseline_model(model, batch)
             query_accuracy = summary.query.accuracy
             seen_accuracy = summary.seen_query.accuracy
             heldout_accuracy = summary.heldout_query.accuracy
+            routing = None
         query_mask = batch.inputs.valid_mask & (
             batch.inputs.event_kinds == int(BindingEventKind.QUERY)
         )
@@ -539,6 +711,7 @@ def _evaluate(model: torch.nn.Module, context: CampaignRunContext) -> list[dict[
                     heldout_mask,
                     heldout_accuracy,
                 ),
+                "routing": routing,
                 "structural": _structural(model, batch, output, summary),
             }
         )
@@ -917,6 +1090,18 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _validate_worker_scope(config: Milestone4CampaignConfig) -> None:
+    if (
+        config.stage not in {CampaignStage.PILOT, CampaignStage.SCREEN}
+        or config.claim_eligible
+        or config.data.test is not None
+        or config.data.scaling is not None
+    ):
+        raise PilotWorkerError(
+            "worker accepts only a non-claiming pilot or screen without test/scaling"
+        )
+
+
 def _execute(arguments: argparse.Namespace) -> dict[str, object]:
     repo = Path(arguments.repo_root).resolve(strict=True)
     output_root = Path(arguments.output_root).resolve(strict=True)
@@ -953,13 +1138,7 @@ def _execute(arguments: argparse.Namespace) -> dict[str, object]:
     _check_import_origins(repo, inventory)
     raw_config = _read_private(config_path, maximum=1024 * 1024, name="config")
     config = load_milestone4_campaign_config(config_path)
-    if (
-        config.stage is not CampaignStage.PILOT
-        or config.claim_eligible
-        or config.data.test is not None
-        or config.data.scaling is not None
-    ):
-        raise PilotWorkerError("worker accepts only the non-claiming pilot")
+    _validate_worker_scope(config)
     if hashlib.sha256(raw_config).hexdigest() != arguments.raw_config_sha256:
         raise PilotWorkerError("raw config digest mismatch")
     if config.fingerprint() != arguments.semantic_config_sha256:

@@ -146,14 +146,38 @@ per source, validation lengths 16/32/64, and no test or scaling stream. The run
 created and independently validated resumable checkpoints; interrupted resume
 remains source/test-verified and was not exercised by this fresh execution.
 
+The next validation-only screen is now frozen in
+`v3/configs/milestone4/validation_screen_v1.yaml`, and the worker and parent
+runner implement its routing summaries, paired aggregation, selection gates,
+and immutable promotion record. The plan contains three fixed development
+pairs and 24 results: 18 independently trained sources across routed oracle,
+curriculum, latent, GRU, cached-Transformer, and causal-TTN conditions, plus
+six compact children derived at CP ranks 2 and 4 from the three curriculum
+parents. Each trained source is budgeted for 512 optimizer steps over mixed
+lengths 10/12/16/18. Validation uses 64 episodes at each of lengths
+16/32/64/128/256. The screen's exact three-pair empirical bootstrap enumerates
+all 27 ordered resamples; with only three pairs this is an operational,
+descriptive selection statistic rather than a 95% scientific claim.
+
+The screen is explicitly non-claiming and exposes neither test nor scaling
+data. Its mandatory runtime declaration fixes future measurement semantics but
+the screen runner does not emit runtime or RSS evidence, so it cannot support
+an efficiency claim. A completed run must publish either
+`complete_promote` or `complete_do_not_promote` only after all source,
+query-partition, oracle/reference, per-pair compact-quality, and routed-collapse
+gates are evaluated. No screen execution, promotion decision, or screen
+evidence bundle has yet been produced.
+
 The recurrent, cached-Transformer, and corrected causal-tree source contracts
-are implemented and pass the complete V3 suite. Pilot-scale checkpoints and
-commit-bound implementation evidence are now published, but there is no
-validation screen, promotion-bound confirmatory campaign, matched-quality
-comparison, MERA result, scientific result, or speed/RSS win. The public cached
-step path prioritizes strict state validation and immutable continuation; a
-comparative runtime campaign must predeclare a measurement path that accounts
-for validation and cache-growth costs consistently before making efficiency
+are implemented, and the current local V3 suite passes 727 tests with one
+skip. That local result covers the new screen source contract but is not an
+execution-evidence record. Pilot-scale checkpoints and commit-bound pilot
+evidence are published, but there is no executed validation screen,
+promotion-bound confirmatory campaign, matched-quality comparison, MERA
+result, scientific result, or speed/RSS win. The public cached step path
+prioritizes strict state validation and immutable continuation; a comparative
+runtime campaign must predeclare a measurement path that accounts for
+validation and cache-growth costs consistently before making efficiency
 claims.
 
 ## Paired campaign boundary

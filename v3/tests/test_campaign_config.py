@@ -22,6 +22,8 @@ SHA_B = "b" * 64
 SHA_C = "c" * 64
 COMMIT = "1" * 40
 TREE = "2" * 40
+ROOT = Path(__file__).resolve().parents[2]
+SCREEN_CONFIG = ROOT / "v3" / "configs" / "milestone4" / "validation_screen_v1.yaml"
 
 
 def base_document(stage: str = "pilot") -> dict[str, object]:
@@ -34,7 +36,7 @@ def base_document(stage: str = "pilot") -> dict[str, object]:
             "statistics_seed": 401,
         }
     ]
-    if stage == "confirmatory":
+    if stage in {"screen", "confirmatory"}:
         pairs = [
             {
                 **pairs[0],
@@ -43,7 +45,11 @@ def base_document(stage: str = "pilot") -> dict[str, object]:
                 "train_seed": 200 + index,
                 "validation_seed": 300 + index,
                 "statistics_seed": 400 + index,
-                "test_seed": 500 + index,
+                **(
+                    {"test_seed": 500 + index}
+                    if stage == "confirmatory"
+                    else {}
+                ),
             }
             for index in range(1, 4)
         ]
@@ -225,8 +231,12 @@ def base_document(stage: str = "pilot") -> dict[str, object]:
         "statistics": {
             "paired_unit": "pair_id",
             "confidence_level": 0.95,
-            "method": "paired_percentile_bootstrap_v1",
-            "resamples": 2000,
+            "method": (
+                "paired_exact_empirical_bootstrap_n3_v1"
+                if stage == "screen"
+                else "paired_percentile_bootstrap_v1"
+            ),
+            "resamples": 27 if stage == "screen" else 2000,
         },
         "runtime": {
             "semantics": "batch1_full_document_streaming",
@@ -238,20 +248,39 @@ def base_document(stage: str = "pilot") -> dict[str, object]:
         },
     }
     if stage == "screen":
+        document["screen_gates"] = {
+            "chance": 0.25,
+            "oracle_mean_min": 0.80,
+            "reference_mean_min": 0.70,
+            "reference_pair_min": 0.60,
+            "reference_heldout_mean_min": 0.60,
+            "reference_longest_length_mean_min": 0.60,
+            "chance_corrected_oracle_recovery_min": 0.80,
+            "oracle_max_drop_vs_reference": 0.02,
+            "candidate_pair_max_drop": 0.10,
+            "require_positive_query_partitions": True,
+            "require_no_route_collapse": True,
+        }
         document["selection"] = {
-            "candidates_by_family": {
-                "routed": [
-                    "routed-source",
-                    "routed-latent",
-                    "routed-compact",
-                ],
+            "candidates_by_stratum": {
+                "routed_latent": ["routed-latent"],
+                "routed_compact_rank": ["routed-compact"],
                 "gru": ["gru-control"],
                 "cached_transformer": ["transformer-control"],
                 "causal_ttn": ["ttn-control"],
             },
             "primary_metric": "macro_length_query_accuracy",
             "direction": "maximize",
-            "tie_break": ["smaller_parameter_count", "lexical_candidate_id"],
+            "standard_tie_break": [
+                "smaller_parameter_count",
+                "lexical_candidate_id",
+            ],
+            "compact_tie_break": [
+                "smaller_parameter_count",
+                "smaller_target_cp_rank",
+                "higher_primary_metric",
+                "lexical_candidate_id",
+            ],
         }
     if stage == "confirmatory":
         data = document["data"]
@@ -263,7 +292,7 @@ def base_document(stage: str = "pilot") -> dict[str, object]:
             "record_path": "results/m4/screen-promotion.json",
             "record_sha256": SHA_A,
             "screen_manifest_sha256": SHA_B,
-            "executable_bundle_sha256": SHA_C,
+            "screen_executable_bundle_sha256": SHA_C,
         }
     return document
 
@@ -291,6 +320,7 @@ def test_all_stage_documents_load_with_exact_presence(
     assert isinstance(config, Milestone4CampaignConfig)
     assert config.stage is expected
     assert (config.selection is not None) is (stage == "screen")
+    assert (config.screen_gates is not None) is (stage == "screen")
     assert (config.promotion is not None) is (stage == "confirmatory")
     assert (config.data.test is not None) is (stage == "confirmatory")
     assert all(
@@ -301,13 +331,71 @@ def test_all_stage_documents_load_with_exact_presence(
     assert len(config.fingerprint()) == 64
 
 
+def test_frozen_validation_screen_config_and_plan() -> None:
+    config = load_milestone4_campaign_config(SCREEN_CONFIG)
+    assert config.stage is CampaignStage.SCREEN
+    assert not config.claim_eligible
+    assert config.data.test is None and config.data.scaling is None
+    assert len(config.pairs) == 3
+    assert all(pair.test_seed is None for pair in config.pairs)
+    assert [
+        (
+            pair.pair_id,
+            pair.model_seed,
+            pair.train_seed,
+            pair.validation_seed,
+            pair.statistics_seed,
+        )
+        for pair in config.pairs
+    ] == [
+        ("screen-pair-1", 2101, 2201, 2301, 2401),
+        ("screen-pair-2", 2102, 2202, 2302, 2402),
+        ("screen-pair-3", 2103, 2203, 2303, 2403),
+    ]
+    assert config.data.train.length_schedule == (10, 12, 16, 18)
+    assert config.data.validation.lengths == (16, 32, 64, 128, 256)
+    assert config.data.validation.episodes_per_length == 64
+    assert config.training.optimizer_steps == 512
+    assert config.training.train_token_budget == 28_672
+    assert config.quality.max_absolute_drop == 0.05
+    assert config.statistics.method == "paired_exact_empirical_bootstrap_n3_v1"
+    assert config.statistics.resamples == 27
+    assert config.screen_gates is not None
+    assert config.screen_gates.candidate_pair_max_drop == 0.10
+    assert config.selection is not None
+    assert dict(config.selection.candidates_by_stratum) == {
+        "cached_transformer": ("transformer-control",),
+        "causal_ttn": ("ttn-control",),
+        "gru": ("gru-control",),
+        "routed_compact_rank": ("routed-compact-r2", "routed-compact-r4"),
+        "routed_latent": ("routed-latent",),
+    }
+    assert config.selection.standard_tie_break == (
+        "smaller_parameter_count",
+        "lexical_candidate_id",
+    )
+    assert config.selection.compact_tie_break == (
+        "smaller_parameter_count",
+        "smaller_target_cp_rank",
+        "higher_primary_metric",
+        "lexical_candidate_id",
+    )
+    plan = resolve_campaign_plan(config, COMMIT, TREE, SHA_A, SHA_B)
+    assert len(config.models) == 8
+    assert len(plan) == 24
+    assert sum(run.role == "trainable_source" for run in plan) == 18
+    assert sum(run.role == "derived_compact" for run in plan) == 6
+
+
 @pytest.mark.parametrize(
     ("stage", "field"),
     [
         ("pilot", "selection"),
+        ("pilot", "screen_gates"),
         ("pilot", "promotion"),
         ("screen", "promotion"),
         ("confirmatory", "selection"),
+        ("confirmatory", "screen_gates"),
     ],
 )
 def test_stage_forbidden_root_fields_are_rejected_even_when_null(
@@ -345,6 +433,62 @@ def test_confirm_requires_all_confirm_fields_and_three_pairs(tmp_path: Path) -> 
     document = base_document("confirmatory")
     document["pairs"] = document["pairs"][:2]  # type: ignore[index]
     with pytest.raises(ValueError, match="three pairs"):
+        load_milestone4_campaign_config(write_document(tmp_path, document))
+
+
+def test_screen_requires_exactly_three_pairs(tmp_path: Path) -> None:
+    document = base_document("screen")
+    document["pairs"] = document["pairs"][:2]  # type: ignore[index]
+    with pytest.raises(ValueError, match="exactly three pairs"):
+        load_milestone4_campaign_config(write_document(tmp_path, document))
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("chance", 0.26),
+        ("oracle_mean_min", 0.79),
+        ("reference_mean_min", 0.69),
+        ("reference_pair_min", 0.59),
+        ("reference_heldout_mean_min", 0.59),
+        ("reference_longest_length_mean_min", 0.59),
+        ("chance_corrected_oracle_recovery_min", 0.79),
+        ("oracle_max_drop_vs_reference", 0.03),
+        ("candidate_pair_max_drop", 0.11),
+        ("require_positive_query_partitions", False),
+        ("require_no_route_collapse", False),
+    ],
+)
+def test_screen_gates_are_exact_and_screen_only(
+    tmp_path: Path, field: str, value: object
+) -> None:
+    document = base_document("screen")
+    gates = document["screen_gates"]
+    assert isinstance(gates, dict)
+    gates[field] = value
+    with pytest.raises(ValueError, match=field):
+        load_milestone4_campaign_config(
+            write_document(tmp_path, document, f"gate-{field}.yaml")
+        )
+
+
+@pytest.mark.parametrize(
+    ("method", "resamples"),
+    [
+        ("paired_percentile_bootstrap_v1", 2000),
+        ("paired_exact_empirical_bootstrap_n3_v1", 26),
+        ("paired_exact_empirical_bootstrap_n3_v1", 28),
+    ],
+)
+def test_screen_requires_exact_three_pair_statistics(
+    tmp_path: Path, method: str, resamples: int
+) -> None:
+    document = base_document("screen")
+    statistics = document["statistics"]
+    assert isinstance(statistics, dict)
+    statistics["method"] = method
+    statistics["resamples"] = resamples
+    with pytest.raises(ValueError, match="screen requires|resamples=27"):
         load_milestone4_campaign_config(write_document(tmp_path, document))
 
 
@@ -455,7 +599,6 @@ def test_every_stage_requires_the_complete_control_matrix(
 @pytest.mark.parametrize(
     "candidate",
     [
-        "routed-source",
         "routed-latent",
         "routed-compact",
         "gru-control",
@@ -463,34 +606,35 @@ def test_every_stage_requires_the_complete_control_matrix(
         "ttn-control",
     ],
 )
-def test_screen_selection_covers_every_non_oracle_source_and_compact_rank(
+def test_screen_selection_covers_every_explicit_candidate_stratum(
     tmp_path: Path, candidate: str
 ) -> None:
     document = base_document("screen")
     selection = document["selection"]
     assert isinstance(selection, dict)
-    groups = selection["candidates_by_family"]
+    groups = selection["candidates_by_stratum"]
     assert isinstance(groups, dict)
     for values in groups.values():
         assert isinstance(values, list)
         if candidate in values:
             values.remove(candidate)
-    with pytest.raises(
-        ValueError, match="selection family/candidates|every non-oracle source"
-    ):
+    with pytest.raises(ValueError, match="exact candidate set|cannot be empty"):
         load_milestone4_campaign_config(
             write_document(tmp_path, document, f"missing-{candidate}.yaml")
         )
 
 
-def test_screen_selection_excludes_oracle_reference_stratum(tmp_path: Path) -> None:
+@pytest.mark.parametrize("diagnostic", ["routed-source", "routed-oracle"])
+def test_screen_selection_excludes_reference_and_oracle_diagnostics(
+    tmp_path: Path, diagnostic: str
+) -> None:
     document = base_document("screen")
     selection = document["selection"]
     assert isinstance(selection, dict)
-    groups = selection["candidates_by_family"]
-    assert isinstance(groups, dict) and isinstance(groups["routed"], list)
-    groups["routed"].append("routed-oracle")
-    with pytest.raises(ValueError, match="every non-oracle source"):
+    groups = selection["candidates_by_stratum"]
+    assert isinstance(groups, dict) and isinstance(groups["routed_latent"], list)
+    groups["routed_latent"].append(diagnostic)
+    with pytest.raises(ValueError, match="exact candidate set|omitted"):
         load_milestone4_campaign_config(write_document(tmp_path, document))
 
 
@@ -756,12 +900,15 @@ def test_promotion_path_is_lexical_and_runner_checks_are_explicit(
     assert "seed freshness" in module_contract
 
 
-def test_confirm_promotion_bundle_must_match_resolved_bundle(tmp_path: Path) -> None:
+def test_confirm_promotion_binds_screen_bundle_not_current_bundle(tmp_path: Path) -> None:
     config = load_milestone4_campaign_config(
         write_document(tmp_path, base_document("confirmatory"))
     )
-    with pytest.raises(ValueError, match="bundle"):
-        resolve_campaign_plan(config, COMMIT, TREE, SHA_A, SHA_B)
+    assert config.promotion is not None
+    assert config.promotion.screen_executable_bundle_sha256 == SHA_C
+    plan = resolve_campaign_plan(config, COMMIT, TREE, SHA_A, SHA_B)
+    assert plan
+    assert all(run.executable_bundle_sha256 == SHA_B for run in plan)
 
 
 def test_unknown_or_missing_nested_keys_are_rejected(tmp_path: Path) -> None:
@@ -824,8 +971,8 @@ def test_selection_requires_exact_immutable_nested_tuples(tmp_path: Path) -> Non
     assert selection is not None
     object.__setattr__(
         selection,
-        "candidates_by_family",
-        list(selection.candidates_by_family),
+        "candidates_by_stratum",
+        list(selection.candidates_by_stratum),
     )
     with pytest.raises(TypeError, match="immutable tuple"):
         selection.__post_init__()
