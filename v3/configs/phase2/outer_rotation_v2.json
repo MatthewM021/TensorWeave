@@ -1,0 +1,107 @@
+{
+  "schema": "tnlm-v3-phase2-outer-rotation-protocol-v2",
+  "protocol_id": "phase2-known-semantics-crossed-complete-cell-rotation-v2",
+  "frozen_before_new_model_fitting_or_outer_evaluation": true,
+  "claim_eligible": false,
+  "epistemic_scope": "prospective_execution_robustness_over_known_binding_semantics_not_secret_law_discovery",
+  "supersedes": {
+    "path": "v3/configs/phase2/outer_rotation_v1.json",
+    "sha256": "2da105f02791ae3a8812015e570591e728df93567755e77bc18fe6c92d61305e",
+    "status": "superseded_before_model_fitting",
+    "reason": "one_complete_block_confounds_outer_cell_with_seed_pair"
+  },
+  "base_task_config": {
+    "path": "v3/configs/milestone4/validation_screen_v1.yaml",
+    "sha256": "67e5dac587ceabf0120948cf9fdc077b32df03628bdb0367346c0c32d75f89ab"
+  },
+  "task": {
+    "num_surface_keys": 5,
+    "value_cardinality": 4,
+    "max_live_bindings": 3,
+    "cell_order": "lexical_key_then_value",
+    "cell_index": "4_times_key_plus_value"
+  },
+  "data": {
+    "generator_splits": ["train", "validation"],
+    "documents_per_split": 16,
+    "document_length": 64,
+    "outer_labels_used_for_fit_or_selection": false
+  },
+  "selector": {
+    "residual_penalties": [4, 16],
+    "restart_count": 2,
+    "max_sweeps": 4,
+    "mode": "pseudoheldout_primary",
+    "inner_folds_per_environment": 19,
+    "candidate_ordering_uses_outer_identifier": false,
+    "fold_candidate_seen_fit_gate": "zero_training_mistakes_required_before_validation_is_admissible",
+    "abort_before_outer_evaluation_if_seen_fit_gate_fails": true
+  },
+  "seed_pair_inventory": {
+    "count": 20,
+    "index_range": [0, 19],
+    "train_seed_formula": "10000_plus_seed_pair_index",
+    "validation_seed_formula": "20000_plus_seed_pair_index",
+    "optimizer_seed_formula": "30000_plus_seed_pair_index"
+  },
+  "crossed_blocks": [
+    {
+      "block_id": "A",
+      "environment_index_offset": 0,
+      "outer_cell_index_range": [0, 19],
+      "seed_pair_index_formula": "outer_cell_index",
+      "complete_single_cell_rotation": true
+    },
+    {
+      "block_id": "B",
+      "environment_index_offset": 20,
+      "outer_cell_index_range": [0, 19],
+      "seed_pair_index_formula": "outer_cell_index_plus_7_mod_20",
+      "complete_single_cell_rotation": true
+    }
+  ],
+  "expanded_design_invariants": {
+    "environment_count": 40,
+    "complete_cell_rotation_blocks": 2,
+    "environments_per_outer_cell": 2,
+    "environments_per_seed_pair": 2,
+    "block_shift": 7,
+    "block_shift_coprime_to_cell_count": true,
+    "cell_seed_incidence_graph_connected": true,
+    "duplicate_cell_seed_pair_combinations": false
+  },
+  "postfit_acceptance": {
+    "required_passing_environments": 40,
+    "required_admissible_fold_candidates": 1520,
+    "seen_training_accuracy": 1.0,
+    "final_local_override_count": 0,
+    "exact_supported_transition_entries": 20,
+    "actual_cell_query_accuracy": 1.0,
+    "actual_cell_focal_accuracy": 1.0,
+    "exact_probe_families": 12,
+    "path_relation_accuracy": 1.0,
+    "selected_penalty_may_vary": true
+  },
+  "reporting_requirements": [
+    "report_all_40_environments",
+    "report_both_repetitions_of_every_outer_cell",
+    "report_both_uses_of_every_seed_pair",
+    "report_every_fold_candidate_seen_fit_before_validation",
+    "report_fold_and_aggregate_selection_scores",
+    "report_selected_penalty_distribution",
+    "report_final_realized_overrides",
+    "report_actual_cell_separately_from_rotated_cell_coverage",
+    "report_all_shortcut_controls",
+    "bind_protocol_config_source_and_result_hashes",
+    "do_not_call_cell_rotation_program_conjugacy_or_equivariance"
+  ],
+  "forbidden_after_model_fitting_begins": [
+    "changing_seed_cell_crossing",
+    "changing_penalty_grid",
+    "changing_optimizer_budget",
+    "changing_seen_fit_or_probe_acceptance_gates",
+    "dropping_or_replacing_failed_environments",
+    "selecting_by_outer_results",
+    "interpreting_validation_when_any_candidate_seen_fit_gate_fails"
+  ]
+}

@@ -198,8 +198,11 @@ the three paired results, applies the predeclared source and compact-quality
 gates, and writes a checksum-bound promotion record with a decision of
 `complete_promote` or `complete_do_not_promote`.
 
-The current local V3 suite passes 727 tests with one skip, including the new
-screen source contract. This is local source verification, not screen evidence.
+The current local V3 suite collects 858 tests.  Its default run passes 854 with
+four skips; the two opt-in Phase-II discovery regressions pass separately.
+The remaining skips are the CUDA-only check and the deliberately unopened
+40-environment Phase-II campaign regression.  This is local source
+verification, not screen or scientific campaign evidence.
 The screen remains non-claiming: it exposes no test or scaling stream, and its
 schema-mandatory runtime declaration does not produce runtime or RSS evidence.
 No screen run or promotion decision has yet been produced. Pilot-scale trained
@@ -209,3 +212,36 @@ scientific result, or speed/RSS win. The functional cache path deliberately
 performs strict public-state validation and immutable growth; comparative timing
 must first use a predeclared, fair measurement path that accounts for that
 overhead consistently across opponents.
+
+## Exact algebra and trace-supervised coefficient learning
+
+The Phase-I analysis now gives the binding task an executable exact semantic
+algebra, strict legality certificate, and heldout-identifiability audit.  For
+the frozen five-key/four-value task, the natural absence-aware realization has
+dimension 21 while direct train support spans 20; unrestricted train behavior
+therefore cannot determine the missing direction without an intervention or a
+declared structural prior.
+
+Phase II adds a trace-supervised transition-table learner, 19 causally censored
+pseudoheldout folds, a shared-plus-key-local selector, and a balanced dynamic
+probe suite.  In three retrospective passive seed pairs, the final models made
+0 / 981 seen-query errors, learned the exact 20 generator-supported BIND,
+UPDATE, and COPY entries with no realized local overrides, and answered
+288 / 288 actual-cell queries and 72 / 72 focal queries correctly.  All 36
+seed-by-probe-family rows and every declared path relation were exact.  The
+selected penalty varied across seeds, so this supports repeatable coefficient
+recovery inside the supplied addressable-register representation, not
+discovery of a unique regularization strength, latent representation, or
+assumption-free algebra.  A later audit found nonzero TRAIN error in 47 / 114
+pilot fold-candidate fits, so their penalty comparisons are optimization-
+confounded even though every final model and behavioral probe is exact.  The
+records remain retrospective and non-claiming;
+see `../docs/V3_PHASE2_LEARNING_THE_ALGEBRA.md` and
+`../v3_recovery/PHASE2_TRACE_ALGEBRA_PILOT_SUMMARY.json`.
+
+The proposed Phase III follow-on removes the supplied register coordinates
+from the estimator and tests exact predictive-state discovery from opaque
+event/query symbols, including an actively acquired missing Hankel direction,
+similarity-gauge invariance, and a fail-closed factorization certificate.  Its
+preregistered design is in
+`../docs/V3_PHASE3_PREDICTIVE_STATE_DISCOVERY.md`.

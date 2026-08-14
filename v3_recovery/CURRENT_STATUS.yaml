@@ -136,10 +136,13 @@ validated_reconstruction:
         source_tree: e59ca383e984177ea337c1a2037bfbe48687cdda
         ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31720252790
         ci_status: passed
-    v3_source_tests_collected: 728
-    v3_source_tests_passed: 727
-    v3_source_tests_skipped: 1
-    v3_source_tests_scope: current_local_source_suite_not_screen_execution_evidence
+    v3_source_tests_collected: 858
+    v3_default_tests_passed: 854
+    v3_default_tests_skipped: 4
+    v3_opt_in_phase2_slow_tests_passed: 2
+    v3_effective_tests_passed: 856
+    v3_effective_tests_skipped: 2
+    v3_source_tests_scope: current_local_source_suite_not_screen_or_scientific_campaign_evidence
     repository_verifier:
       status: passed
       protected_v2_files: 193
@@ -213,6 +216,80 @@ validated_reconstruction:
       - promotion-bound paired multi-seed confirmatory campaign
       - optional identity-initialized MERA ablation
       - fair predeclared cached-runtime measurement path
+  phase_1_2_compositional_algebra_research:
+    status: power_control_passed_and_multienvironment_v3_frozen_unexecuted
+    claim_eligible: false
+    scope: coefficient_recovery_inside_a_supplied_addressable_register_transducer
+    exact_semantic_analysis:
+      full_semantic_states: 821
+      train_semantic_states: 708
+      absence_aware_full_dimension: 21
+      absence_aware_train_dimension: 20
+      unrestricted_train_behavior_nullity: 4912
+    passive_trace_pilot:
+      paired_seed_environments: 3
+      train_seeds: [17, 18, 19]
+      validation_seeds: [23, 24, 25]
+      documents_per_split: 16
+      document_length: 64
+      residual_penalties: [4, 16]
+      selected_penalties: [4, 4, 16]
+      seen_training_queries_correct: 981
+      seen_training_queries_total: 981
+      final_local_overrides: 0
+      learned_supported_categorical_entries: 20
+      runs_with_exact_shared_table: 3
+      actual_cell_queries_correct: 288
+      actual_cell_queries_total: 288
+      actual_cell_focal_queries_correct: 72
+      actual_cell_focal_queries_total: 72
+      exact_seed_by_probe_family_rows: 36
+      rotated_cell_queries_correct: 5400
+      rotated_cell_queries_total: 5400
+      deterministic_seed_17_23_byte_replay: passed
+      independent_record_audit: passed
+      fold_candidates_with_nonzero_train_error: 47
+      penalty_selection_interpretability: confounded_by_candidate_underoptimization
+      summary: PHASE2_TRACE_ALGEBRA_PILOT_SUMMARY.json
+      checksum_manifest: PHASE2_TRACE_ALGEBRA_PILOT_EVIDENCE.sha256
+    observed_exception_power_control:
+      status: passed
+      scope: directly_observed_transition_address_exception_only
+      positive_selected_penalty: 4
+      positive_exact_local_overrides: 1
+      positive_validation_mistakes: 0
+      null_selected_penalty: 16
+      null_local_overrides: 0
+      null_validation_mistakes: 0
+      file: PHASE2_ALGEBRA_POWER_CONTROL_V1.json
+      file_sha256: 4fa8d54c636ae693fdca7931ebb3e2095488eb8cc74f8d7f49e120e4c6e230a6
+      record_sha256: 831bf991a99ad51b841a916f919df94def448c8f722fd9e1f06769e873c1913f
+    outer_rotation_v3:
+      status: frozen_preopen_not_started
+      environments: 40
+      complete_cell_blocks: 2
+      fold_candidates: 1520
+      documents_per_split: 24
+      document_length: 64
+      protocol_sha256: 8689ab0ad06a1268c96690da27a6f8573b1536ca19c3bc18c403fdc07ffe2649
+      implementation_manifest: PHASE2_OUTER_ROTATION_V3_IMPLEMENTATION.sha256
+      implementation_manifest_sha256: 6ff8b9e54d5fe7710fe605e2f7615046275f54eb20fd2f75147bbd840e6e7858
+      two_phase_batch_open: true
+    limitations:
+      - retrospective_protocol_rehearsal
+      - three_seeds_only
+      - penalty_selection_not_stable
+      - register_representation_and_query_gauge_supplied
+      - trusted_controller_used_oracle_occupancy_and_dependency_metadata
+      - not_representation_discovery
+      - not_assumption_free_algebra_discovery
+      - not_confirmatory
+      - not_natural_language_evidence
+    remaining:
+      - execute_all_40_frozen_preopen_environments_and_terminal_gate
+      - batch_open_only_if_all_1520_candidates_and_40_final_fits_pass
+      - freeze_a_genuinely_prospective_externally_held_environment
+      - broaden_to_latent_predictive_state_and_operator_discovery
 not_yet_reconstructed:
   - trained scientific evaluation of recurrent, cached-transformer, and causal-tree controls
   - optional identity-initialized MERA ablation

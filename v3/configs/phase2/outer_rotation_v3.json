@@ -1,0 +1,235 @@
+{
+  "schema": "tnlm-v3-phase2-outer-rotation-protocol-v3",
+  "protocol_id": "phase2-known-semantics-crossed-complete-cell-rotation-v3",
+  "frozen_before_new_environment_fitting_or_outer_probe_evaluation": true,
+  "claim_eligible": false,
+  "epistemic_scope": "precommitted_new_data_coefficient_recovery_replication_over_known_semantics_not_secret_law_or_representation_discovery",
+  "supersedes": {
+    "path": "v3/configs/phase2/outer_rotation_v2.json",
+    "sha256": "9aef5525f3abf67a9c111b412ad1a5443817ebb1b1afd83a1a0050c0fb6092ce",
+    "status": "superseded_before_new_environment_fitting",
+    "reasons": [
+      "v2_confounded_validation_scores_with_nonzero_candidate_training_error",
+      "v2_did_not_bind_the_new_trace_initializer_and_pairwise_optimizer",
+      "v2_opened_outer_probes_per_environment_instead_of_after_a_terminal_campaign_preopen_gate",
+      "v2_used_too_few_documents_for_the_minimum_pseudoquery_gate"
+    ]
+  },
+  "base_task_config": {
+    "path": "v3/configs/milestone4/validation_screen_v1.yaml",
+    "sha256": "67e5dac587ceabf0120948cf9fdc077b32df03628bdb0367346c0c32d75f89ab"
+  },
+  "implementation_commitment": {
+    "required_before_any_preopen_environment_fit": true,
+    "manifest_path": "v3_recovery/PHASE2_OUTER_ROTATION_V3_IMPLEMENTATION.sha256",
+    "manifest_sha256_recorded_by_every_artifact": true,
+    "reason_for_external_manifest": "the_runner_reads_the_manifest_so_the_manifest_can_bind_the_runner_without_a_self_hash_cycle",
+    "required_source_globs": [
+      "v3/src/tnlm_v3/*.py"
+    ],
+    "manifest_must_include_every_matching_source_file": true,
+    "required_paths": [
+      "v3/configs/milestone4/validation_screen_v1.yaml",
+      "v3/configs/phase2/outer_rotation_v3.json",
+      "v3/pyproject.toml",
+      "v3/scripts/run_phase2_algebra_power_control.py",
+      "v3/scripts/run_phase2_trace_algebra_experiment.py",
+      "v3/scripts/run_phase2_trace_algebra_multienvironment.py"
+    ]
+  },
+  "task": {
+    "num_surface_keys": 5,
+    "value_cardinality": 4,
+    "max_live_bindings": 3,
+    "cell_order": "lexical_key_then_value",
+    "cell_index": "4_times_key_plus_value",
+    "supported_learned_transition_entries": 20,
+    "supplied_structure": [
+      "addressable_register_interface",
+      "structured_event_parser_and_argument_roles",
+      "four_symbol_value_alphabet_aligned_with_query_labels",
+      "presence_and_invalidation_grammar",
+      "identity_query_gauge",
+      "shared_plus_destination_key_local_transition_table_family"
+    ]
+  },
+  "data": {
+    "generator_splits": ["train", "validation"],
+    "documents_per_split": 24,
+    "document_length": 64,
+    "primary_generated_events_per_environment": 3072,
+    "primary_generated_events_total": 122880,
+    "deterministic_certificate_replay_generation_metered_separately": true,
+    "outer_labels_used_for_fit_or_selection": false,
+    "outer_identifier_known_to_trusted_controller": true,
+    "task_fingerprint_participates_in_generator_seed_derivation": true
+  },
+  "selector": {
+    "residual_penalties": [4, 16],
+    "restart_count": 1,
+    "max_sweeps": 4,
+    "max_pairwise_rounds": 2,
+    "mode": "pseudoheldout_primary",
+    "inner_folds_per_environment": 19,
+    "minimum_pseudo_dependent_queries_per_fold": 16,
+    "trace_initializer": "fixed_point_plurality_from_visible_transitions_and_train_query_targets",
+    "pairwise_search_scope": "initializer_uncertain_or_coordinate_changed_transition_addresses",
+    "selector_derives_optimizer_seed_from_inferred_outer_identifier": false,
+    "fold_optimizer_seed_formula": "environment_optimizer_seed_plus_4_times_pseudo_key_plus_pseudo_value",
+    "environment_optimizer_seed_is_a_precommitted_balanced_schedule_factor": true,
+    "fold_candidate_seen_fit_gate": "zero_training_mistakes_and_zero_local_overrides",
+    "fold_candidate_objective_at_gate": 0,
+    "fold_candidate_global_optimum_then_known_analytically": true,
+    "abort_before_terminal_preopen_aggregate_if_any_candidate_gate_fails": true
+  },
+  "seed_pair_inventory": {
+    "count": 20,
+    "index_range": [0, 19],
+    "train_seed_formula": "10000_plus_seed_pair_index",
+    "validation_seed_formula": "20000_plus_seed_pair_index",
+    "optimizer_seed_formula": "30000_plus_seed_pair_index",
+    "numeric_data_seed_reuse_is_not_common_random_numbers": true,
+    "reason": "the_heldout_dependent_task_fingerprint_changes_generator_derived_seeds",
+    "permitted_inference": "balanced_precommitted_assignment_over_independent_environment_draws",
+    "forbidden_inference": "shared_rng_seed_main_effect_or_cell_by_seed_independence"
+  },
+  "crossed_blocks": [
+    {
+      "block_id": "A",
+      "environment_index_offset": 0,
+      "outer_cell_index_range": [0, 19],
+      "seed_pair_index_formula": "outer_cell_index",
+      "complete_single_cell_rotation": true
+    },
+    {
+      "block_id": "B",
+      "environment_index_offset": 20,
+      "outer_cell_index_range": [0, 19],
+      "seed_pair_index_formula": "outer_cell_index_plus_7_mod_20",
+      "complete_single_cell_rotation": true
+    }
+  ],
+  "expanded_design_invariants": {
+    "environment_count": 40,
+    "complete_cell_rotation_blocks": 2,
+    "environments_per_outer_cell": 2,
+    "environments_per_seed_pair_label": 2,
+    "block_shift": 7,
+    "block_shift_coprime_to_cell_count": true,
+    "cell_seed_label_incidence_graph_connected": true,
+    "duplicate_cell_seed_label_combinations": false,
+    "data_realizations_are_independent_not_matched": true,
+    "replicates_per_cell": 2,
+    "gold_standard_full_cell_by_seed_cross_not_claimed": true
+  },
+  "execution_phases": {
+    "phase_1_preopen": {
+      "permitted": [
+        "generate_train_and_validation_corpora",
+        "construct_trusted_fold_attestations",
+        "fit_and_select_candidates",
+        "write_content_bound_preopen_environment_shards"
+      ],
+      "forbidden": [
+        "construct_outer_probe_suite",
+        "read_outer_probe_answers",
+        "evaluate_outer_or_rotated_probes"
+      ]
+    },
+    "phase_2_terminal_preopen_aggregate": {
+      "required_environment_shards": 40,
+      "required_admissible_fold_candidates": 1520,
+      "requires_every_fold_candidate_gate": true,
+      "requires_every_final_seen_fit_zero_mistakes_and_zero_overrides": true,
+      "content_binds_every_preopen_shard": true
+    },
+    "phase_3_batch_open": {
+      "permitted_only_after_terminal_preopen_aggregate": true,
+      "evaluates_all_40_frozen_models": true,
+      "failed_environment_replacement_forbidden": true,
+      "post_open_optimizer_or_protocol_change_forbidden": true
+    }
+  },
+  "work_budget": {
+    "planned_objective_evaluations_per_fit": 8001,
+    "fit_calls_per_environment": 39,
+    "max_scored_event_work_per_fit": 12300000,
+    "conservative_scored_event_work_per_environment": 479408640,
+    "max_scored_event_work_per_environment": 480000000,
+    "conservative_scored_event_work_total": 19176345600,
+    "max_scored_event_work_total": 19200000000,
+    "max_primary_generated_events_total": 122880,
+    "max_deterministic_replay_generated_events_total": 491520,
+    "max_all_generation_work_total": 614400,
+    "replay_generation_is_validation_only_and_never_refit_or_reselection": true
+  },
+  "runtime_reproducibility": {
+    "record_exact_python_version": true,
+    "record_exact_torch_version": true,
+    "record_exact_pyyaml_version": true,
+    "record_platform_and_device": true,
+    "expected_frozen_environment": {
+      "python": "3.12.13",
+      "torch": "2.13.0+cpu",
+      "pyyaml": "6.0.3",
+      "device": "cpu"
+    }
+  },
+  "preopen_acceptance": {
+    "required_passing_environments": 40,
+    "required_admissible_fold_candidates": 1520,
+    "every_candidate_training_mistakes": 0,
+    "every_candidate_local_overrides": 0,
+    "every_final_training_mistakes": 0,
+    "every_final_local_overrides": 0,
+    "all_other_19_cells_observed_in_each_environment": true,
+    "unique_pseudoheldout_folds_per_environment": 19,
+    "minimum_pseudo_dependent_queries_per_fold": 16
+  },
+  "postopen_acceptance": {
+    "exact_supported_transition_entries_per_environment": 20,
+    "actual_cell_cases": [15, 15],
+    "actual_cell_queries": [96, 96],
+    "actual_cell_focal_queries": [24, 24],
+    "exact_probe_families": [12, 12],
+    "exact_path_relations": [3, 3],
+    "rotated_control_cases": [300, 300],
+    "rotated_control_queries": [1800, 1800],
+    "rotated_control_focal_queries": [480, 480],
+    "all_shortcut_controls_strictly_below_learned_model": true,
+    "selected_penalty_may_vary": true,
+    "no_pooled_average_rescue": true
+  },
+  "prerequisite_controls": {
+    "observed_transition_address_exception_power_control_required": true,
+    "record_path": "v3_recovery/PHASE2_ALGEBRA_POWER_CONTROL_V1.json",
+    "record_must_validate_before_any_preopen_fit": true,
+    "record_sha256_bound_by_every_preopen_and_campaign_artifact": true,
+    "positive_expected": "penalty_4_realizes_exactly_the_declared_observed_override",
+    "null_expected": "penalty_16_selected_on_tie_with_zero_overrides",
+    "self_pseudoheldout_exception_recovery_claim_forbidden": true
+  },
+  "reporting_requirements": [
+    "report_all_40_environments_and_both_replicates_per_cell",
+    "report_every_fold_candidate_training_mistake_and_override_count",
+    "report_fold_and_aggregate_selection_scores",
+    "report_selected_penalty_distribution",
+    "report_final_realized_transition_tables_and_overrides",
+    "report_actual_cell_separately_from_rotated_cell_coverage",
+    "report_all_shortcut_controls",
+    "bind_protocol_implementation_preopen_and_open_artifact_hashes",
+    "describe_numeric_data_seeds_as_independent_draw_labels_not_common_random_numbers",
+    "do_not_call_cell_rotation_program_conjugacy_or_equivariance",
+    "do_not_call_the_supplied_register_representation_discovered"
+  ],
+  "forbidden_after_any_preopen_fit_begins": [
+    "changing_seed_cell_crossing",
+    "changing_document_count_or_length",
+    "changing_penalty_grid_or_optimizer_budget",
+    "changing_seen_fit_or_probe_acceptance_gates",
+    "dropping_replacing_or_selectively_rerunning_failed_environments",
+    "opening_any_outer_probe_before_the_terminal_preopen_aggregate",
+    "selecting_or_debugging_by_outer_results",
+    "interpreting_validation_when_any_candidate_preopen_gate_fails"
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "schema": "tnlm-v3-phase2-trace-algebra-pilot-summary-v1",
+  "scope": "retrospective_three_seed_trace_supervised_coefficient_recovery_in_a_supplied_register_transducer",
+  "claim_eligible": false,
+  "campaign_config": {
+    "path": "v3/configs/milestone4/validation_screen_v1.yaml",
+    "sha256": "67e5dac587ceabf0120948cf9fdc077b32df03628bdb0367346c0c32d75f89ab"
+  },
+  "source_files": [
+    {
+      "path": "v3/scripts/run_phase2_trace_algebra_experiment.py",
+      "sha256": "c0059dc02f60ef356406add09952bab41f890e500dbb8edd4d6f15da3321f61c"
+    },
+    {
+      "path": "v3/src/tnlm_v3/algebra_discovery.py",
+      "sha256": "88948304994254d9742b50764ce3eb17c5e9bbf2b7265e7b9b6178c9a4da48a4"
+    },
+    {
+      "path": "v3/src/tnlm_v3/algebra_discovery_probes.py",
+      "sha256": "57b5704f0acaa0941e33b356a6b375484d405d1fd42e32a4570ad85e01ed19af"
+    }
+  ],
+  "source_bundle": {
+    "path": "v3_recovery/PHASE2_TRACE_ALGEBRA_PILOT_SOURCE_BUNDLE.zip",
+    "bytes": 46099,
+    "sha256": "bf4c98c88b3d20499ae822b5047c96b55252d0de04db54f9199344e2b590c52f",
+    "entry_count": 6,
+    "source_entry_count": 4,
+    "crc_verified": true,
+    "deterministic_zip_timestamps": true
+  },
+  "frozen_protocol": {
+    "documents_per_split": 16,
+    "document_length": 64,
+    "residual_penalties": [4, 16],
+    "optimizer_seed": 0,
+    "restart_count": 2,
+    "max_sweeps": 4,
+    "pseudoheldout_folds_per_run": 19,
+    "outer_cell": [0, 0],
+    "learned_categorical_transition_entries": 20,
+    "supplied_structure": [
+      "addressable_register_interface",
+      "structured_event_parser_and_arguments",
+      "value_alphabet",
+      "presence_and_invalidation_grammar",
+      "identity_query_gauge",
+      "shared_plus_key_local_transition_table_family"
+    ]
+  },
+  "successful_runs": [
+    {
+      "path": "work/phase2-trace-algebra-pilot-r2s4-v1.json",
+      "bytes": 117217,
+      "file_sha256": "a5d27c361332abecfb0b3e0dcf439f091edfe6a4e2337cd2a19a0a1600410a3f",
+      "record_sha256": "abc45cc0d76d2d5d53f35e54ca2aaca8217661f2b397a53bd6fedd7c3034b1b0",
+      "train_seed": 17,
+      "validation_seed": 23,
+      "selected_residual_penalty": 4,
+      "pseudoheldout_errors": {"4": [85, 838], "16": [90, 838]},
+      "fold_primary_wins": {"4": 2, "16": 1, "tie": 16},
+      "seen_training": [328, 328],
+      "final_local_overrides": 0,
+      "actual_cell_queries": [96, 96],
+      "actual_cell_focal_queries": [24, 24],
+      "exact_probe_families": [12, 12],
+      "path_consistency": 1.0,
+      "rotated_cell_queries": [1800, 1800],
+      "rotated_cell_focal_queries": [480, 480]
+    },
+    {
+      "path": "work/phase2-trace-algebra-pilot-seed2-v1.json",
+      "bytes": 117176,
+      "file_sha256": "a6d2b1a7dbf21afa89c5fd360f7868208aed169aaab1e92c807b93309758294e",
+      "record_sha256": "36af0ed4aadcbf460a192eb2127f3ded157d3c3782021a202ce4b097143badd4",
+      "train_seed": 18,
+      "validation_seed": 24,
+      "selected_residual_penalty": 4,
+      "pseudoheldout_errors": {"4": [437, 1001], "16": [478, 1001]},
+      "fold_primary_wins": {"4": 7, "16": 5, "tie": 7},
+      "seen_training": [319, 319],
+      "final_local_overrides": 0,
+      "actual_cell_queries": [96, 96],
+      "actual_cell_focal_queries": [24, 24],
+      "exact_probe_families": [12, 12],
+      "path_consistency": 1.0,
+      "rotated_cell_queries": [1800, 1800],
+      "rotated_cell_focal_queries": [480, 480]
+    },
+    {
+      "path": "work/phase2-trace-algebra-pilot-seed3-v1.json",
+      "bytes": 117192,
+      "file_sha256": "2dd280cb8d82408b55e0c92e85689477ac9af1d62a78cc86275e7978ba560ee9",
+      "record_sha256": "40412b867f147165947023274c9506853b2f4b3bb4f5c0596f640e4885e508b4",
+      "train_seed": 19,
+      "validation_seed": 25,
+      "selected_residual_penalty": 16,
+      "pseudoheldout_errors": {"4": [147, 992], "16": [94, 992]},
+      "fold_primary_wins": {"4": 1, "16": 4, "tie": 14},
+      "seen_training": [334, 334],
+      "final_local_overrides": 0,
+      "actual_cell_queries": [96, 96],
+      "actual_cell_focal_queries": [24, 24],
+      "exact_probe_families": [12, 12],
+      "path_consistency": 1.0,
+      "rotated_cell_queries": [1800, 1800],
+      "rotated_cell_focal_queries": [480, 480]
+    }
+  ],
+  "aggregate": {
+    "successful_seed_pairs": 3,
+    "selected_penalty_counts": {"4": 2, "16": 1},
+    "fold_candidates_total": 114,
+    "fold_candidates_with_nonzero_train_error": 47,
+    "penalty_comparison_interpretability": "confounded_by_candidate_underoptimization",
+    "seen_training_queries": [981, 981],
+    "final_local_overrides": 0,
+    "runs_with_exact_20_entry_shared_table": 3,
+    "actual_cell_queries": [288, 288],
+    "actual_cell_focal_queries": [72, 72],
+    "exact_seed_by_family_rows": [36, 36],
+    "runs_with_exact_path_relations": 3,
+    "rotated_cell_queries": [5400, 5400],
+    "rotated_cell_focal_queries": [1440, 1440]
+  },
+  "low_budget_optimization_control": {
+    "path": "work/phase2-trace-algebra-pilot-v1.json",
+    "bytes": 117363,
+    "file_sha256": "821e68af8f1ddcc7ef94b60a54322f163971c75a1cf5c1ba5d0423b4b587cf2c",
+    "record_sha256": "4e1f03695dd8292e42f844978af42aee892095b9caf27a9f31ce95542ddff528",
+    "train_seed": 17,
+    "validation_seed": 23,
+    "restart_count": 1,
+    "max_sweeps": 1,
+    "seen_training": [234, 328],
+    "actual_cell_queries": [82, 96],
+    "actual_cell_focal_queries": [10, 24],
+    "interpretation": "optimization_failed_seen_fit_gate_outer_result_not_interpretable"
+  },
+  "reproducibility": {
+    "seed_17_23_repeated_byte_for_byte": true,
+    "repeated_bytes": 117217,
+    "repeated_file_sha256": "a5d27c361332abecfb0b3e0dcf439f091edfe6a4e2337cd2a19a0a1600410a3f"
+  },
+  "post_outer_optimizer_diagnostic": {
+    "evidence_status": "retrospective_diagnostic_not_replacement_pilot_evidence",
+    "trace_query_initializer_and_pairwise_search_used": true,
+    "fold_candidates_exact_zero_error_zero_override": [114, 114],
+    "selected_penalties": [16, 16, 16],
+    "interpretation": "optimizer_confound_removed_only_after_outer_semantics_were_known"
+  },
+  "independent_audit": {
+    "status": "passed",
+    "record_and_source_hashes_verified": true,
+    "fold_arithmetic_recomputed": true,
+    "learned_tables_recomputed": true,
+    "probe_shortcut_and_rotation_summaries_recomputed": true
+  },
+  "conclusion": "passive_trace_and_query_supervision_recovered_the_coefficients_of_the_supplied_register_algebra_across_three_exploratory_seeds",
+  "limitations": [
+    "retrospective_protocol_rehearsal",
+    "outer_identifier_known_to_trusted_controller",
+    "three_seeds_only",
+    "penalty_selection_not_stable",
+    "fold_candidate_penalty_scores_confounded_by_underoptimization",
+    "addressable_register_representation_supplied",
+    "query_gauge_and_event_factorization_supplied",
+    "not_representation_discovery",
+    "not_assumption_free_algebra_discovery",
+    "not_confirmatory",
+    "not_natural_language_evidence"
+  ]
+}
