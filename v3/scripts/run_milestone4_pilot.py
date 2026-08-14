@@ -339,7 +339,7 @@ def _parse_canonical_json(raw: bytes, *, name: str) -> Mapping[str, Any]:
 
 def _run_git(repo_root: Path, *arguments: str, binary: bool = False) -> bytes | str:
     completed = subprocess.run(
-        ["git", "-c", f"safe.directory={repo_root}", *arguments],
+        ["git", "-c", f"safe.directory={repo_root.as_posix()}", *arguments],
         cwd=repo_root,
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,

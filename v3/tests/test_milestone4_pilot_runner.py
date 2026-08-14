@@ -61,6 +61,24 @@ def test_inventory_digest_matches_frozen_raw_entry_contract(runner) -> None:  # 
     ).hexdigest()
 
 
+def test_git_provenance_uses_portable_safe_directory(
+    runner, monkeypatch: pytest.MonkeyPatch, tmp_path: Path  # type: ignore[no-untyped-def]
+) -> None:
+    repo = tmp_path / "checkout with space"
+    captured: dict[str, object] = {}
+
+    def fake_run(argv, **kwargs):  # type: ignore[no-untyped-def]
+        captured["argv"] = argv
+        captured["cwd"] = kwargs["cwd"]
+        return SimpleNamespace(returncode=0, stdout=b"ok\n", stderr=b"")
+
+    monkeypatch.setattr(runner.subprocess, "run", fake_run)
+    assert runner._run_git(repo, "rev-parse", "HEAD") == "ok\n"
+    argv = captured["argv"]
+    assert argv[2] == f"safe.directory={repo.as_posix()}"
+    assert captured["cwd"] == repo
+
+
 def test_attempt_paths_are_deterministic_and_external(runner) -> None:  # type: ignore[no-untyped-def]
     run_id = "a" * 64
     assert (
