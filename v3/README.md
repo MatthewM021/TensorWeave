@@ -198,10 +198,10 @@ the three paired results, applies the predeclared source and compact-quality
 gates, and writes a checksum-bound promotion record with a decision of
 `complete_promote` or `complete_do_not_promote`.
 
-The current local V3 suite collects 928 tests.  Its default run passes 924 with
+The current local V3 suite collects 986 tests.  Its default run passes 982 with
 four skips; the two opt-in Phase-II discovery regressions pass separately.
-The remaining skips are the CUDA-only check and the deliberately unopened
-40-environment Phase-II campaign regression.  This is local source
+The remaining skips are the CUDA-only check and the frozen-snapshot-only
+40-environment Phase-II campaign replay.  This is local source
 verification, not screen or scientific campaign evidence.
 The screen remains non-claiming: it exposes no test or scaling stream, and its
 schema-mandatory runtime declaration does not produce runtime or RSS evidence.
@@ -259,6 +259,13 @@ post-V3 corrective result is nonconfirmatory and remains limited to coefficient
 recovery in the supplied representation.  Evidence is in
 `../v3_recovery/phase2_outer_rotation_v4/`.
 
+That Phase-II execution remains bound to its frozen source snapshot.  The
+later Phase-III module is an explicit one-file source-closure addition, so the
+historical production loaders fail closed on the current head before fitting
+or probing.  Tests audit that no file recorded by the old closures changed;
+the old evidence is neither regenerated nor silently treated as current-source
+execution.
+
 The first bounded Phase III checkpoint is also executable.  Its learner sees
 only opaque diagnostic tokens and answers under an honest-code API boundary.
 Across four omissions and two nonce-keyed relabel blocks, passive exact rank is
@@ -267,5 +274,15 @@ categorical response raises it to 5 and reconstructs all nine finite
 zero-suffix diagnostic rows.  All 24 compatible completion
 outcomes pass, and paired realizations are related by exact rational similarity
 maps.  This is not yet arbitrary-suffix operator discovery, a full PSR, or
-tensor-factor discovery.  The broader preregistered design remains in
+tensor-factor discovery.
+
+A second bounded checkpoint learns guarded event maps only on their legal
+source domains.  Across two full-support controls and eight rotated omissions,
+it reconstructs all 44 legal state--event edges, predicts 64 sealed edges and
+120 long/path programs exactly, and rejects all 460 undefined edges.  Every
+environment retains certified total-extension nullity 80 and serializes no
+total operator.  The trusted controller supplies the 15-edge excitation basis
+and the postfit similarity correspondences, so this is partial-map recovery
+under supplied experimental structure—not autonomous acquisition, a total
+WFA, or representation discovery.  The broader preregistered design remains in
 `../docs/V3_PHASE3_PREDICTIVE_STATE_DISCOVERY.md`.

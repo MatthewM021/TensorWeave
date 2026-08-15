@@ -5,7 +5,6 @@ from dataclasses import dataclass
 import hashlib
 import importlib.util
 import json
-import os
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -374,43 +373,143 @@ def test_preopen_budget_fails_before_prerequisite_generation_or_fit(
         module.build_preopen_environment_record(0, **{keyword: value})
 
 
-def test_production_power_v2_validates_exact_positive_and_null_gates() -> None:
+def test_production_power_v2_is_immutable_and_fails_closed_on_one_file_source_drift(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     module = _load_script()
     protocol = module.load_frozen_protocol()
     assert protocol.power_control_relative_path == (
         "v3_recovery/PHASE2_ALGEBRA_POWER_CONTROL_V2.json"
     )
-    commitment = module.load_power_control_commitment(protocol)
-    assert commitment.relative_path == protocol.power_control_relative_path
-    assert commitment.file_sha256 == (
+    record_path = module.default_power_control_record_path()
+    payload = record_path.read_bytes()
+    expected_file_sha256 = (
         "31cc623ad890582e21c1c2c414f14fb87ecc149e93b504fe28bbb3913dba00e3"
     )
-    assert commitment.file_sha256 == protocol.power_control_expected_file_sha256
-    assert commitment.record_sha256 == (
+    expected_record_sha256 = (
         "74a8d6ee5b519f8e1bc840a6e3838952ff967065ca7b11f642d447c5e9123b12"
     )
+    assert len(payload) == 1_303_121
+    assert hashlib.sha256(payload).hexdigest() == expected_file_sha256
+    assert expected_file_sha256 == protocol.power_control_expected_file_sha256
+
+    document = json.loads(payload)
+    assert payload == (
+        json.dumps(
+            document,
+            sort_keys=True,
+            indent=2,
+            ensure_ascii=True,
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode("utf-8")
+    material = dict(document)
+    assert material.pop("record_sha256") == expected_record_sha256
+    assert hashlib.sha256(module._canonical_bytes(material)).hexdigest() == (
+        expected_record_sha256
+    )
+
+    recorded_sources = document["source_file_sha256"]
+    assert isinstance(recorded_sources, dict)
+    assert len(recorded_sources) == 30
+    v3_root = Path(__file__).resolve().parents[1]
+    for relative, expected_digest in recorded_sources.items():
+        assert hashlib.sha256((v3_root / relative).read_bytes()).hexdigest() == (
+            expected_digest
+        )
+
+    power_runner = module._load_power_runner()
+    current_sources = power_runner._source_hashes()
+    added_source = "src/tnlm_v3/opaque_partial_operators.py"
+    assert set(current_sources) - set(recorded_sources) == {added_source}
+    assert not set(recorded_sources) - set(current_sources)
+    assert all(current_sources[path] == digest for path, digest in recorded_sources.items())
+    assert current_sources[added_source] == (
+        "6efd6dad92e8c3c22fb787071dee599363a61a11b4d560f60d7a5d0fb20e9738"
+    )
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("fit or probe work was reached before source-drift rejection")
+
+    monkeypatch.setattr(
+        power_runner, "run_pair_local_exception_power_control", forbidden
+    )
+    monkeypatch.setattr(module, "_load_power_runner", lambda: power_runner)
+    for name in (
+        "_build_frozen_trace_corpus",
+        "run_outer_rotation",
+        "build_balanced_probe_suite",
+        "evaluate_probe_suite",
+        "evaluate_shortcut_controls",
+    ):
+        monkeypatch.setattr(module, name, forbidden)
+    with pytest.raises(ValueError) as error:
+        module.load_power_control_commitment(protocol)
+    assert str(error.value) == "source hashes do not match the executing source tree"
     with pytest.raises(ValueError, match="preregistered path"):
         module.load_power_control_commitment(protocol, Path(__file__))
 
 
-def test_production_v4_implementation_manifest_validates_exact_closure() -> None:
+def test_production_v4_manifest_is_immutable_and_fails_closed_on_one_file_drift(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     module = _load_script()
     protocol = module.load_frozen_protocol()
-    commitment = module.load_implementation_manifest(protocol)
     manifest_path = module.default_implementation_manifest_path()
     expected_sha256 = (
         "de030722267f30922a5f19b6ac65c4c0ce797bc45ded2d31f692df40254b39a0"
     )
-    assert commitment.relative_path == (
+    assert protocol.implementation_manifest_relative_path == (
         "v3_recovery/PHASE2_OUTER_ROTATION_V4_IMPLEMENTATION.sha256"
     )
-    assert commitment.manifest_sha256 == expected_sha256
-    assert len(commitment.file_sha256s) == 34
-    assert tuple(path for path, _ in commitment.file_sha256s) == (
-        protocol.implementation_required_paths
+    payload = manifest_path.read_bytes()
+    assert len(payload) == 3_391
+    assert hashlib.sha256(payload).hexdigest() == expected_sha256
+    rows = tuple(
+        (relative, digest)
+        for digest, relative in (
+            line.split("  ", 1) for line in payload.decode("utf-8").splitlines()
+        )
     )
-    assert manifest_path.stat().st_size == 3_391
-    assert hashlib.sha256(manifest_path.read_bytes()).hexdigest() == expected_sha256
+    assert len(rows) == 34
+    assert payload == "".join(
+        f"{digest}  {relative}\n" for relative, digest in rows
+    ).encode("utf-8")
+    assert hashlib.sha256(module._canonical_bytes(rows)).hexdigest() == (
+        "c4a9a8f31052c047f4796e28d2205678623ae9ac3d74f6b20b899a602c55411d"
+    )
+
+    repository = Path(__file__).resolve().parents[2]
+    for relative, expected_digest in rows:
+        assert hashlib.sha256((repository / relative).read_bytes()).hexdigest() == (
+            expected_digest
+        )
+
+    recorded_paths = tuple(relative for relative, _ in rows)
+    current_paths = protocol.implementation_required_paths
+    added_path = "v3/src/tnlm_v3/opaque_partial_operators.py"
+    assert set(current_paths) - set(recorded_paths) == {added_path}
+    assert not set(recorded_paths) - set(current_paths)
+    assert tuple(path for path in current_paths if path != added_path) == recorded_paths
+    assert hashlib.sha256((repository / added_path).read_bytes()).hexdigest() == (
+        "6efd6dad92e8c3c22fb787071dee599363a61a11b4d560f60d7a5d0fb20e9738"
+    )
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("fit or probe work was reached before source-drift rejection")
+
+    for name in (
+        "_build_frozen_trace_corpus",
+        "run_outer_rotation",
+        "build_balanced_probe_suite",
+        "evaluate_probe_suite",
+        "evaluate_shortcut_controls",
+    ):
+        monkeypatch.setattr(module, name, forbidden)
+    with pytest.raises(ValueError) as error:
+        module.load_implementation_manifest(protocol)
+    assert str(error.value) == "implementation manifest path inventory or order changed"
     with pytest.raises(ValueError, match="preregistered path"):
         module.load_implementation_manifest(protocol, Path(__file__))
 
@@ -1085,9 +1184,11 @@ def test_source_exposes_only_two_phase_cli_and_scoped_claims() -> None:
     assert module.PREOPEN_ENVIRONMENT_SCHEMA != module.OPEN_ENVIRONMENT_SCHEMA
 
 
-@pytest.mark.skipif(
-    os.environ.get("TNLM_RUN_SLOW_MULTIENVIRONMENT") != "1",
-    reason="set TNLM_RUN_SLOW_MULTIENVIRONMENT=1 only after V4 source/power/manifest freeze",
+@pytest.mark.skip(
+    reason=(
+        "positive V4 replay requires the frozen V4 source snapshot; the current "
+        "head intentionally contains post-freeze Phase-III source"
+    ),
 )
 def test_full_v4_two_phase_campaign_opt_in_only(tmp_path: Path) -> None:
     module = _load_script()

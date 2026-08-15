@@ -5,10 +5,10 @@
 The full arbitrary-suffix operator and factorization campaign remains a
 pre-execution research protocol.  It specifies the first full operator-and-
 factorization experiment that removes the supplied addressable-register
-coordinates used in Phase II.  A
-bounded zero-suffix diagnostic checkpoint has now been completed and is
-reported explicitly below; none of the broader operator, factorization, or
-scaling results has yet been obtained.
+coordinates used in Phase II.  Bounded zero-suffix diagnostic and guarded
+partial-operator checkpoints have now been completed and are reported
+explicitly below; none of the broader total-operator, factorization, or scaling
+results has yet been obtained.
 
 The primary question is deliberately narrower than "discover a geometry of
 language":
@@ -129,17 +129,32 @@ contracts.
 | **C. Strict legal-language behavior** | Every word is interpreted. An illegal action enters an observable absorbing dead state; legality/death and state diagnostics are outputs. | The full frozen `K=5, V=4` contract has certified rank 192. Its rank is not 21. The toy strict rank is recomputed exactly rather than inferred from the absence-aware result. |
 
 The `4 -> 5` and `20 -> 21` experiments below refer only to Contract B. They
-describe the rank of the identified observation table before and after one
-missing predictive direction is excited. They are not claims that the strict
+describe the rank of the zero-suffix diagnostic state table before and after
+one missing predictive direction is excited. They are not claims that every
+event operator has been identified. They are also not claims that the strict
 series changes rank from 20 to 21, nor that the promised-valid series has
 those dimensions.
 
-Contract A is a masked, domain-restricted Hankel problem. The learner may use
+Contracts A and B are masked, domain-restricted problems. The learner may use
 only complete rectangular subblocks and exact equations whose words are
-declared promised-valid by the sanitized transcript. Contract C is total and
-includes the dead behavior. Contract B makes absence observable while keeping
-illegal words outside the series. Each report records the domain mask as part
-of the evidence.
+declared defined by the sanitized transcript. Contract C is total and includes
+the dead behavior. Contract B makes absence observable while keeping illegal
+words outside the series. Each report records the domain mask as visible
+supervision and as part of the evidence.
+
+For a partial contract, let `D_a` be the span of reachable predictive states
+from which event `a` is legal. Observations identify at most the restricted map
+`A_a|D_a`. Even when the ambient predictive dimension is `r`, a total `r x r`
+extension retains at least
+
+\[
+(r-\dim D_a)r
+\]
+
+free rational parameters. Undefined actions do not supply zero rows, an
+`ABSENT` result, a no-op, or a dead-state transition. A report may serialize a
+legal-domain basis and its images; it must not serialize one preferred total
+extension unless a separately declared total contract identifies it.
 
 ## Opaque event/query firewall
 
@@ -224,8 +239,8 @@ random initialization, gradient descent, early stopping, or best-seed choice.
    reduction and emit the pivot words, tests, masks, and elimination
    transcript.
 
-Let `B` be the resulting invertible `r x r` basis block with basis prefixes
-`p_i` and basis tests `(s_j,c_j)`. Define
+For a total contract, let `B` be the resulting invertible `r x r` basis block
+with basis prefixes `p_i` and basis tests `(s_j,c_j)`. Define
 
 \[
 H_a[i,j] = f_{c_j}(p_i a s_j).
@@ -239,11 +254,16 @@ A_a = H_a B^{-1}, \qquad
 \omega_c = H[P_B,(\epsilon,c)].
 \]
 
-For masked Contract A, the learner instead solves the corresponding exact
-linear systems from all defined entries. It may emit an operator only when
-the solution is unique on the reachable/observable quotient. Otherwise the
-certificate says `not_identified`; minimum-norm or zero completion is
-forbidden.
+For masked Contracts A and B, the learner instead solves the corresponding
+exact linear systems from all defined entries. For event `a`, it records a
+basis of `D_a`, the images of that basis, the observed-source rank, and a basis
+annihilating `D_a`. The latter supplies explicit nonzero perturbations that
+leave every legal observation unchanged and certifies the total-extension
+nullity above. The learner may call the restricted map identified only when
+the observed legal-source span equals `D_a`. It may emit a total operator only
+when a separately totalized contract gives a unique solution on the complete
+reachable/observable quotient. Minimum-norm, zero, no-op, and dead-state
+completions are forbidden priors.
 
 ### Exact reconstruction certificate
 
@@ -265,7 +285,8 @@ than trusting serialized summary booleans.
 
 ## Gauge and similarity: what representation recovery means
 
-Latent coordinates are not identifiable. If `G` is invertible, then
+Latent coordinates are not identifiable. For a total realization, if `G` is
+invertible, then
 
 \[
 \alpha^\top G,\quad
@@ -276,8 +297,8 @@ G^{-1}\omega_c
 realize the same series. Raw matrix equality, coordinate correlations, and
 neuron-by-neuron alignment are therefore invalid success criteria.
 
-For a learned minimal realization `L` and a reference realization `R`, the
-evaluator solves for one rational invertible map `G` satisfying
+For a learned total minimal realization `L` and a reference realization `R`,
+the evaluator solves for one rational invertible map `G` satisfying
 
 \[
 \alpha_L^\top=\alpha_R^\top G,\qquad
@@ -288,6 +309,13 @@ A_{L,a}=G^{-1}A_{R,a}G,\qquad
 for every opaque-token/output-token correspondence. Acceptance requires one
 and the same `G` for the initial state, all event operators, and all readouts.
 Matching each operator with a different map is forbidden.
+
+For a partial realization, the evaluator instead requires one common `G` for
+all predictive states and readouts and checks every legal edge in the form
+`q_L(p) = q_R(p)G` and `q_L(pa) = q_R(pa)G`. Domain bases and their image bases
+must transform by that same `G`. No equality is requested between arbitrary
+off-domain matrix completions, because those completions are not behavioral
+objects of the guarded contract.
 
 `G` is first solved from a frozen alignment set and then checked on disjoint
 operators, readouts, prefixes, and suffixes. For the omission experiments, a
@@ -301,88 +329,103 @@ It must first reduce exactly to its reachable/observable quotient; that
 minimal quotient must have the certified rank and satisfy the same single-`G`
 test. Extra modes must be unreachable, unobservable, or both.
 
-## Stage T: `K=2, V=2` active rank recovery
+## Stage T: `K=2, V=2` rank restoration and guarded-map recovery
 
 The toy stage is a mandatory debugging and falsification stage, not optional
-warm-up evidence.
+warm-up evidence. It is split into two claims that must not be conflated.
 
-### Environment schedule
+### T0: zero-suffix diagnostic rank
 
 - Use the absence-aware contract with a live cap of 2.
 - Rotate the omitted pair through all four key/value cells.
 - Run two independent opaque input/output bijection blocks, for eight
   environments total.
-- Enumerate complete passive support subject to the one-cell exclusion; do not
-  substitute a finite random trajectory sample.
-- Precommit every passive table, domain mask, opaque bijection hash, active
-  candidate-pool hash, and candidate order before fitting any environment.
+- Enumerate the complete zero-suffix diagnostic support subject to the
+  one-cell exclusion; do not substitute a finite random trajectory sample.
+- Precommit every passive table, opaque vocabulary, candidate-pool hash, and
+  candidate order before fitting any environment.
 
-The expected passive restricted rank is 4. The learner is not told that
-number. It must discover rank 4, emit at least two exact passive-consistent
-continuations that disagree on an authorized active candidate, and decline to
-make an identified prediction for that disagreement.
+The expected passive diagnostic rank is 4. The learner is not told that
+number. It must discover rank 4, emit exact passive-consistent continuations
+that disagree on an authorized active candidate, and decline to make an
+identified prediction for that disagreement.
 
-### Active acquisition
+The answer-free acquisition rule selects the missing atomic vocabulary item
+and its two terminal diagnostic channels. Every compatible categorical
+response must raise the finite diagnostic table to rank 5. Exactly one
+membership response, containing the two categorical diagnostic tokens, is
+opened per environment. The learner rebuilds the finite diagnostic block from
+scratch, reconstructs all nine zero-suffix states, and eliminates the exhibited
+state-row disagreement. A known-row repeat control must remain rank 4.
 
-The learner receives a pool of unlabeled opaque words. For each word it
-symbolically tries every categorical answer still compatible with the passive
-contract; it does not ask which answer is real. It selects the first word,
-under its frozen deterministic ordering rule, on which its surviving minimal
-continuations disagree and for which **every** compatible answer makes the
-augmented table rank increase by exactly one (and hence become rank 5 in this
-stage). Selection therefore certifies the value of the experiment before
-seeing its outcome. It uses only the passive table, output alphabet, and
-candidate words; no candidate answer, semantic route, or cell identity is
-available.
+This one response identifies the fifth diagnostic state direction. It does
+**not** identify all action maps or arbitrary suffix behavior.
 
-Exactly one label-bearing membership response is permitted per environment.
-The response must make the table rank 5. The learner then rebuilds the model
-from scratch using the passive table plus that single response. It must
-recover a minimal rank-5 realization, predict the rest of the complete sealed
-absence-aware table exactly, and eliminate the previously exhibited
-disagreement.
+### T1: partial operators on legal source domains
 
-A control query repeats an already known table entry. It must leave the rank
-at 4. This distinguishes information gain from merely rerunning the learner.
+The guarded toy has ten state-changing event tokens: four binds, two updates,
+two ordered copies, and two invalidations. The two diagnostics remain output
+channels rather than event operators. Across nine reachable states there are
+44 legal state--event edges and 46 undefined edges. Undefined edges stay in a
+learner-visible definedness mask and never receive synthetic target values.
 
-The toy stage fails if any omission/bijection environment needs a second
-label-bearing answer, uses semantic metadata, silently chooses a completion
-before acquisition, or reaches only behavioral accuracy without an exact
-rank and reconstruction certificate.
+For each of the four omissions under two nonce-keyed opaque relabelings, the
+trusted controller causally censors every edge whose source or target enters
+the omitted cell. This leaves exactly 21 passively labeled edges. The
+controller supplies and content-binds a fixed 15-edge legal-domain excitation
+basis; that basis was designed with semantic knowledge and is not claimed to
+have been discovered by the learner. Its first response restores diagnostic
+rank `4 -> 5` but must leave nine restricted event maps unidentified. Only
+after this negative checkpoint are the other 14 responses opened. Thus an
+omission environment uses 15 membership responses and 30 categorical labels,
+not one answer.
 
-## Stage F: full `K=5, V=4` active rank recovery
+The remaining eight legal edges are sealed redundancy checks. Acceptance
+requires the exact partition `21 passive + 15 acquired + 8 sealed = 44`, exact
+prediction of all eight sealed targets, and exact prediction of 12 separately
+sealed long/path programs. Two additional full-support opaque controls receive
+all 44 edge labels passively and no active labels. The ten environments form
+five paired-relabel comparisons.
 
-The full absence-aware stage repeats the toy procedure without changing the
-learner or acquisition rule.
+In the rank-5 absence-aware coordinates the legal-source ranks and unavoidable
+off-domain extension nullities are:
 
-### Environment schedule
+| Event family | Tokens | Legal-source rank per token | Total-extension nullity per token |
+|---|---:|---:|---:|
+| bind | 4 | 3 | 10 |
+| update | 2 | 4 | 5 |
+| copy | 2 | 3 | 10 |
+| invalidate | 2 | 4 | 5 |
 
-- Use the frozen five-key, four-value, three-live-binding task.
-- Rotate the omitted pair through all 20 key/value cells.
-- Use two independent opaque bijection blocks, for 40 environments total.
-- Enumerate complete passive support under each exclusion.
-- Freeze all 40 preactive shards and one terminal preactive aggregate before
-  opening any active answer.
-- If any preactive environment fails, stop the campaign. Do not replace the
-  environment, expand a budget, inspect its sealed answer, or rescue the
-  result with a pooled mean.
+The aggregate total-extension nullity is 80. Every event certificate must bind
+a legal-domain basis, its image basis, and an exact annihilator basis proving
+the stated ambiguity. The serialized `total_operator` is always `null`.
+Success means all ten **restricted** maps are exact on their legal domains,
+the legality mask and sealed compositions are exact, and one common rational
+similarity relates each paired opaque realization. It is not a full WFA,
+autonomous acquisition discovery, or identification of off-domain behavior.
 
-Every preactive table is expected to have restricted rank 20. Each shard must
-contain a reconstructed rank-20 model, a one-dimensional nonidentifiability
-certificate, two exact disagreeing continuations, and one selected opaque
-active candidate. The outer cell identity remains in the controller record
-and is absent from the learner record.
+## Stage F: full `K=5, V=4` diagnostic and operator follow-ons
 
-Only after the terminal aggregate verifies all 40 shards may the controller
-open the 40 selected membership answers as a single batch. Each environment
-gets exactly one answer. Every postactive table must have rank 21; its rebuilt
-minimal model must reconstruct the complete sealed absence-aware behavior and
-all long compositional probes exactly.
+The full absence-aware diagnostic stage may repeat T0 over all 20 omissions and
+two opaque relabel blocks. A one-response `20 -> 21` result would identify the
+missing diagnostic state direction only. It must not be reported as complete
+arbitrary-suffix behavior or as identification of every `21 x 21` event
+matrix.
 
-This is an active-identification result. It does not turn the passive
-zero-support prediction into an identified fact. The correct passive
-conclusion remains that a one-dimensional family of continuations is
-consistent with the observed data.
+A full guarded-operator campaign is a separate, not-yet-frozen experiment. It
+must first enumerate the legal-source span `D_a` for every opaque event token,
+then precommit enough active responses to drive every claimed restricted-map
+nullity to zero. Each action retains `(21-dim(D_a))*21` unconstrained total
+extension parameters. The campaign must keep independent legal edges and long
+programs sealed after basis closure, and it must report any map that remains
+underexcited as `not_identified`.
+
+If the scientific target is instead a set of total `21 x 21` operators, the
+protocol must freeze a new explicitly totalized contract and collect complete
+shifted-block evidence with nullity zero. An overwrite/no-op completion would
+be supplied structure; a dead-state completion is Contract C and changes the
+rank. Neither may be silently attached to Contract B.
 
 ## Contract-isolation controls
 
@@ -417,7 +460,7 @@ more than one contract fingerprint.
 The main omission campaign evaluates a frozen dimension ladder in addition to
 the automatically minimized learner.
 
-| Scale | Underfit/passive dimension | Full minimal dimension | Overcomplete dimension |
+| Scale | Underfit/passive diagnostic dimension | Full diagnostic dimension | Overcomplete diagnostic dimension |
 |---|---:|---:|---:|
 | `K=2, V=2`, absence-aware | 4 | 5 | 8 |
 | `K=5, V=4`, absence-aware | 20 | 21 | 32 |
@@ -434,9 +477,10 @@ Each baseline has a predetermined interpretation:
   active representation recovery.
 - **Rank-4/rank-20 model:** must exactly fit the passive restricted table and
   fail to fit the full postactive table.
-- **Rank-5/rank-21 model:** is not identified before acquisition merely
-  because the dimension was supplied. After acquisition it must minimize to
-  the exact full rank and pass all reconstruction gates.
+- **Rank-5/rank-21 diagnostic model:** is not identified before acquisition
+  merely because the dimension was supplied. After diagnostic acquisition it
+  must minimize to the exact full state rank. This alone says nothing about
+  whether every guarded event map has enough legal-source excitation.
 - **Rank-8/rank-32 model:** may fit, but must reduce exactly to rank 5 or 21.
   Unconstrained hidden directions are reported, never interpreted.
 - **Nullspace twins:** two exact passive-consistent models must disagree on
@@ -452,10 +496,20 @@ upper bound.
 
 ## Compositional-factor discovery
 
-This stage runs only on a fully identified, minimal, rank-5 or rank-21
-Contract-B realization. It receives the learned operators as an unordered map
-from opaque symbols. It receives neither canonical key/value coordinates nor
-event-family labels.
+This stage is **not eligible from guarded Contract-B maps alone**. Partial
+event maps do not define unique elements of `End(W)`: different off-domain
+extensions have identical guarded behavior but can have different commutants
+and operator-Schmidt ranks. A preferred zero or minimum-norm completion would
+manufacture the geometry being tested.
+
+The algebraic search below is therefore a design for a separately frozen
+totalized experiment. It may run only after every total event operator is
+identified with shifted-system nullity zero, or after a new theory proves that
+the proposed factor certificate is invariant across **all** total extensions
+of the learned partial maps. Otherwise the mandatory output is
+`factorization_not_identified_from_guarded_contract`. An eligible learner
+receives the total operators as an unordered map from opaque symbols and
+receives neither canonical key/value coordinates nor event-family labels.
 
 ### Recover the affine difference space
 
@@ -600,13 +654,14 @@ one failed family, omission, output class, or path relation.
 The implementation config must use the following caps. A cached evaluation of
 one complete word counts once regardless of the number of output channels
 returned. Repeated cache hits do not count again. A denied, undefined, or
-malformed active request counts as the environment's one active response and
-therefore causes failure.
+malformed active request consumes one response from the applicable stage's
+frozen budget and causes failure.
 
 | Run | Environments | Maximum word length | Maximum suffix-test candidates | Maximum distinct oracle evaluations per environment | Label-bearing active responses |
 |---|---:|---:|---:|---:|---:|
-| Toy absence-aware omission | 8 | 16 | 64 | 50,000 | 1 |
-| Full absence-aware omission | 40 | 64 | 128 | 5,000,000 | 1 |
+| Toy zero-suffix diagnostic omission (T0) | 8 | 16 | 64 | 50,000 | 1 response / 2 labels |
+| Toy guarded partial operators (T1) | 8 omission + 2 full controls | 16 | 64 | 50,000 | 15 responses / 30 labels for an omission; 0 for a full control |
+| Full zero-suffix diagnostic omission (F0) | 40 | 64 | 128 | 5,000,000 | 1 response / all diagnostic channels |
 | Toy promised-valid, full support | 2 | 16 | 64 | 50,000 | 0 |
 | Full promised-valid, full support | 2 | 64 | 128 | 5,000,000 | 0 |
 | Toy strict, full support | 2 | 32 | 128 | 100,000 | 0 |
@@ -620,7 +675,12 @@ Additional fixed caps are:
   machine and 822 for the full strict machine;
 - exact basis dimension capped at 10 for the toy and 192 for the full strict
   control; and
-- no more than one complete rebuild after the active response;
+- no more than one complete rebuild after the T0 response and two staged
+  rebuilds for T1 (the one-response negative checkpoint and the final
+  15-response fit);
+- for T1, exactly 90 definedness-mask rows, 44 legal edges, 46 undefined
+  edges, and the omission partition `21 + 15 + 8`; at most 30 returned
+  categorical labels and 12 long/path probes;
 - at most 10,000 sealed behavioral words per environment; and
 - sealed behavioral word length capped at 128 for the toy and 512 for the
   full task.
@@ -631,8 +691,10 @@ length cap or the passive basis construction exceeds any cap, the environment
 fails closed.
 
 These are computational ceilings, not sample-size claims. The passive
-omission tables enumerate their declared support exactly. The scientific
-active-observation count is one categorical answer per environment.
+omission tables enumerate their declared support exactly. Scientific
+active-observation counts are reported separately: T0 uses one membership
+response containing two labels; T1 uses 15 membership responses containing 30
+labels. Neither is abbreviated to "one answer."
 
 ## Execution order and content binding
 
@@ -647,19 +709,27 @@ Before any learner process starts, commit and hash:
 - the exact arithmetic/runtime manifest; and
 - all resource caps and failure policies.
 
-Execution then proceeds in five irreversible stages:
+Execution then proceeds in six irreversible stages:
 
 1. **Firewall qualification:** run import denial, canaries, sidecar poisoning,
    and bijection controls.
-2. **Toy preactive:** finish all eight rank-4 shards and a terminal aggregate.
-3. **Toy active open:** release the eight chosen answers as one batch and
-   require all eight rank-5 results before continuing.
-4. **Full preactive:** finish all 40 rank-20 shards and a terminal aggregate.
-5. **Full active open and structure audit:** release all 40 answers as one
-   batch, freeze rank-21 models, and only then run similarity, factorization,
-   Schmidt-rank, contract-isolation, and sealed behavioral evaluations.
+2. **Toy T0 preactive:** finish all eight rank-4 diagnostic shards and a
+   terminal aggregate.
+3. **Toy T0 active open:** release the eight selected diagnostic responses as
+   one batch and require all eight finite rank-5 diagnostic blocks.
+4. **Toy T1 guarded maps:** freeze the two full-support and eight 21-edge
+   omission inputs plus the controller-supplied 15-edge bases. For each
+   omission, open response one, freeze the negative checkpoint, then open the
+   other 14 responses. Freeze all partial maps before opening the eight edge
+   checks and 12 long/path probes.
+5. **Full F0 preactive:** finish all 40 rank-20 diagnostic shards and a
+   terminal aggregate.
+6. **Full F0 active open:** release the 40 selected diagnostic responses as a
+   batch and freeze the rank-21 diagnostic blocks. Do not run a total-operator
+   or factorization audit until its distinct totalization/evidence protocol is
+   frozen and eligible.
 
-No active answer may be constructed in a learner process before the matching
+No active response may be constructed in a learner process before the matching
 terminal aggregate exists. Failed environments are retained. There is no seed
 replacement, budget increase, selective rerun, best-environment reporting, or
 postopen change to the factor search.
@@ -683,24 +753,41 @@ correctly classified as non-completing; underfit and overcomplete models have
 the expected exact minimal quotients; output defaults fail the balanced
 controls.
 
-### Gate 2: toy predictive-state discovery
+### Gate 2a: toy diagnostic-state discovery
 
-All 8/8 environments have passive rank 4, a certified disagreement, exactly
-one active answer, postactive rank 5, exact complete-table reconstruction, and
-exact sealed behavior. The known-entry control remains rank 4.
+All 8/8 T0 environments have passive diagnostic rank 4, a certified
+disagreement, exactly one membership response containing two categorical
+labels, postactive rank 5, and exact reconstruction of all nine zero-suffix
+diagnostic states. The known-entry control remains rank 4. This gate makes no
+operator claim.
 
-### Gate 3: full predictive-state discovery
+### Gate 2b: toy guarded partial operators
 
-All 40/40 environments have passive rank 20, a one-dimensional ambiguity,
-exactly one active answer, postactive rank 21, and exact complete-table plus
-long-probe reconstruction. No result may be replaced by an aggregate rate.
+Both full-support controls reconstruct all 44 legal edges without active
+labels. All 8/8 omission environments have the exact `21 + 15 + 8` edge
+partition; response one raises the diagnostic rank while leaving nine maps
+unidentified; all 15 responses identify every restricted legal-domain map;
+all eight sealed edges and 12 long/path programs are exact. Every total
+operator is absent, the per-family extension nullities sum to 80, and five
+paired-relabel similarities satisfy every state, readout, and restricted-edge
+equation.
+
+### Gate 3: full diagnostic-state discovery
+
+All 40/40 F0 environments have passive diagnostic rank 20, a one-dimensional
+state-row ambiguity, exactly one diagnostic response, postactive diagnostic
+rank 21, and exact reconstruction of the declared finite diagnostic block. No
+result may be replaced by an aggregate rate. Guarded operator recovery is
+reported separately and may remain `not_identified`.
 
 ### Gate 4: gauge-equivalent recovery
 
 Every minimal postactive model is related to the exact reference and to its
-paired opaque-bijection model by one full-rank rational similarity map
-satisfying every operator and readout equation. The map is fitted and tested
-on disjoint frozen sets.
+paired opaque-bijection model by one full-rank rational similarity map. For a
+total contract it satisfies every operator and readout equation. For a partial
+contract it satisfies every state, readout, legal-domain basis, and legal-edge
+image equation, without comparing arbitrary off-domain completions. The map is
+fitted and tested on disjoint frozen sets.
 
 ### Gate 5: contract isolation
 
@@ -710,14 +797,17 @@ pooled.
 
 ### Gate 6: compositional-factor discovery
 
-This is a separate, stronger pass condition. All full postactive environments
-must recover the `5 x 4` double-centralizer certificate, exact expected
-operator-Schmidt ranks, and all polynomial/path identities. All negative
-factorization controls must behave as preregistered. If Gate 3 passes and Gate
-6 fails, the conclusion is exact predictive-state discovery without
-compositional-factor discovery.
+This is a separate, stronger pass condition and is ineligible for the current
+guarded Contract-B partial maps. Under a future identified totalized contract,
+all full postactive environments must recover the `5 x 4`
+double-centralizer certificate, exact expected operator-Schmidt ranks, and all
+polynomial/path identities, while every negative control behaves as
+preregistered. Until that prerequisite exists, the required verdict is
+`factorization_not_identified_from_guarded_contract` even if Gate 3 passes.
 
-## Implemented bounded checkpoint
+## Implemented bounded checkpoints
+
+### T0: finite zero-suffix diagnostic block
 
 The first executable checkpoint is now implemented in
 `v3/src/tnlm_v3/opaque_predictive_state.py`.  Its claim is deliberately
@@ -754,17 +844,68 @@ This checkpoint demonstrates exact passive ambiguity diagnosis and active
 rank restoration in the smallest opaque finite block.  It does not yet meet
 the full operator, factorization, or scaling gates below.
 
+### T1: guarded partial operators
+
+The next bounded checkpoint is implemented in
+`v3/src/tnlm_v3/opaque_partial_operators.py`.  It keeps Contract B partial and
+therefore learns no invented zero, no-op, dead-state, or other total extension.
+The sanitized estimator sees opaque state diagnostics, opaque event tokens,
+two categorical target labels per membership response, and the complete
+defined/undefined mask.  It does not receive semantic key/value coordinates,
+event roles, the omitted-cell identity, or controller sidecars.  The trusted
+controller supplies the semantically designed 15-edge excitation basis; the
+learner neither discovers nor selects that basis.
+
+The deterministic report contains two full-support controls and all four
+omissions under two nonce-keyed relabelings.  The controls use all 44 legal
+edges passively.  Every omission has the exact partition `21 passive + 15
+acquired + 8 sealed = 44`.  The first response raises diagnostic rank `4 -> 5`
+while nine of ten restricted maps remain unidentified; the next 14 responses
+close the remaining legal-source deficits.  Across the report this is 256
+passive edges, 120 membership responses containing 240 target-label fields,
+64 sealed edges, and 120 separately sealed long/path programs.  Every sealed
+prediction is exact.
+
+All ten learned realizations identify the ten event maps on their legal source
+domains.  They reject all `10 x 46 = 460` undefined state--event pairs.  Exact
+annihilator witnesses retain total-extension nullity 80 in every environment,
+and every serialized `total_operator` is `null`.  Five rational similarities
+are derived from five independent controller-aligned fit states and verified
+on four disjoint states, exact aligned readouts, and all 44 legal edges.  The
+state, event, and readout correspondences used for this postfit audit are
+supplied by the trusted controller; they are not learned from the opaque input.
+
+The hostile suite passes 58 / 58 tests, and the two Phase-III checkpoints pass
+103 / 103 together.  The T1 source SHA-256 is
+`6efd6dad92e8c3c22fb787071dee599363a61a11b4d560f60d7a5d0fb20e9738`;
+the test SHA-256 is
+`da1b7a862d3638450773049359663a1b68a266141012b6b4cc3753dd0081152a`;
+the deterministic report SHA-256 is
+`26cd2a6d628abe67c3d2a16a373b2c524a1ef2b22687d8122b7777f04116f80f`.
+Authoritative environment/report reconstruction, rather than standalone
+nested hashes, is the semantic evidence boundary.
+
+This demonstrates exact guarded-map recovery when a trusted controller
+supplies enough legal-domain excitation.  It does not demonstrate autonomous
+query design, total-WFA identification, off-domain behavior, factorization,
+process isolation, or assumption-free representation discovery.
+
 ## Required reporting
 
 The final report gives every environment row, not only aggregates. It includes:
 
-- passive and postactive exact ranks;
+- passive and postactive exact diagnostic ranks;
 - pivot-prefix and suffix-test lengths;
 - oracle-evaluation and exact-elimination work;
-- selected active word hash, disagreement values, returned opaque output, and
-  rank increment;
+- every active request hash, whether its basis was learner-selected or supplied
+  by the trusted controller, returned-label count, and rank increment;
+- for every partial event map, the legal-domain rank, observed-source rank,
+  restricted nullity, total-extension nullity, domain/image bases, and exact
+  annihilator witness;
+- explicit `total_operator: null` fields for guarded contracts and an aggregate
+  extension-nullity audit;
 - underfit, minimal, overcomplete, memorizer, and nullspace-twin outcomes;
-- complete-table and per-probe-family exact counts;
+- finite diagnostic-table, sealed-edge, and per-probe-family exact counts;
 - similarity-map determinant, exact residuals, fit-set hash, and disjoint
   test-set hash;
 - candidate factor pairs and every rejected reason;
@@ -783,16 +924,18 @@ not replace exact acceptance.
 If Gates 0--5 pass, the strongest justified statement is:
 
 > For this finite binding system and these explicitly declared observable
-> contracts, an exact multi-output Hankel/PSR learner recovered the latent
-> predictive realization from opaque event/query behavior up to similarity.
-> Under the absence-aware contract, one actively selected categorical answer
-> closed the single direction missing from each rotated passive environment.
+> contracts, an exact opaque diagnostic learner recovered the predictive state
+> coordinates up to similarity. Under the guarded absence-aware contract, one
+> membership response closed the single missing diagnostic direction, while a
+> larger disclosed excitation basis identified each event map only on its
+> legal source domain. Off-domain total extensions remained nonidentified.
 
 This would not show that the heldout direction was identifiable passively. It
 would show that the ambiguity can be diagnosed behaviorally and removed with
 a bounded intervention.
 
-If Gate 6 also passes, the additional justified statement is:
+If a future eligible totalized experiment makes Gate 6 pass, the additional
+justified statement is:
 
 > Within the preregistered algebra-search language, the fully identified
 > predictive operators determine a role--filler tensor factorization through

@@ -69,3 +69,25 @@ its nonconfirmatory supplied-representation scope; `EVIDENCE.sha256` binds the
 Candidate-fit cleanliness remains a typed, hash-bound trusted-runner
 certificate because candidate models are not serialized; the 40 final models'
 direct-TRAIN fits are independently replayed.
+
+The later Phase-III `opaque_partial_operators.py` module is intentionally not
+added to either frozen Phase-II source closure.  On the current head, the
+historical Power V2 and V4 production loaders therefore reject execution as
+post-freeze source drift.  Regression tests verify that this is exactly one
+added file, with no removed or changed recorded file, and that rejection occurs
+before fitting or probing.  A positive production replay requires the frozen
+V4 source bundle/commit; the immutable Phase-II artifacts are not regenerated
+or reclassified to follow later code.
+
+Phase III now has two local bounded checkpoints.  The first recovers the
+finite zero-suffix diagnostic state block at exact rank `4 -> 5` from opaque
+tokens after one two-label membership response; it makes no transition-
+operator claim.  The second keeps the absence-aware contract guarded and
+learns each event map only on its legal source domain.  Its two full-support
+controls and eight rotated omissions reconstruct all 44 legal edges, predict
+64 sealed edges and 120 long/path programs exactly, reject all 460 undefined
+edges, and retain exact off-domain total-extension nullity 80 per environment.
+The 15-edge excitation basis and postfit state/event correspondences are
+trusted-controller inputs.  These are honest-code synthetic protocol
+rehearsals—not process-isolated, autonomous acquisition, total-WFA,
+factorization, natural-language, or assumption-free representation evidence.

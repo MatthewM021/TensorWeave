@@ -1,5 +1,5 @@
 project: tensor-network-native-language-model
-updated: 2026-08-14
+updated: 2026-08-15
 status: v3_reconstruction_in_progress
 historical_handoff: V3_RECOVERY_STATUS.yaml
 validated_reconstruction:
@@ -136,11 +136,11 @@ validated_reconstruction:
         source_tree: e59ca383e984177ea337c1a2037bfbe48687cdda
         ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31720252790
         ci_status: passed
-    v3_source_tests_collected: 928
-    v3_default_tests_passed: 924
+    v3_source_tests_collected: 986
+    v3_default_tests_passed: 982
     v3_default_tests_skipped: 4
     v3_opt_in_phase2_slow_tests_passed: 2
-    v3_effective_tests_passed: 926
+    v3_effective_tests_passed: 984
     v3_effective_tests_skipped: 2
     v3_source_tests_scope: current_local_source_suite_not_screen_or_scientific_campaign_evidence
     repository_verifier:
@@ -349,6 +349,10 @@ validated_reconstruction:
       evidence_directory: phase2_outer_rotation_v4
       claim_scope: coefficient_recovery_inside_supplied_addressable_register_representation
       confirmatory: false
+      frozen_source_snapshot_required_for_positive_production_replay: true
+      current_head_postfreeze_source_additions: 1
+      current_head_changed_or_removed_frozen_source_files: 0
+      current_head_production_loader_fails_closed_before_fit_or_probe: true
     phase_3_opaque_zero_suffix_miniature:
       status: locally_verified_bounded_checkpoint
       scope: finite_zero_suffix_multioutput_absence_diagnostic_block_only
@@ -369,12 +373,60 @@ validated_reconstruction:
       arbitrary_suffix_operator_discovery: false
       full_psr_discovery: false
       tensor_factor_discovery: false
+    phase_3_guarded_partial_operator_miniature:
+      status: locally_verified_bounded_checkpoint
+      scope: exact_partial_event_maps_on_supplied_legal_source_domains
+      environments: 10
+      full_support_controls: 2
+      rotated_omissions: 8
+      legal_edges_per_environment: 44
+      undefined_edges_per_environment: 46
+      omission_passive_edges: 21
+      omission_active_membership_responses: 15
+      target_label_fields_per_membership_response: 2
+      omission_sealed_edges: 8
+      sealed_long_path_programs_per_environment: 12
+      passive_edges_total: 256
+      active_membership_responses_total: 120
+      returned_target_label_fields_total: 240
+      sealed_edges_correct: 64
+      sealed_edges_total: 64
+      sealed_long_path_programs_correct: 120
+      sealed_long_path_programs_total: 120
+      undefined_edges_rejected: 460
+      undefined_edges_total: 460
+      passive_rank_sequence: [5, 5, 4, 4, 4, 4, 4, 4, 4, 4]
+      postactive_rank_sequence: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+      restricted_event_maps_identified_per_environment: 10
+      total_extension_nullity_per_environment: 80
+      serialized_total_operators: 0
+      exact_rational_similarity_certificates: 5
+      similarity_fit_states: 5
+      similarity_disjoint_test_states: 4
+      active_excitation_basis_supplied_by_trusted_controller: true
+      active_excitation_basis_learned_or_selected_by_estimator: false
+      similarity_correspondences_supplied_by_trusted_controller: true
+      similarity_correspondences_learned_by_estimator: false
+      focused_tests_passed: 58
+      phase_3_checkpoint_tests_passed: 103
+      deterministic_report_sha256: 26cd2a6d628abe67c3d2a16a373b2c524a1ef2b22687d8122b7777f04116f80f
+      source_sha256: 6efd6dad92e8c3c22fb787071dee599363a61a11b4d560f60d7a5d0fb20e9738
+      test_sha256: da1b7a862d3638450773049359663a1b68a266141012b6b4cc3753dd0081152a
+      honest_code_api_boundary: true
+      cryptographic_or_process_isolation: false
+      autonomous_active_acquisition_discovery: false
+      total_wfa_operator_discovery: false
+      off_domain_behavior_identified: false
+      tensor_factor_discovery: false
     limitations:
       - post_v3_corrective_replication_is_nonconfirmatory
       - two_replicates_per_cell
       - penalty_strength_not_empirically_identified
       - register_representation_and_query_gauge_supplied
       - trusted_controller_used_oracle_occupancy_and_dependency_metadata
+      - phase_3_active_excitation_basis_and_similarity_correspondences_supplied_by_trusted_controller
+      - phase_3_guarded_maps_do_not_identify_total_operator_extensions
+      - frozen_phase_2_production_replay_requires_the_frozen_source_snapshot
       - not_representation_discovery
       - not_assumption_free_algebra_discovery
       - not_confirmatory
@@ -383,7 +435,8 @@ validated_reconstruction:
       - preserve_v3_as_failed_without_post_hoc_gate_reclassification
       - preserve_v4_as_a_post_v3_nonconfirmatory_corrective_pass
       - freeze_a_genuinely_prospective_externally_held_environment
-      - extend_the_bounded_opaque_zero_suffix_block_to_arbitrary_suffix_operator_discovery
+      - scale_guarded_legal_domain_operator_recovery_with_explicit_nullity_accounting
+      - freeze_a_separate_totalized_contract_before_any_total_operator_or_factorization_claim
 not_yet_reconstructed:
   - trained scientific evaluation of recurrent, cached-transformer, and causal-tree controls
   - optional identity-initialized MERA ablation
