@@ -13,6 +13,22 @@ import pytest
 from tnlm_v3.algebra_discovery import SequenceDiscoveryLimitError
 
 
+_POST_FREEZE_PACKAGE_SOURCE_SHA256 = {
+    "src/tnlm_v3/opaque_active_discovery.py": (
+        "4af57946adfbb7dc704a9fa7f30cede0b0cda2873cddf6cd22e3f9df59e320b9"
+    ),
+    "src/tnlm_v3/opaque_active_discovery_protocol.py": (
+        "b84c0579eb76f8bc6ea90aded979c56983b1d0b01df243dc2e09ead4cb97af06"
+    ),
+    "src/tnlm_v3/opaque_active_teaching_control.py": (
+        "5c0ca90c0bdeb92f338ef89dc5bc275e5ca2d6e0dd3eb56a924333c97f1238ae"
+    ),
+    "src/tnlm_v3/opaque_partial_operators.py": (
+        "6efd6dad92e8c3c22fb787071dee599363a61a11b4d560f60d7a5d0fb20e9738"
+    ),
+}
+
+
 def _load_script():
     path = (
         Path(__file__).resolve().parents[1]
@@ -421,13 +437,11 @@ def test_production_power_v2_is_immutable_and_fails_closed_on_one_file_source_dr
 
     power_runner = module._load_power_runner()
     current_sources = power_runner._source_hashes()
-    added_source = "src/tnlm_v3/opaque_partial_operators.py"
-    assert set(current_sources) - set(recorded_sources) == {added_source}
+    added_sources = _POST_FREEZE_PACKAGE_SOURCE_SHA256
+    assert set(current_sources) - set(recorded_sources) == set(added_sources)
     assert not set(recorded_sources) - set(current_sources)
     assert all(current_sources[path] == digest for path, digest in recorded_sources.items())
-    assert current_sources[added_source] == (
-        "6efd6dad92e8c3c22fb787071dee599363a61a11b4d560f60d7a5d0fb20e9738"
-    )
+    assert {path: current_sources[path] for path in added_sources} == added_sources
 
     def forbidden(*args, **kwargs):
         raise AssertionError("fit or probe work was reached before source-drift rejection")
@@ -488,13 +502,17 @@ def test_production_v4_manifest_is_immutable_and_fails_closed_on_one_file_drift(
 
     recorded_paths = tuple(relative for relative, _ in rows)
     current_paths = protocol.implementation_required_paths
-    added_path = "v3/src/tnlm_v3/opaque_partial_operators.py"
-    assert set(current_paths) - set(recorded_paths) == {added_path}
+    added_paths = {
+        f"v3/{relative}": digest
+        for relative, digest in _POST_FREEZE_PACKAGE_SOURCE_SHA256.items()
+    }
+    assert set(current_paths) - set(recorded_paths) == set(added_paths)
     assert not set(recorded_paths) - set(current_paths)
-    assert tuple(path for path in current_paths if path != added_path) == recorded_paths
-    assert hashlib.sha256((repository / added_path).read_bytes()).hexdigest() == (
-        "6efd6dad92e8c3c22fb787071dee599363a61a11b4d560f60d7a5d0fb20e9738"
-    )
+    assert tuple(path for path in current_paths if path not in added_paths) == recorded_paths
+    assert {
+        path: hashlib.sha256((repository / path).read_bytes()).hexdigest()
+        for path in added_paths
+    } == added_paths
 
     def forbidden(*args, **kwargs):
         raise AssertionError("fit or probe work was reached before source-drift rejection")

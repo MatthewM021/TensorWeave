@@ -70,16 +70,15 @@ Candidate-fit cleanliness remains a typed, hash-bound trusted-runner
 certificate because candidate models are not serialized; the 40 final models'
 direct-TRAIN fits are independently replayed.
 
-The later Phase-III `opaque_partial_operators.py` module is intentionally not
-added to either frozen Phase-II source closure.  On the current head, the
-historical Power V2 and V4 production loaders therefore reject execution as
-post-freeze source drift.  Regression tests verify that this is exactly one
-added file, with no removed or changed recorded file, and that rejection occurs
-before fitting or probing.  A positive production replay requires the frozen
-V4 source bundle/commit; the immutable Phase-II artifacts are not regenerated
-or reclassified to follow later code.
+The later Phase-III modules are intentionally not added to either frozen
+Phase-II source closure. On the current head, the historical Power V2 and V4
+production loaders therefore reject execution as post-freeze source drift.
+Regression tests verify the later additions, with no removed or changed
+recorded file, and that rejection occurs before fitting or probing. A positive
+production replay requires the frozen V4 source bundle/commit; the immutable
+Phase-II artifacts are not regenerated or reclassified to follow later code.
 
-Phase III now has two local bounded checkpoints.  The first recovers the
+Phase III now has three local bounded checkpoints. The first recovers the
 finite zero-suffix diagnostic state block at exact rank `4 -> 5` from opaque
 tokens after one two-label membership response; it makes no transition-
 operator claim.  The second keeps the absence-aware contract guarded and
@@ -88,6 +87,37 @@ controls and eight rotated omissions reconstruct all 44 legal edges, predict
 64 sealed edges and 120 long/path programs exactly, reject all 460 undefined
 edges, and retain exact off-domain total-extension nullity 80 per environment.
 The 15-edge excitation basis and postfit state/event correspondences are
-trusted-controller inputs.  These are honest-code synthetic protocol
-rehearsals—not process-isolated, autonomous acquisition, total-WFA,
-factorization, natural-language, or assumption-free representation evidence.
+trusted-controller inputs.
+
+The official third checkpoint is preserved under
+`phase3_t2_opaque_active_discovery/`. It retains the supplied finite grammar,
+legality mask, passive rows, and unordered candidate pool, but autonomously
+selects the causal excitation sequence. Its two controls and eight omissions
+used 112 membership responses / 224 labels, made eight answer-free structural
+inferences, and left 64 candidates sealed. All 440 legal rows and 120 long/path
+programs were exact, all 460 undefined pairs were rejected, and five postfit
+gauge certificates passed. The T1-first-14 reuse control remained
+nonidentified. The truth-aware postfit teaching control accounted for 104
+counterfactual queries, 16 singleton inferences, 64 unopened candidates, 208
+labels, and zero new membership calls; it is noncausal and selection-
+ineligible.
+
+The official protocol/source-runtime/terminal/report record SHA-256 values are
+`7c5ee8bcee72e0af5ac2d8404f54b479e1b7d1b1200922ec40caf66483c04292`,
+`514ebb445d3eb00e456095bf3377bf4f7eb2e15a4282e0765ca307b5203e5e90`,
+`31b3849c7a469ed380c68502193287e4917ee07170bbbd9c3c95d837055c1352`,
+and
+`9993913e5f60a73ce41fb08803c7dab24511165a4dc636e89b065d68be59c40f`.
+The terminal and report raw-file SHA-256 values are
+`e5e2524285c970eff1e45474d43aee43cf26615ce8ae89aa19b43dd0aa5b0819`
+and
+`89b1fa8fa2d5f21fd001143d8275fcde94acdac964169828d55f566386ae5bd9`.
+`SUMMARY.json` has record/file SHA-256 values
+`d70a52a187b8341bdfc072043fdba629803f5177385181109dd49ac191c6929b`
+and
+`d44abe1afb0e175fb160efccabfe084390018b1c87a994ecdbacfae74a68c7a3`;
+the 14-row `EVIDENCE.sha256` manifest has raw SHA-256
+`1ca40ffb794134599f39ec3ce6db25b9b58f00d2430658d938df91554f3dba00`.
+All three checkpoints remain honest-code synthetic rehearsals, not process-
+isolated total-WFA, factorization, natural-language, global-query-minimality,
+or assumption-free representation evidence.

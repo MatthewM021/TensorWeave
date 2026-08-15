@@ -5,10 +5,11 @@
 The full arbitrary-suffix operator and factorization campaign remains a
 pre-execution research protocol.  It specifies the first full operator-and-
 factorization experiment that removes the supplied addressable-register
-coordinates used in Phase II.  Bounded zero-suffix diagnostic and guarded
-partial-operator checkpoints have now been completed and are reported
-explicitly below; none of the broader total-operator, factorization, or scaling
-results has yet been obtained.
+coordinates used in Phase II. Bounded zero-suffix diagnostic, controller-
+supplied guarded partial-operator, and learner-selected guarded partial-
+operator checkpoints have now been completed and are reported explicitly
+below; none of the broader total-operator, factorization, or scaling results
+has yet been obtained.
 
 The primary question is deliberately narrower than "discover a geometry of
 language":
@@ -889,6 +890,56 @@ This demonstrates exact guarded-map recovery when a trusted controller
 supplies enough legal-domain excitation.  It does not demonstrate autonomous
 query design, total-WFA identification, off-domain behavior, factorization,
 process isolation, or assumption-free representation discovery.
+
+### T2: learner-selected guarded partial operators
+
+The official bounded T2 campaign is implemented by
+`v3/src/tnlm_v3/opaque_active_discovery.py` and its sealed protocol wrapper.
+It retains T1's supplied nine-state categorical grammar, complete legality
+mask, 21 passive omission edges, and unordered 23-edge membership-query pool,
+but removes T1's controller-designed excitation ordering. The learner commits
+each request before receiving its two-label response and uses only opaque
+diagnostics, the legal mask, its passive input, and its causal transcript.
+
+Two full-support controls and eight omission arms passed. Across the omissions,
+the learner made 112 membership requests containing 224 returned labels,
+derived eight answer-sidecar-free structural inferences, and left 64 candidates
+sealed. Every omission realized `21 passive + 14 queried + 1 inferred + 8
+sealed = 44` legal edges and identified all ten restricted maps. Across the ten
+arms, all 440 defined rows and 120 long/path programs were exact, all 460
+undefined pairs were rejected, and five exact controller-aligned postfit gauge
+certificates passed. Every total operator remained absent and exact off-domain
+extension nullity remained 80 per environment.
+
+The controller-supplied postfit reuse-the-first-14-T1-edges baseline remained
+nonidentified in all eight omissions. A separate truth-aware, noncausal
+teaching-set control used 104 counterfactual requests, 208 labels, 16 singleton
+inferences, 64 unopened candidates, and zero new membership calls. That control
+is evidence about a smaller truth-specific teaching set only; it is ineligible
+for autonomous selection, confirmation, or a global query-minimality claim.
+
+The official protocol SHA-256 is
+`7c5ee8bcee72e0af5ac2d8404f54b479e1b7d1b1200922ec40caf66483c04292`,
+and the source/runtime binding is
+`514ebb445d3eb00e456095bf3377bf4f7eb2e15a4282e0765ca307b5203e5e90`.
+The terminal record/raw-file SHA-256 values are respectively
+`31b3849c7a469ed380c68502193287e4917ee07170bbbd9c3c95d837055c1352`
+and
+`e5e2524285c970eff1e45474d43aee43cf26615ce8ae89aa19b43dd0aa5b0819`;
+the opened report record/raw-file values are
+`9993913e5f60a73ce41fb08803c7dab24511165a4dc636e89b065d68be59c40f`
+and
+`89b1fa8fa2d5f21fd001143d8275fcde94acdac964169828d55f566386ae5bd9`.
+The evidence is preserved under
+`v3_recovery/phase3_t2_opaque_active_discovery/` and is authoritative only
+through complete environment/report reconstruction.
+
+T2 demonstrates autonomous causal acquisition within a supplied finite
+grammar, legal-domain mask, and candidate pool, followed by arbitrary-length
+guarded-language equivalence. It does not demonstrate a total WFA, globally
+minimal query count, autonomous vocabulary or legality discovery,
+factorization, natural-language learning, or assumption-free representation
+discovery.
 
 ## Required reporting
 

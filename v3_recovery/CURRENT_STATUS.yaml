@@ -136,11 +136,12 @@ validated_reconstruction:
         source_tree: e59ca383e984177ea337c1a2037bfbe48687cdda
         ci_run: https://github.com/MatthewM021/TensorWeave/actions/runs/31720252790
         ci_status: passed
-    v3_source_tests_collected: 986
-    v3_default_tests_passed: 982
-    v3_default_tests_skipped: 4
+    v3_source_tests_collected: 1042
+    v3_default_tests_passed: 1031
+    v3_default_tests_skipped: 11
     v3_opt_in_phase2_slow_tests_passed: 2
-    v3_effective_tests_passed: 984
+    v3_opt_in_phase3_t2_tests_passed: 7
+    v3_effective_tests_passed: 1040
     v3_effective_tests_skipped: 2
     v3_source_tests_scope: current_local_source_suite_not_screen_or_scientific_campaign_evidence
     repository_verifier:
@@ -350,7 +351,7 @@ validated_reconstruction:
       claim_scope: coefficient_recovery_inside_supplied_addressable_register_representation
       confirmatory: false
       frozen_source_snapshot_required_for_positive_production_replay: true
-      current_head_postfreeze_source_additions: 1
+      current_head_postfreeze_source_additions: 4
       current_head_changed_or_removed_frozen_source_files: 0
       current_head_production_loader_fails_closed_before_fit_or_probe: true
     phase_3_opaque_zero_suffix_miniature:
@@ -418,13 +419,83 @@ validated_reconstruction:
       total_wfa_operator_discovery: false
       off_domain_behavior_identified: false
       tensor_factor_discovery: false
+    phase_3_autonomous_guarded_discovery_t2:
+      status: completed_official_bounded_pass
+      scope: autonomous_causal_query_selection_inside_supplied_finite_guarded_problem
+      environments: 10
+      full_support_controls: 2
+      rotated_omissions: 8
+      supplied_structure:
+        finite_categorical_state_grammar: true
+        complete_legality_mask: true
+        passive_rows_per_omission: 21
+        unordered_candidate_pool_per_omission: 23
+        postfit_similarity_correspondence: trusted_controller_supplied
+      omission_active_membership_responses: 14
+      target_label_fields_per_membership_response: 2
+      omission_structural_inferences: 1
+      omission_sealed_edges: 8
+      passive_edges_total: 256
+      active_membership_responses_total: 112
+      returned_target_label_fields_total: 224
+      structural_inferences_total: 8
+      sealed_edges_exact: 64
+      sealed_edges_total: 64
+      legal_edges_exact: 440
+      legal_edges_total: 440
+      undefined_edges_rejected: 460
+      undefined_edges_total: 460
+      sealed_long_path_programs_exact: 120
+      sealed_long_path_programs_total: 120
+      restricted_event_maps_identified_per_environment: 10
+      serialized_total_operators: 0
+      total_extension_nullity_per_environment: 80
+      exact_rational_similarity_certificates: 5
+      guarded_arbitrary_length_language_equivalence: true
+      t1_first_14_reuse_control:
+        controller_supplied_postfit_negative_control: true
+        nonidentified_omissions: 8
+        identified_omissions: 0
+        remaining_non_singleton_events_per_omission: 1
+        compatible_versions_for_remaining_event: 9
+      postfit_truth_aware_teaching_control:
+        counterfactual_truth_selected_queries: 104
+        answer_free_singleton_inferences: 16
+        counterfactual_unopened_candidates: 64
+        counterfactual_returned_categorical_labels: 208
+        new_membership_calls: 0
+        restricted_maps_closed: 80
+        truth_specific_noncausal: true
+        autonomous_selection_eligible: false
+        confirmatory_eligible: false
+      evidence:
+        directory: phase3_t2_opaque_active_discovery
+        protocol_sha256: 7c5ee8bcee72e0af5ac2d8404f54b479e1b7d1b1200922ec40caf66483c04292
+        source_runtime_binding_sha256: 514ebb445d3eb00e456095bf3377bf4f7eb2e15a4282e0765ca307b5203e5e90
+        terminal_record_sha256: 31b3849c7a469ed380c68502193287e4917ee07170bbbd9c3c95d837055c1352
+        terminal_file_sha256: e5e2524285c970eff1e45474d43aee43cf26615ce8ae89aa19b43dd0aa5b0819
+        report_record_sha256: 9993913e5f60a73ce41fb08803c7dab24511165a4dc636e89b065d68be59c40f
+        report_file_sha256: 89b1fa8fa2d5f21fd001143d8275fcde94acdac964169828d55f566386ae5bd9
+        summary_record_sha256: d70a52a187b8341bdfc072043fdba629803f5177385181109dd49ac191c6929b
+        summary_file_sha256: d44abe1afb0e175fb160efccabfe084390018b1c87a994ecdbacfae74a68c7a3
+        evidence_manifest_file_sha256: 1ca40ffb794134599f39ec3ce6db25b9b58f00d2430658d938df91554f3dba00
+        evidence_manifest_rows: 14
+      honest_code_api_boundary: true
+      cryptographic_or_process_isolation: false
+      global_query_minimality_established: false
+      total_wfa_operator_discovery: false
+      natural_language_evidence: false
+      assumption_free_representation_discovery: false
+      tensor_factor_discovery: false
     limitations:
       - post_v3_corrective_replication_is_nonconfirmatory
       - two_replicates_per_cell
       - penalty_strength_not_empirically_identified
       - register_representation_and_query_gauge_supplied
       - trusted_controller_used_oracle_occupancy_and_dependency_metadata
-      - phase_3_active_excitation_basis_and_similarity_correspondences_supplied_by_trusted_controller
+      - phase_3_t1_active_excitation_basis_and_similarity_correspondences_supplied_by_trusted_controller
+      - phase_3_t2_grammar_legality_mask_candidate_pool_and_postfit_similarity_correspondences_supplied
+      - phase_3_t2_does_not_establish_global_query_minimality
       - phase_3_guarded_maps_do_not_identify_total_operator_extensions
       - frozen_phase_2_production_replay_requires_the_frozen_source_snapshot
       - not_representation_discovery

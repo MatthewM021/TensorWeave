@@ -198,11 +198,12 @@ the three paired results, applies the predeclared source and compact-quality
 gates, and writes a checksum-bound promotion record with a decision of
 `complete_promote` or `complete_do_not_promote`.
 
-The current local V3 suite collects 986 tests.  Its default run passes 982 with
-four skips; the two opt-in Phase-II discovery regressions pass separately.
-The remaining skips are the CUDA-only check and the frozen-snapshot-only
-40-environment Phase-II campaign replay.  This is local source
-verification, not screen or scientific campaign evidence.
+The current local V3 suite collects 1,042 tests. Its default run passes 1,031
+with 11 skips; two opt-in Phase-II discovery regressions and seven opt-in
+Phase-III T2 regressions pass separately. The two remaining effective skips
+are the CUDA-only check and the frozen-snapshot-only 40-environment Phase-II
+campaign replay. This is local source verification, not screen or scientific
+campaign evidence.
 The screen remains non-claiming: it exposes no test or scaling stream, and its
 schema-mandatory runtime declaration does not produce runtime or RSS evidence.
 No screen run or promotion decision has yet been produced. Pilot-scale trained
@@ -259,12 +260,11 @@ post-V3 corrective result is nonconfirmatory and remains limited to coefficient
 recovery in the supplied representation.  Evidence is in
 `../v3_recovery/phase2_outer_rotation_v4/`.
 
-That Phase-II execution remains bound to its frozen source snapshot.  The
-later Phase-III module is an explicit one-file source-closure addition, so the
-historical production loaders fail closed on the current head before fitting
-or probing.  Tests audit that no file recorded by the old closures changed;
-the old evidence is neither regenerated nor silently treated as current-source
-execution.
+That Phase-II execution remains bound to its frozen source snapshot. The later
+Phase-III modules are explicit source-closure additions, so the historical
+production loaders fail closed on the current head before fitting or probing.
+Tests audit that no file recorded by the old closures changed; the old evidence
+is neither regenerated nor silently treated as current-source execution.
 
 The first bounded Phase III checkpoint is also executable.  Its learner sees
 only opaque diagnostic tokens and answers under an honest-code API boundary.
@@ -286,3 +286,24 @@ and the postfit similarity correspondences, so this is partial-map recovery
 under supplied experimental structure—not autonomous acquisition, a total
 WFA, or representation discovery.  The broader preregistered design remains in
 `../docs/V3_PHASE3_PREDICTIVE_STATE_DISCOVERY.md`.
+
+The official third bounded checkpoint removes the controller-supplied T1
+excitation ordering while retaining the supplied finite categorical grammar,
+legality mask, passive table, and unordered legal query pool. Across the eight
+omissions, its causal learner chose 112 membership requests, received 224
+labels, made eight answer-free structural inferences, and left 64 candidate
+edges sealed. With the two full-support controls, all 440 legal rows and 120
+long/path programs were exact, all 460 undefined pairs were rejected, and five
+postfit gauge certificates passed. The postfit T1-first-14 reuse baseline
+remained nonidentified in every omission.
+
+A truth-aware teaching control found a smaller `104 queries + 16 inferences`
+closure with 64 candidates unopened and 208 counterfactual labels, but made no
+new membership calls and is noncausal and selection-ineligible. The official
+protocol, source/runtime binding, terminal record, and opened report hashes
+begin `7c5ee8bc`, `514ebb45`, `31b3849c`, and `9993913e`; the full identities
+and evidence paths are recorded in
+`../docs/V3_PHASE3_T2_AUTONOMOUS_GUARDED_DISCOVERY.md`. This supports autonomous
+causal query selection only inside the supplied guarded problem. It does not
+identify a total WFA, establish global query minimality, learn from natural
+language, or provide assumption-free representation discovery.
